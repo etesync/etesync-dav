@@ -24,7 +24,7 @@ class Authenticator:
         return data['token']
 
 
-class Base:
+class RawBase:
     def __init__(self, cryptoManager, content, uid):
         self.cryptoManager = cryptoManager
         self.uid = uid
@@ -35,7 +35,7 @@ class Base:
         return self.cryptoManager.decrypt(self.content)
 
 
-class Journal(Base):
+class RawJournal(RawBase):
     def __init__(self, cryptoManager, content, uid):
         super().__init__(cryptoManager, content, uid)
         self.hmac = content[:HMAC_SIZE]
@@ -49,7 +49,7 @@ class Journal(Base):
             raise Exception('HMAC MISMATCH')
 
 
-class Entry(Base):
+class RawEntry(RawBase):
     def calcHmac(self, prev):
         prevUid = b''
         if prev is not None:
@@ -78,7 +78,7 @@ class BaseManager:
             version = j['version']
             content = base64.b64decode(j['content'])
             cryptoManager = CryptoManager(version, password, uid.encode('utf-8'))
-            journal = Journal(cryptoManager=cryptoManager, content=content, uid=uid)
+            journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
             yield journal
 
 
@@ -98,7 +98,7 @@ class JournalManager:
             version = j['version']
             content = base64.b64decode(j['content'])
             cryptoManager = CryptoManager(version, password, uid.encode('utf-8'))
-            journal = Journal(cryptoManager=cryptoManager, content=content, uid=uid)
+            journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
             yield journal
 
 
@@ -114,14 +114,14 @@ class EntryManager:
         remote = self.remote.copy()
         prev = None
         if last is not None:
-            prev = Entry(cryptoManager, b'', last)
+            prev = RawEntry(cryptoManager, b'', last)
             remote.args['last'] = last
         response = self.opener.open(remote.url)
         data = json.loads(response.read().decode())
         for j in data:
             uid = j['uid']
             content = base64.b64decode(j['content'])
-            entry = Entry(cryptoManager=cryptoManager, content=content, uid=uid)
+            entry = RawEntry(cryptoManager=cryptoManager, content=content, uid=uid)
             entry.verify(prev)
             prev = entry
             yield entry
