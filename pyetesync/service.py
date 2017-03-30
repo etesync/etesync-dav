@@ -125,3 +125,24 @@ class EntryManager:
             entry.verify(prev)
             prev = entry
             yield entry
+
+
+class SyncEntry:
+    def __init__(self, action, content):
+        self.action = action
+        self.content = content
+
+    @classmethod
+    def from_json(cls, json_string):
+        data = json.loads(json_string)
+        return SyncEntry(data['action'], data['content'])
+
+
+class JournalInfo:
+    def __init__(self, journal_type):
+        self.journal_type = journal_type
+
+    @classmethod
+    def from_json(cls, json_string):
+        data = json.loads(json_string)
+        return JournalInfo(data['type'])
