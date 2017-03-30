@@ -62,7 +62,36 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        return cache.JournalEntity.select()
+        for cache_journal in cache.JournalEntity.select():
+            yield Journal(cache_journal)
 
     def get(self, uid):
-        return cache.JournalEntity.get(uid=uid)
+        return Journal(cache.JournalEntity.get(uid=uid))
+
+
+class ApiObjectBase:
+    def __init__(self, cache_obj):
+        self.cache_obj = cache_obj
+
+    @property
+    def uid(self):
+        return self.cache_obj.uid
+
+    @property
+    def content(self):
+        return self.cache_obj.content
+
+
+class Entry(ApiObjectBase):
+    pass
+
+
+class Journal(ApiObjectBase):
+    @property
+    def version(self):
+        return self.cache_obj.version
+
+    @property
+    def entries(self):
+        for entry in self.cache_obj.entries:
+            yield Entry(entry)
