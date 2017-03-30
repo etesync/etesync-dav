@@ -53,12 +53,12 @@ class EteSync:
         collection = Journal(journal).collection
 
         try:
-            last = journal.entries.order_by(cache.EntryEntity.id.desc()).get().uid
+            last = journal.entries.order_by(cache.EntryEntity.id.desc()).get()
         except cache.EntryEntity.DoesNotExist:
             last = None
 
-        prev = None
-        for entry in manager.list(cryptoManager, last):
+        prev = last
+        for entry in manager.list(cryptoManager, last.uid):
             entry.verify(prev)
             syncEntry = SyncEntry.from_json(entry.getContent().decode())
             collection.apply_sync_entry(syncEntry)
