@@ -1,7 +1,6 @@
 import peewee as pw
-from playhouse.sqlite_ext import SqliteExtDatabase
 
-db = SqliteExtDatabase('my_database.db')
+from .db import db
 
 
 class BaseModel(pw.Model):
@@ -18,6 +17,7 @@ class Journal(BaseModel):
     version = pw.IntegerField()
     uid = pw.CharField(unique=True, null=False, index=True)
     content = pw.BlobField()
+    deleted = pw.BooleanField(null=False, default=False)
 
 
 class Entry(BaseModel):
@@ -29,5 +29,4 @@ class Entry(BaseModel):
         order_by = ('id', )
 
 
-db.connect()
 db.create_tables([User, Journal, Entry], safe=True)
