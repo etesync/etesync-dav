@@ -37,7 +37,7 @@ class EteSync:
 
         journal = cache.JournalEntity.get(uid=journal_uid)
         cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
-        journalInfo = JournalInfo.from_json(journal.content)
+        collection = Journal(journal).collection
 
         try:
             last = journal.entries.order_by(cache.EntryEntity.id.desc()).get().uid
@@ -48,10 +48,7 @@ class EteSync:
         for entry in manager.list(cryptoManager, last):
             entry.verify(prev)
             syncEntry = SyncEntry.from_json(entry.getContent().decode())
-            if journalInfo.journal_type == 'ADDRESS_BOOK':
-                pim.Contact.apply_sync_entry(journal, syncEntry)
-            elif journalInfo.journal_type == 'CALENDAR':
-                pim.Event.apply_sync_entry(journal, syncEntry)
+            collection.apply_sync_entry(syncEntry)
             cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
 
             prev = entry
@@ -86,6 +83,21 @@ class Entry(ApiObjectBase):
     pass
 
 
+class BaseCollection:
+    def __init__(self, journal):
+        self.cache_journal = journal.cache_obj
+
+
+class Calendar(BaseCollection):
+    def apply_sync_entry(self, sync_entry):
+        pim.Event.apply_sync_entry(self.cache_journal, sync_entry)
+
+
+class AddressBook(BaseCollection):
+    def apply_sync_entry(self, sync_entry):
+        pim.Contact.apply_sync_entry(self.cache_journal, sync_entry)
+
+
 class Journal(ApiObjectBase):
     @property
     def version(self):
@@ -95,3 +107,11 @@ class Journal(ApiObjectBase):
     def entries(self):
         for entry in self.cache_obj.entries:
             yield Entry(entry)
+
+    @property
+    def collection(self):
+        journal_info = JournalInfo.from_json(self.content)
+        if journal_info.journal_type == 'ADDRESS_BOOK':
+            return AddressBook(self)
+        elif journal_info.journal_type == 'CALENDAR':
+            return Calendar(self)
