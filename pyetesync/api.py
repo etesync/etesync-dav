@@ -6,10 +6,11 @@ API_URL = 'https://api.etesync.com/'
 
 
 class EteSync:
-    def __init__(self, email, auth_token, remote=API_URL):
+    def __init__(self, email, auth_token, remote=API_URL, cipher_key=None):
         self.email = email
         self.auth_token = auth_token
         self.remote = remote
+        self.cipher_key = cipher_key
 
         self.user, created = cache.User.get_or_create(username=email)
 
