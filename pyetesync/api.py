@@ -72,7 +72,7 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        for cache_journal in cache.JournalEntity.select().where(cache.JournalEntity.deleted == False):
+        for cache_journal in cache.JournalEntity.select().where(~cache.JournalEntity.deleted):
             yield Journal(cache_journal)
 
     def get(self, uid):
