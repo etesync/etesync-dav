@@ -1,8 +1,11 @@
 from .crypto import CryptoManager, derive_key
 from .service import JournalManager, EntryManager, SyncEntry, JournalInfo
-from . import cache, pim
+from . import cache, pim, service
 
 API_URL = 'https://api.etesync.com/'
+
+# Expose the authenticator
+Authenticator = service.Authenticator
 
 
 class EteSync:
