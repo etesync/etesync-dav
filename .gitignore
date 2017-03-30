@@ -1,6 +1,7 @@
 Session.vim
 /.venv
 /.coverage
+/etesync.db
 
 __pycache__
 .*.swp
