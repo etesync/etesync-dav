@@ -105,8 +105,17 @@ class Contact(ApiObjectBase):
 
 
 class BaseCollection:
-    def __init__(self, journal):
+    def __init__(self, journal, journal_info):
         self.cache_journal = journal.cache_obj
+        self.journal_info = journal_info
+
+    @property
+    def display_name(self):
+        return self.journal_info.display_name
+
+    @property
+    def description(self):
+        return self.journal_info.description
 
 
 class Calendar(BaseCollection):
@@ -138,9 +147,9 @@ class Journal(ApiObjectBase):
     def collection(self):
         journal_info = JournalInfo.from_json(self.content)
         if journal_info.journal_type == 'ADDRESS_BOOK':
-            return AddressBook(self)
+            return AddressBook(self, journal_info)
         elif journal_info.journal_type == 'CALENDAR':
-            return Calendar(self)
+            return Calendar(self, journal_info)
 
     # CRUD
     def list(self):
