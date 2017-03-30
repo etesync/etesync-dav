@@ -83,6 +83,14 @@ class Entry(ApiObjectBase):
     pass
 
 
+class Event(ApiObjectBase):
+    pass
+
+
+class Contact(ApiObjectBase):
+    pass
+
+
 class BaseCollection:
     def __init__(self, journal):
         self.cache_journal = journal.cache_obj
@@ -92,10 +100,20 @@ class Calendar(BaseCollection):
     def apply_sync_entry(self, sync_entry):
         pim.Event.apply_sync_entry(self.cache_journal, sync_entry)
 
+    # CRUD
+    def list(self):
+        for event in self.cache_journal.event_set:
+            yield Event(event)
+
 
 class AddressBook(BaseCollection):
     def apply_sync_entry(self, sync_entry):
         pim.Contact.apply_sync_entry(self.cache_journal, sync_entry)
+
+    # CRUD
+    def list(self):
+        for contact in self.cache_journal.contact_set:
+            yield Contact(contact)
 
 
 class Journal(ApiObjectBase):
@@ -104,14 +122,14 @@ class Journal(ApiObjectBase):
         return self.cache_obj.version
 
     @property
-    def entries(self):
-        for entry in self.cache_obj.entries:
-            yield Entry(entry)
-
-    @property
     def collection(self):
         journal_info = JournalInfo.from_json(self.content)
         if journal_info.journal_type == 'ADDRESS_BOOK':
             return AddressBook(self)
         elif journal_info.journal_type == 'CALENDAR':
             return Calendar(self)
+
+    # CRUD
+    def list(self):
+        for entry in self.cache_obj.entries:
+            yield Entry(entry)
