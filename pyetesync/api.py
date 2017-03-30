@@ -70,6 +70,9 @@ class ApiObjectBase:
     def __init__(self, cache_obj):
         self.cache_obj = cache_obj
 
+    def __repr__(self):
+        return '<{} {}>'.format(self.__class__.__name__, self.uid)
+
     @property
     def uid(self):
         return self.cache_obj.uid
