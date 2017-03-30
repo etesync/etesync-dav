@@ -1,7 +1,7 @@
 import peewee as pw
 import vobject
 
-from .cache import Journal
+from .cache import JournalEntity
 from .db import db
 
 
@@ -11,7 +11,7 @@ class BaseModel(pw.Model):
 
 
 class BaseContent(BaseModel):
-    journal = pw.ForeignKeyField(Journal)
+    journal = pw.ForeignKeyField(JournalEntity)
     uid = pw.UUIDField(unique=True, null=False, index=True)
     content = pw.BlobField()
 

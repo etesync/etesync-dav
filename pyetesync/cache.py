@@ -12,7 +12,7 @@ class User(BaseModel):
     username = pw.CharField(unique=True, null=False)
 
 
-class Journal(BaseModel):
+class JournalEntity(BaseModel):
     owner = pw.ForeignKeyField(User, related_name='journals')
     version = pw.IntegerField()
     uid = pw.CharField(unique=True, null=False, index=True)
@@ -20,8 +20,8 @@ class Journal(BaseModel):
     deleted = pw.BooleanField(null=False, default=False)
 
 
-class Entry(BaseModel):
-    journal = pw.ForeignKeyField(Journal, related_name='entries')
+class EntryEntity(BaseModel):
+    journal = pw.ForeignKeyField(JournalEntity, related_name='entries')
     uid = pw.CharField(unique=True, null=False, index=True)
     content = pw.BlobField()
 
@@ -29,4 +29,4 @@ class Entry(BaseModel):
         order_by = ('id', )
 
 
-db.create_tables([User, Journal, Entry], safe=True)
+db.create_tables([User, JournalEntity, EntryEntity], safe=True)

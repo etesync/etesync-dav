@@ -25,9 +25,9 @@ class EteSync:
         for entry in manager.list(self.cipher_key):
             entry.verify()
             try:
-                journal = cache.Journal.get(uid=entry.uid)
-            except cache.Journal.DoesNotExist:
-                journal = cache.Journal(owner=self.user, version=entry.version, uid=entry.uid)
+                journal = cache.JournalEntity.get(uid=entry.uid)
+            except cache.JournalEntity.DoesNotExist:
+                journal = cache.JournalEntity(owner=self.user, version=entry.version, uid=entry.uid)
             journal.content = entry.getContent()
             journal.save()
 
@@ -35,13 +35,13 @@ class EteSync:
         journal_uid = uid
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
-        journal = cache.Journal.get(uid=journal_uid)
+        journal = cache.JournalEntity.get(uid=journal_uid)
         cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
         journalInfo = JournalInfo.from_json(journal.content)
 
         try:
-            last = journal.entries.order_by(cache.Entry.id.desc()).get().uid
-        except cache.Entry.DoesNotExist:
+            last = journal.entries.order_by(cache.EntryEntity.id.desc()).get().uid
+        except cache.EntryEntity.DoesNotExist:
             last = None
 
         prev = None
@@ -52,7 +52,7 @@ class EteSync:
                 pim.Contact.apply_sync_entry(journal, syncEntry)
             elif journalInfo.journal_type == 'CALENDAR':
                 pim.Event.apply_sync_entry(journal, syncEntry)
-            cache.Entry.create(uid=entry.uid, content=entry.getContent(), journal=journal)
+            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
 
             prev = entry
 
@@ -62,7 +62,7 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        return cache.Journal.select()
+        return cache.JournalEntity.select()
 
     def get(self, uid):
-        return cache.Journal.get(uid=uid)
+        return cache.JournalEntity.get(uid=uid)
