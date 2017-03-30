@@ -130,6 +130,9 @@ class Calendar(BaseCollection):
         for event in self.cache_journal.event_set:
             yield Event(event)
 
+    def get(self, uid):
+        return Event(self.cache_journal.event_set.where(pim.Event.uid == uid).get())
+
 
 class AddressBook(BaseCollection):
     def apply_sync_entry(self, sync_entry):
@@ -139,6 +142,9 @@ class AddressBook(BaseCollection):
     def list(self):
         for contact in self.cache_journal.contact_set:
             yield Contact(contact)
+
+    def get(self, uid):
+        return Contact(self.cache_journal.contact_set.where(pim.Contact.uid == uid).get())
 
 
 class Journal(ApiObjectBase):
