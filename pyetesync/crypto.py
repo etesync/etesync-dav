@@ -1,6 +1,7 @@
 import pyaes
 import hashlib
 import hmac
+import pyscrypt
 
 CURRENT_VERSION = 2
 
@@ -10,6 +11,15 @@ AES_BLOCK_SIZE = int(128 / 8)  # 128bits in bytes
 
 def hmac256(key, data):
     return hmac.new(key, data, digestmod=hashlib.sha256).digest()
+
+
+def derive_key(user_password, salt):
+    return pyscrypt.hash(password=user_password.encode('utf-8'),
+                         salt=salt.encode('utf-8'),
+                         N=16384,
+                         r=8,
+                         p=1,
+                         dkLen=190)
 
 
 class CryptoManager:
