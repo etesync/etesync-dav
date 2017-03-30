@@ -4,4 +4,5 @@ Session.vim
 /etesync.db
 
 __pycache__
+*.egg-info
 .*.swp
