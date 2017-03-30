@@ -1,18 +1,13 @@
 import peewee as pw
 
-from .db import db
+from . import db
 
 
-class BaseModel(pw.Model):
-    class Meta:
-        database = db
-
-
-class User(BaseModel):
+class User(db.BaseModel):
     username = pw.CharField(unique=True, null=False)
 
 
-class JournalEntity(BaseModel):
+class JournalEntity(db.BaseModel):
     owner = pw.ForeignKeyField(User, related_name='journals')
     version = pw.IntegerField()
     uid = pw.CharField(unique=True, null=False, index=True)
@@ -20,7 +15,7 @@ class JournalEntity(BaseModel):
     deleted = pw.BooleanField(null=False, default=False)
 
 
-class EntryEntity(BaseModel):
+class EntryEntity(db.BaseModel):
     journal = pw.ForeignKeyField(JournalEntity, related_name='entries')
     uid = pw.CharField(unique=True, null=False, index=True)
     content = pw.BlobField()
@@ -29,4 +24,4 @@ class EntryEntity(BaseModel):
         order_by = ('id', )
 
 
-db.create_tables([User, JournalEntity, EntryEntity], safe=True)
+db.db.create_tables([User, JournalEntity, EntryEntity], safe=True)

@@ -2,15 +2,10 @@ import peewee as pw
 import vobject
 
 from .cache import JournalEntity
-from .db import db
+from . import db
 
 
-class BaseModel(pw.Model):
-    class Meta:
-        database = db
-
-
-class BaseContent(BaseModel):
+class BaseContent(db.BaseModel):
     journal = pw.ForeignKeyField(JournalEntity)
     uid = pw.UUIDField(unique=True, null=False, index=True)
     content = pw.BlobField()
@@ -50,4 +45,4 @@ class Contact(BaseContent):
         return vobj.uid.value
 
 
-db.create_tables([Event, Contact], safe=True)
+db.db.create_tables([Event, Contact], safe=True)
