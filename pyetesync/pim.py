@@ -16,8 +16,9 @@ class BaseContent(db.BaseModel):
 
         if sync_entry.action == 'DELETE':
             try:
-                content = cls.get(uid=uid).delete()
+                cls.get(uid=uid).delete_instance()
             except cls.DoesNotExist:
+                print("WARNING: Failed to delete " + uid)
                 pass
 
             return
