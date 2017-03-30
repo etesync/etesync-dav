@@ -22,14 +22,23 @@ class EteSync:
     def sync_journal_list(self):
         manager = JournalManager(self.remote, self.auth_token)
 
-        # FIXME: Handle deletions on server
+        existing = {}
+        for journal in self.list():
+            existing[journal.uid] = journal.cache_obj
+
         for entry in manager.list(self.cipher_key):
             entry.verify()
-            try:
-                journal = cache.JournalEntity.get(uid=entry.uid)
-            except cache.JournalEntity.DoesNotExist:
+            if entry.uid in existing:
+                journal = existing[entry.uid]
+                del existing[journal.uid]
+            else:
                 journal = cache.JournalEntity(owner=self.user, version=entry.version, uid=entry.uid)
             journal.content = entry.getContent()
+            journal.save()
+
+        # Delete remaining
+        for journal in existing.values():
+            journal.deleted = True
             journal.save()
 
     def sync_journal(self, uid):
@@ -60,11 +69,11 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        for cache_journal in cache.JournalEntity.select():
+        for cache_journal in cache.JournalEntity.select().where(cache.JournalEntity.deleted == False):
             yield Journal(cache_journal)
 
     def get(self, uid):
-        return Journal(cache.JournalEntity.get(uid=uid))
+        return Journal(cache.JournalEntity.get(uid=uid, deleted=False))
 
 
 class ApiObjectBase:
