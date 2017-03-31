@@ -259,9 +259,9 @@ class BaseCollection:
         return self.get_content_class()(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
 
     @classmethod
-    def create(cls, owner, uid, content):
+    def create(cls, etesync, uid, content):
         cache_obj = cache.JournalEntity(new=True)
-        cache_obj.owner = owner
+        cache_obj.owner = etesync.owner
         cache_obj.uid = uid
         cache_obj.content = content
         cache_obj.version = CURRENT_VERSION
