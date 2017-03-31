@@ -1,3 +1,4 @@
+import os
 import pyaes
 import hashlib
 import hmac
@@ -32,17 +33,25 @@ class CryptoManager:
             key = hmac256(salt, key)
 
         self.version = version
-        self.cipherKey = hmac256(b'aes', key)
+        self.cipher_key = hmac256(b'aes', key)
         self.hmacKey = hmac256(b'hmac', key)
 
     def decrypt(self, ctext):
         iv = ctext[:AES_BLOCK_SIZE]
         ctext = ctext[AES_BLOCK_SIZE:]
-        aes = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(self.cipherKey, iv=iv))
+        aes = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(self.cipher_key, iv=iv))
 
         ret = aes.feed(ctext)
         ret += aes.feed()
         return ret
+
+    def encrypt(self, clear_text):
+        iv = os.urandom(AES_BLOCK_SIZE)
+        aes = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(self.cipher_key, iv=iv))
+
+        ret = aes.feed(clear_text)
+        ret += aes.feed()
+        return iv + ret
 
     def hmac(self, data):
         if self.version == 1:
