@@ -1,7 +1,8 @@
 import vobject
+import json
 
 from .crypto import CryptoManager, derive_key
-from .service import JournalManager, EntryManager, SyncEntry, JournalInfo
+from .service import JournalManager, EntryManager, SyncEntry
 from . import cache, pim, service
 
 API_URL = 'https://api.etesync.com/'
@@ -210,17 +211,22 @@ class Contact(PimObject):
 
 
 class BaseCollection:
-    def __init__(self, journal, journal_info):
+    def __init__(self, journal):
         self.cache_obj = journal.cache_obj
-        self.journal_info = journal_info
+        self.journal_info = json.loads(self.cache_obj.content)
 
     @property
     def display_name(self):
-        return self.journal_info.display_name
+        return self.journal_info.get('displayName')
 
     @property
     def description(self):
-        return self.journal_info.description
+        return self.journal_info.get('description')
+
+    @property
+    def update_info(self, update_info):
+        self.journal_info.update(update_info)
+        self.cache_obj.content = json.dumps(self.journal_info, ensure_ascii=False)
 
     def apply_sync_entry(self, sync_entry):
         journal = self.cache_obj
@@ -260,8 +266,7 @@ class BaseCollection:
         cache_obj.content = content
         cache_obj.version = version
         cache_obj.save()
-        journal_info = JournalInfo.from_json(content)
-        return cls(Journal(cache_obj), journal_info)
+        return cls(Journal(cache_obj))
 
     def delete(self):
         self.cache_obj.deleted = True
@@ -302,11 +307,11 @@ class Journal(ApiObjectBase):
 
     @property
     def collection(self):
-        journal_info = JournalInfo.from_json(self.content)
-        if journal_info.journal_type == AddressBook.TYPE:
-            return AddressBook(self, journal_info)
-        elif journal_info.journal_type == Calendar.TYPE:
-            return Calendar(self, journal_info)
+        journal_info = json.loads(self.content)
+        if journal_info.get('type') == AddressBook.TYPE:
+            return AddressBook(self)
+        elif journal_info.get('type') == Calendar.TYPE:
+            return Calendar(self)
 
     # CRUD
     def list(self):

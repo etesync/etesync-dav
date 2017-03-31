@@ -168,15 +168,3 @@ class SyncEntry:
     def to_json(self):
         data = {'action': self.action, 'content': self.content.decode()}
         return json.dumps(data, ensure_ascii=False)
-
-
-class JournalInfo:
-    def __init__(self, journal_type, display_name, description):
-        self.journal_type = journal_type
-        self.display_name = display_name
-        self.description = description
-
-    @classmethod
-    def from_json(cls, json_string):
-        data = json.loads(json_string)
-        return JournalInfo(data['type'], data.get('displayName', ''), data.get('description', ''))
