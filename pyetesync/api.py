@@ -213,7 +213,10 @@ class Contact(PimObject):
 class BaseCollection:
     def __init__(self, journal):
         self.cache_obj = journal.cache_obj
-        self.journal_info = json.loads(self.cache_obj.content)
+        if self.cache_obj.content is not None:
+            self.journal_info = json.loads(self.cache_obj.content)
+        else:
+            self.journal_info = self._get_default_info()
 
     @property
     def display_name(self):
@@ -223,10 +226,15 @@ class BaseCollection:
     def description(self):
         return self.journal_info.get('description')
 
-    @property
     def update_info(self, update_info):
-        self.journal_info.update(update_info)
+        if update_info is None:
+            self.journal_info = self._get_default_info()
+        else:
+            self.journal_info.update(update_info)
         self.cache_obj.content = json.dumps(self.journal_info, ensure_ascii=False)
+
+    def _get_default_info(self):
+        return {'type': self.__class__.TYPE, 'readOnly': False, 'selected': True}
 
     def apply_sync_entry(self, sync_entry):
         journal = self.cache_obj
@@ -263,10 +271,12 @@ class BaseCollection:
         cache_obj = cache.JournalEntity(new=True)
         cache_obj.owner = etesync.user
         cache_obj.uid = uid
-        cache_obj.content = content
         cache_obj.version = CURRENT_VERSION
+
+        ret = cls(Journal(cache_obj))
+        ret.update_info(content)
         cache_obj.save()
-        return cls(Journal(cache_obj))
+        return ret
 
     def delete(self):
         self.cache_obj.deleted = True
@@ -287,6 +297,11 @@ class Calendar(BaseCollection):
 
     def get_content_class(self):
         return Event
+
+    def _get_default_info(self):
+        ret = super()._get_default_info()
+        ret.update({'supportsVEVENT': True})
+        return ret
 
 
 class AddressBook(BaseCollection):
