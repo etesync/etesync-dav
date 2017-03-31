@@ -256,7 +256,7 @@ class BaseCollection:
             yield self.get_content_class()(content)
 
     def get(self, uid):
-        return self.get_content_class(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
+        return self.get_content_class()(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
 
     @classmethod
     def create(cls, owner, uid, content):
