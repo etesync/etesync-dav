@@ -1,5 +1,4 @@
-from urllib.request import build_opener
-import urllib.parse
+import requests
 import json
 import base64
 import binascii
@@ -17,10 +16,8 @@ class Authenticator:
         self.remote.path.normalize()
 
     def get_auth_token(self, username, password):
-        details = urllib.parse.urlencode({'username': username, 'password': password}).encode('utf-8')
-        request = urllib.request.Request(self.remote.url, details)
-        response = urllib.request.urlopen(request)
-        data = json.loads(response.read().decode())
+        response = requests.post(self.remote.url, data={'username': username, 'password': password})
+        data = response.json()
         return data['token']
 
 
@@ -63,16 +60,20 @@ class RawEntry(RawBase):
 
 
 class BaseManager:
-    def __init__(self, remote, authToken):
+    def __init__(self, auth_token):
+        self.headers = {'Authorization': 'Token ' + auth_token}
+
+
+class JournalManager(BaseManager):
+    def __init__(self, remote, auth_token):
+        super().__init__(auth_token)
         self.remote = furl(remote)
         self.remote.path.segments.extend(API_PATH + ('journals', ''))
         self.remote.path.normalize()
-        self.opener = build_opener()
-        self.opener.addheaders = [('Authorization', 'Token ' + authToken)]
 
     def list(self, password):
-        response = self.opener.open(self.remote.url)
-        data = json.loads(response.read().decode())
+        response = requests.get(self.remote.url, headers=self.headers)
+        data = response.json()
         for j in data:
             uid = j['uid']
             version = j['version']
@@ -82,33 +83,12 @@ class BaseManager:
             yield journal
 
 
-class JournalManager:
-    def __init__(self, remote, authToken):
-        self.remote = furl(remote)
-        self.remote.path.segments.extend(API_PATH + ('journals', ''))
-        self.remote.path.normalize()
-        self.opener = build_opener()
-        self.opener.addheaders = [('Authorization', 'Token ' + authToken)]
-
-    def list(self, password):
-        response = self.opener.open(self.remote.url)
-        data = json.loads(response.read().decode())
-        for j in data:
-            uid = j['uid']
-            version = j['version']
-            content = base64.b64decode(j['content'])
-            cryptoManager = CryptoManager(version, password, uid.encode('utf-8'))
-            journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
-            yield journal
-
-
-class EntryManager:
-    def __init__(self, remote, authToken, journalId):
+class EntryManager(BaseManager):
+    def __init__(self, remote, auth_token, journalId):
+        super().__init__(auth_token)
         self.remote = furl(remote)
         self.remote.path.segments.extend(API_PATH + ('journal', journalId, ''))
         self.remote.path.normalize()
-        self.opener = build_opener()
-        self.opener.addheaders = [('Authorization', 'Token ' + authToken)]
 
     def list(self, cryptoManager, last=None):
         remote = self.remote.copy()
@@ -116,8 +96,9 @@ class EntryManager:
         if last is not None:
             prev = RawEntry(cryptoManager, b'', last)
             remote.args['last'] = last
-        response = self.opener.open(remote.url)
-        data = json.loads(response.read().decode())
+
+        response = requests.get(remote.url, headers=self.headers)
+        data = response.json()
         for j in data:
             uid = j['uid']
             content = base64.b64decode(j['content'])
