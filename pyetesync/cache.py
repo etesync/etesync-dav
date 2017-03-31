@@ -24,6 +24,3 @@ class EntryEntity(db.BaseModel):
 
     class Meta:
         order_by = ('id', )
-
-
-db.db.create_tables([User, JournalEntity, EntryEntity], safe=True)

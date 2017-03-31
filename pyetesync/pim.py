@@ -16,6 +16,3 @@ class Content(db.BaseModel):
         indexes = (
             (('journal', 'uid'), True),
         )
-
-
-db.db.create_tables([Content], safe=True)

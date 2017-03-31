@@ -1,9 +1,10 @@
 import vobject
 import json
+import os
 
 from .crypto import CryptoManager, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
-from . import cache, pim, service
+from . import cache, pim, service, db
 
 API_URL = 'https://api.etesync.com/'
 
@@ -12,13 +13,35 @@ Authenticator = service.Authenticator
 
 
 class EteSync:
-    def __init__(self, email, auth_token, remote=API_URL, cipher_key=None):
+    def __init__(self, email, auth_token, remote=API_URL, cipher_key=None, db_path=None):
         self.email = email
         self.auth_token = auth_token
         self.remote = remote
         self.cipher_key = cipher_key
 
+        self._init_db(db_path)
+
         self.user, created = cache.User.get_or_create(username=email)
+
+    def _init_db(self, db_path):
+        from playhouse.sqlite_ext import SqliteExtDatabase
+
+        if db_path is None:
+            db_path = os.path.join(os.path.expanduser('~'), '.pyetesync', 'data.db')
+
+        directory = os.path.dirname(db_path)
+        if directory != '' and not os.path.exists(directory):
+            os.makedirs(directory)
+
+        database = SqliteExtDatabase(db_path)
+        database.connect()
+
+        db.database_proxy.initialize(database)
+
+        self._init_db_tables(database)
+
+    def _init_db_tables(self, database):
+        database.create_tables([pim.Content, cache.User, cache.JournalEntity, cache.EntryEntity], safe=True)
 
     def sync(self):
         self.sync_journal_list()
