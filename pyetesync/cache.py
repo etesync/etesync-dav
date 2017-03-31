@@ -12,6 +12,8 @@ class JournalEntity(db.BaseModel):
     version = pw.IntegerField()
     uid = pw.CharField(unique=True, null=False, index=True)
     content = pw.BlobField()
+    new = pw.BooleanField(null=False, default=False)
+    dirty = pw.BooleanField(null=False, default=False)
     deleted = pw.BooleanField(null=False, default=False)
 
 

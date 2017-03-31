@@ -25,6 +25,7 @@ class EteSync:
             self.sync_journal(journal.uid)
 
     def sync_journal_list(self):
+        self.push_journal_list()
         manager = JournalManager(self.remote, self.auth_token)
 
         existing = {}
@@ -44,6 +45,27 @@ class EteSync:
         # Delete remaining
         for journal in existing.values():
             journal.deleted = True
+            journal.save()
+
+    def push_journal_list(self):
+        manager = JournalManager(self.remote, self.auth_token)
+
+        changed = self.user.journals.where(cache.JournalEntity.dirty | cache.JournalEntity.new)
+
+        for journal in changed:
+            crypto_manager = CryptoManager(journal.version, self.cipher_key, journal.uid.encode())
+            raw_journal = service.RawJournal(crypto_manager, uid=journal.uid)
+            raw_journal.update(journal.content)
+
+            if journal.deleted:
+                manager.delete(raw_journal)
+            elif journal.new:
+                manager.add(raw_journal)
+                journal.new = False
+            else:
+                manager.update(raw_journal)
+
+            journal.dirty = False
             journal.save()
 
     def sync_journal(self, uid):
@@ -230,8 +252,30 @@ class BaseCollection:
     def get(self, uid):
         return self.get_content_class(self.cache_obj.event_set.where(pim.Content.uid == uid).get())
 
+    @classmethod
+    def create(cls, owner, uid, content, version):
+        cache_obj = cache.JournalEntity(new=True)
+        cache_obj.owner = owner
+        cache_obj.uid = uid
+        cache_obj.content = content
+        cache_obj.version = version
+        cache_obj.save()
+        journal_info = JournalInfo.from_json(content)
+        return cls(Journal(cache_obj), journal_info)
+
+    def delete(self):
+        self.cache_obj.deleted = True
+        self.cache_obj.dirty = True
+        self.cache_obj.save()
+
+    def save(self):
+        self.cache_obj.dirty = True
+        self.cache_obj.save()
+
 
 class Calendar(BaseCollection):
+    TYPE = 'CALENDAR'
+
     def get_uid(self, sync_entry):
         vobj = vobject.readOne(sync_entry.content)
         return vobj.vevent.uid.value
@@ -241,6 +285,8 @@ class Calendar(BaseCollection):
 
 
 class AddressBook(BaseCollection):
+    TYPE = 'ADDRESS_BOOK'
+
     def get_uid(self, sync_entry):
         vobj = vobject.readOne(sync_entry.content)
         return vobj.uid.value
@@ -257,9 +303,9 @@ class Journal(ApiObjectBase):
     @property
     def collection(self):
         journal_info = JournalInfo.from_json(self.content)
-        if journal_info.journal_type == 'ADDRESS_BOOK':
+        if journal_info.journal_type == AddressBook.TYPE:
             return AddressBook(self, journal_info)
-        elif journal_info.journal_type == 'CALENDAR':
+        elif journal_info.journal_type == Calendar.TYPE:
             return Calendar(self, journal_info)
 
     # CRUD

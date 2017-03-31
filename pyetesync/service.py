@@ -40,10 +40,11 @@ class RawBase:
 
 
 class RawJournal(RawBase):
-    def __init__(self, cryptoManager, content, uid):
+    def __init__(self, cryptoManager, content=None, uid=None):
         super().__init__(cryptoManager, content, uid)
-        self.hmac = content[:HMAC_SIZE]
-        self.content = content[HMAC_SIZE:]
+        if content is not None:
+            self.hmac = content[:HMAC_SIZE]
+            self.content = content[HMAC_SIZE:]
 
     def calcHmac(self):
         return self.cryptoManager.hmac(self.uid.encode() + self.content)
@@ -53,10 +54,12 @@ class RawJournal(RawBase):
             raise Exception('HMAC MISMATCH')
 
     def to_simple(self):
-        return {'uid': self.uid, 'content': self.hmac + self.content, 'version': self.version}
+        content = base64.b64encode(self.hmac + self.content)
+        return {'uid': self.uid, 'content': content.decode(), 'version': self.version}
 
-    def setContent(self, content):
-        raise Exception("Not implemented")
+    def update(self, content):
+        self.setContent(content)
+        self.hmac = self.calcHmac()
 
 
 class RawEntry(RawBase):
