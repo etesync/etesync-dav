@@ -31,6 +31,9 @@ class RawBase:
     def getContent(self):
         return self.cryptoManager.decrypt(self.content)
 
+    def to_json(self):
+        return {'uid': self.uid, 'content': self.content}
+
 
 class RawJournal(RawBase):
     def __init__(self, cryptoManager, content, uid):
@@ -44,6 +47,9 @@ class RawJournal(RawBase):
     def verify(self):
         if self.calcHmac() != self.hmac:
             raise Exception('HMAC MISMATCH')
+
+    def to_simple(self):
+        return {'uid': self.uid, 'content': self.hmac + self.content, 'version': self.version}
 
 
 class RawEntry(RawBase):
@@ -63,6 +69,12 @@ class BaseManager:
     def __init__(self, auth_token):
         self.headers = {'Authorization': 'Token ' + auth_token}
 
+    def detail_url(self, uid):
+        remote = self.remote.copy()
+        remote.path.segments.extend((uid, ''))
+        remote.path.normalize()
+        return remote
+
 
 class JournalManager(BaseManager):
     def __init__(self, remote, auth_token):
@@ -81,6 +93,19 @@ class JournalManager(BaseManager):
             cryptoManager = CryptoManager(version, password, uid.encode('utf-8'))
             journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
             yield journal
+
+    def add(self, journal):
+        data = journal.to_simple()
+        requests.post(self.remote.url, headers=self.headers, json=data)
+
+    def delete(self, journal):
+        remote = self.detail_url(journal.uid)
+        requests.delete(remote.url, headers=self.headers)
+
+    def update(self, journal):
+        remote = self.detail_url(journal.uid)
+        data = journal.to_simple()
+        requests.put(remote.url, headers=self.headers, json=data)
 
 
 class EntryManager(BaseManager):
