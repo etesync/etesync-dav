@@ -124,8 +124,8 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        for cache_journal in cache.JournalEntity.select().where(~cache.JournalEntity.deleted):
-            yield Journal(cache_journal)
+        for cache_obj in cache.JournalEntity.select().where(~cache.JournalEntity.deleted):
+            yield Journal(cache_obj)
 
     def get(self, uid):
         return Journal(cache.JournalEntity.get(uid=uid, deleted=False))
@@ -189,7 +189,7 @@ class Contact(PimObject):
 
 class BaseCollection:
     def __init__(self, journal, journal_info):
-        self.cache_journal = journal.cache_obj
+        self.cache_obj = journal.cache_obj
         self.journal_info = journal_info
 
     @property
@@ -201,7 +201,7 @@ class BaseCollection:
         return self.journal_info.description
 
     def apply_sync_entry(self, sync_entry):
-        journal = self.cache_journal
+        journal = self.cache_obj
         uid = self.get_uid(sync_entry)
 
         try:
@@ -224,11 +224,11 @@ class BaseCollection:
 
     # CRUD
     def list(self):
-        for content in self.cache_journal.content_set.where(~pim.Content.deleted):
+        for content in self.cache_obj.content_set.where(~pim.Content.deleted):
             yield self.get_content_class()(content)
 
     def get(self, uid):
-        return self.get_content_class(self.cache_journal.event_set.where(pim.Content.uid == uid).get())
+        return self.get_content_class(self.cache_obj.event_set.where(pim.Content.uid == uid).get())
 
 
 class Calendar(BaseCollection):
