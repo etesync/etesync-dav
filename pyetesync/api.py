@@ -1,3 +1,5 @@
+import vobject
+
 from .crypto import CryptoManager, derive_key
 from .service import JournalManager, EntryManager, SyncEntry, JournalInfo
 from . import cache, pim, service
@@ -45,6 +47,18 @@ class EteSync:
             journal.save()
 
     def sync_journal(self, uid):
+        # FIXME: At the moment if there's a conflict remote would win, which is
+        # not good and doesn't conform to java client. Copy what's done there.
+        self.pull_journal(uid)
+        self.push_journal(uid)
+
+    def _get_last_entry(self, journal):
+        try:
+            return journal.entries.order_by(cache.EntryEntity.id.desc()).get()
+        except cache.EntryEntity.DoesNotExist:
+            return None
+
+    def pull_journal(self, uid):
         journal_uid = uid
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
@@ -52,12 +66,8 @@ class EteSync:
         cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
         collection = Journal(journal).collection
 
-        try:
-            prev = journal.entries.order_by(cache.EntryEntity.id.desc()).get()
-            last_uid = prev.uid
-        except cache.EntryEntity.DoesNotExist:
-            prev = None
-            last_uid = None
+        prev = self._get_last_entry(journal)
+        last_uid = None if prev is None else prev.uid
 
         for entry in manager.list(cryptoManager, last_uid):
             entry.verify(prev)
@@ -66,6 +76,47 @@ class EteSync:
             cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
 
             prev = entry
+
+    def push_journal(self, uid):
+        # FIXME: Implement pushing in chunks
+        journal_uid = uid
+        manager = EntryManager(self.remote, self.auth_token, journal_uid)
+
+        journal = cache.JournalEntity.get(uid=journal_uid)
+        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
+        changed_set = journal.content_set.where(pim.Content.new | pim.Content.dirty | pim.Content.deleted)
+        changed = list(changed_set)
+
+        if len(changed) == 0:
+            return
+
+        prev = self._get_last_entry(journal)
+        last_uid = None if prev is None else prev.uid
+
+        entries = []
+        for pim_entry in changed:
+            if pim_entry.deleted:
+                action = 'DELETE'
+            elif pim_entry.new:
+                action = 'ADD'
+            else:
+                action = 'CHANGE'
+            sync_entry = SyncEntry(action, pim_entry.content)
+            raw_entry = service.RawEntry(crypto_manager)
+            raw_entry.update(sync_entry.to_json(), prev)
+            entries.append(raw_entry)
+
+        manager.add(entries, last_uid)
+
+        # Add entries to cache
+        for entry in entries:
+            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
+
+        # Clear dirty flags and delete deleted content
+        pim.Content.delete().where((pim.Content.journal == journal) & pim.Content.deleted).execute()
+        pim.Content.update(new=False, dirty=False).where(
+                (pim.Content.journal == journal) & (pim.Content.new | pim.Content.dirty)
+            ).execute()
 
     def derive_key(self, password):
         self.cipher_key = derive_key(password, self.email)
@@ -109,6 +160,16 @@ class Entry(ApiObjectBase):
 
 
 class PimObject(ApiObjectBase):
+    @classmethod
+    def create(cls, journal, uid, content):
+        cache_obj = pim.Content()
+        cache_obj.journal = journal.cache_obj
+        cache_obj.uid = uid
+        cache_obj.content = content
+        cache_obj.new = True
+        cache_obj.save()
+        return cls(cache_obj)
+
     def delete(self):
         self.cache_obj.deleted = True
         self.cache_obj.save()
@@ -139,31 +200,53 @@ class BaseCollection:
     def description(self):
         return self.journal_info.description
 
-
-class Calendar(BaseCollection):
     def apply_sync_entry(self, sync_entry):
-        pim.Event.apply_sync_entry(self.cache_journal, sync_entry)
+        journal = self.cache_journal
+        uid = self.get_uid(sync_entry)
+
+        try:
+            content = pim.Content.get(uid=uid, journal=journal)
+        except pim.Content.DoesNotExist:
+            content = None
+
+        if sync_entry.action == 'DELETE':
+            if content is not None:
+                content.delete_instance()
+            else:
+                print("WARNING: Failed to delete " + uid)
+
+            return
+
+        content = pim.Content(journal=journal, uid=uid) if content is None else content
+
+        content.content = sync_entry.content
+        content.save()
 
     # CRUD
     def list(self):
-        for event in self.cache_journal.event_set.where(~pim.Event.deleted):
-            yield Event(event)
+        for content in self.cache_journal.content_set.where(~pim.Content.deleted):
+            yield self.get_content_class()(content)
 
     def get(self, uid):
-        return Event(self.cache_journal.event_set.where(pim.Event.uid == uid).get())
+        return self.get_content_class(self.cache_journal.event_set.where(pim.Content.uid == uid).get())
+
+
+class Calendar(BaseCollection):
+    def get_uid(self, sync_entry):
+        vobj = vobject.readOne(sync_entry.content)
+        return vobj.vevent.uid.value
+
+    def get_content_class(self):
+        return Event
 
 
 class AddressBook(BaseCollection):
-    def apply_sync_entry(self, sync_entry):
-        pim.Contact.apply_sync_entry(self.cache_journal, sync_entry)
+    def get_uid(self, sync_entry):
+        vobj = vobject.readOne(sync_entry.content)
+        return vobj.uid.value
 
-    # CRUD
-    def list(self):
-        for contact in self.cache_journal.contact_set.where(~pim.Contact.deleted):
-            yield Contact(contact)
-
-    def get(self, uid):
-        return Contact(self.cache_journal.contact_set.where(pim.Contact.uid == uid).get())
+    def get_content_class(self):
+        return Contact
 
 
 class Journal(ApiObjectBase):

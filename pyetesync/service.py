@@ -22,7 +22,7 @@ class Authenticator:
 
 
 class RawBase:
-    def __init__(self, cryptoManager, content, uid):
+    def __init__(self, cryptoManager, content=None, uid=None):
         self.cryptoManager = cryptoManager
         self.uid = uid
         self.version = cryptoManager.version
@@ -31,8 +31,12 @@ class RawBase:
     def getContent(self):
         return self.cryptoManager.decrypt(self.content)
 
-    def to_json(self):
-        return {'uid': self.uid, 'content': self.content}
+    def setContent(self, content):
+        self.content = self.cryptoManager.encrypt(content)
+
+    def to_simple(self):
+        content = base64.b64encode(self.content)
+        return {'uid': self.uid, 'content': content.decode()}
 
 
 class RawJournal(RawBase):
@@ -51,6 +55,9 @@ class RawJournal(RawBase):
     def to_simple(self):
         return {'uid': self.uid, 'content': self.hmac + self.content, 'version': self.version}
 
+    def setContent(self, content):
+        raise Exception("Not implemented")
+
 
 class RawEntry(RawBase):
     def calcHmac(self, prev):
@@ -63,6 +70,10 @@ class RawEntry(RawBase):
     def verify(self, prev):
         if self.calcHmac(prev) != binascii.unhexlify(self.uid):
             raise Exception('HMAC MISMATCH')
+
+    def update(self, content, prev):
+        self.setContent(content)
+        self.uid = binascii.hexlify(self.calcHmac(prev)).decode()
 
 
 class BaseManager:
@@ -150,6 +161,10 @@ class SyncEntry:
     def from_json(cls, json_string):
         data = json.loads(json_string)
         return SyncEntry(data['action'], data['content'])
+
+    def to_json(self):
+        data = {'action': self.action, 'content': self.content.decode()}
+        return json.dumps(data, ensure_ascii=False)
 
 
 class JournalInfo:
