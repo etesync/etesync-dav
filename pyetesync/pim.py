@@ -7,28 +7,34 @@ from . import db
 
 class BaseContent(db.BaseModel):
     journal = pw.ForeignKeyField(JournalEntity)
-    uid = pw.UUIDField(unique=True, null=False, index=True)
+    uid = pw.UUIDField(null=False, index=True)
     content = pw.BlobField()
     dirty = pw.BooleanField(null=False, default=False)
     deleted = pw.BooleanField(null=False, default=False)
+
+    class Meta:
+        indexes = (
+            (('journal', 'uid'), True),
+        )
 
     @classmethod
     def apply_sync_entry(cls, journal, sync_entry):
         uid = cls.get_uid(sync_entry)
 
+        try:
+            content = cls.get(uid=uid, journal=journal)
+        except cls.DoesNotExist:
+            content = None
+
         if sync_entry.action == 'DELETE':
-            try:
-                cls.get(uid=uid).delete_instance()
-            except cls.DoesNotExist:
+            if content is not None:
+                content.delete_instance()
+            else:
                 print("WARNING: Failed to delete " + uid)
-                pass
 
             return
 
-        try:
-            content = cls.get(uid=uid)
-        except cls.DoesNotExist:
-            content = cls(journal=journal, uid=uid)
+        content = cls(journal=journal, uid=uid) if content is None else content
 
         content.content = sync_entry.content
         content.save()
