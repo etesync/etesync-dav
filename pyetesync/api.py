@@ -1,7 +1,7 @@
 import vobject
 import json
 
-from .crypto import CryptoManager, derive_key
+from .crypto import CryptoManager, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
 from . import cache, pim, service
 
@@ -259,12 +259,12 @@ class BaseCollection:
         return self.get_content_class(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
 
     @classmethod
-    def create(cls, owner, uid, content, version):
+    def create(cls, owner, uid, content):
         cache_obj = cache.JournalEntity(new=True)
         cache_obj.owner = owner
         cache_obj.uid = uid
         cache_obj.content = content
-        cache_obj.version = version
+        cache_obj.version = CURRENT_VERSION
         cache_obj.save()
         return cls(Journal(cache_obj))
 
