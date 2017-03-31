@@ -261,7 +261,7 @@ class BaseCollection:
     @classmethod
     def create(cls, etesync, uid, content):
         cache_obj = cache.JournalEntity(new=True)
-        cache_obj.owner = etesync.owner
+        cache_obj.owner = etesync.user
         cache_obj.uid = uid
         cache_obj.content = content
         cache_obj.version = CURRENT_VERSION
