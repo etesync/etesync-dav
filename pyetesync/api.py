@@ -124,11 +124,11 @@ class EteSync:
 
     # CRUD operations
     def list(self):
-        for cache_obj in cache.JournalEntity.select().where(~cache.JournalEntity.deleted):
+        for cache_obj in self.user.journals.where(~cache.JournalEntity.deleted):
             yield Journal(cache_obj)
 
     def get(self, uid):
-        return Journal(cache.JournalEntity.get(uid=uid, deleted=False))
+        return Journal(self.user.journals.where((cache.JournalEntity.uid == uid) & ~cache.JournalEntity.deleted).get())
 
 
 class ApiObjectBase:
