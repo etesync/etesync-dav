@@ -91,20 +91,38 @@ class ApiObjectBase:
     def uid(self):
         return self.cache_obj.uid
 
+    @uid.setter
+    def uid(self, uid):
+        self.cache_obj.uid = uid
+
     @property
     def content(self):
         return self.cache_obj.content
+
+    @content.setter
+    def content(self, content):
+        self.cache_obj.content = content
 
 
 class Entry(ApiObjectBase):
     pass
 
 
-class Event(ApiObjectBase):
+class PimObject(ApiObjectBase):
+    def delete(self):
+        self.cache_obj.deleted = True
+        self.cache_obj.save()
+
+    def save(self):
+        self.cache_obj.dirty = True
+        self.cache_obj.save()
+
+
+class Event(PimObject):
     pass
 
 
-class Contact(ApiObjectBase):
+class Contact(PimObject):
     pass
 
 
@@ -128,7 +146,7 @@ class Calendar(BaseCollection):
 
     # CRUD
     def list(self):
-        for event in self.cache_journal.event_set:
+        for event in self.cache_journal.event_set.where(~pim.Event.deleted):
             yield Event(event)
 
     def get(self, uid):
@@ -141,7 +159,7 @@ class AddressBook(BaseCollection):
 
     # CRUD
     def list(self):
-        for contact in self.cache_journal.contact_set:
+        for contact in self.cache_journal.contact_set.where(~pim.Contact.deleted):
             yield Contact(contact)
 
     def get(self, uid):

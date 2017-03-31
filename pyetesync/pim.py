@@ -9,6 +9,8 @@ class BaseContent(db.BaseModel):
     journal = pw.ForeignKeyField(JournalEntity)
     uid = pw.UUIDField(unique=True, null=False, index=True)
     content = pw.BlobField()
+    dirty = pw.BooleanField(null=False, default=False)
+    deleted = pw.BooleanField(null=False, default=False)
 
     @classmethod
     def apply_sync_entry(cls, journal, sync_entry):
