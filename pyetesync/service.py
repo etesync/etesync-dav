@@ -132,6 +132,14 @@ class EntryManager(BaseManager):
             prev = entry
             yield entry
 
+    def add(self, entries, last=None):
+        remote = self.remote.copy()
+        if last is not None:
+            remote.args['last'] = last
+
+        data = list(map(lambda x: x.to_simple(), entries))
+        requests.post(remote.url, headers=self.headers, json=data)
+
 
 class SyncEntry:
     def __init__(self, action, content):
