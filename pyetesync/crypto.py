@@ -15,8 +15,8 @@ def hmac256(key, data):
 
 
 def derive_key(user_password, salt):
-    return pyscrypt.hash(password=user_password.encode('utf-8'),
-                         salt=salt.encode('utf-8'),
+    return pyscrypt.hash(password=user_password.encode(),
+                         salt=salt.encode(),
                          N=16384,
                          r=8,
                          p=1,

@@ -46,7 +46,7 @@ class RawJournal(RawBase):
         self.content = content[HMAC_SIZE:]
 
     def calcHmac(self):
-        return self.cryptoManager.hmac(self.uid.encode('utf-8') + self.content)
+        return self.cryptoManager.hmac(self.uid.encode() + self.content)
 
     def verify(self):
         if self.calcHmac() != self.hmac:
@@ -63,7 +63,7 @@ class RawEntry(RawBase):
     def calcHmac(self, prev):
         prevUid = b''
         if prev is not None:
-            prevUid = prev.uid.encode('utf-8')
+            prevUid = prev.uid.encode()
 
         return self.cryptoManager.hmac(prevUid + self.content)
 
@@ -101,7 +101,7 @@ class JournalManager(BaseManager):
             uid = j['uid']
             version = j['version']
             content = base64.b64decode(j['content'])
-            cryptoManager = CryptoManager(version, password, uid.encode('utf-8'))
+            cryptoManager = CryptoManager(version, password, uid.encode())
             journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
             yield journal
 

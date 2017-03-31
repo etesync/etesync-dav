@@ -63,7 +63,7 @@ class EteSync:
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
         journal = cache.JournalEntity.get(uid=journal_uid)
-        cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
+        cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
         collection = Journal(journal).collection
 
         prev = self._get_last_entry(journal)
@@ -83,7 +83,7 @@ class EteSync:
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
         journal = cache.JournalEntity.get(uid=journal_uid)
-        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode('utf-8'))
+        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
         changed_set = journal.content_set.where(pim.Content.new | pim.Content.dirty | pim.Content.deleted)
         changed = list(changed_set)
 
