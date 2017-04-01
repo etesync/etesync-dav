@@ -205,7 +205,7 @@ class ApiObjectBase:
 
     @property
     def uid(self):
-        return self._cache_obj.uid
+        return str(self._cache_obj.uid)
 
     @uid.setter
     def uid(self, uid):
