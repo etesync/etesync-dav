@@ -232,6 +232,9 @@ class PimObject(ApiObjectBase):
 
     @classmethod
     def create(cls, collection, uid, content):
+        if collection.get_content_class() != cls:
+            raise Exception('Collection "{}" does not allow "{}" children.'.format(
+                collection.__class__.__name__, cls.__name__))
         return super().create(collection.journal, uid, content)
 
     def delete(self):
