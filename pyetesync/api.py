@@ -109,13 +109,13 @@ class EteSync:
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
         journal = cache.JournalEntity.get(uid=journal_uid)
-        cryptoManager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
+        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
         collection = Journal(journal).collection
 
         prev = self._get_last_entry(journal)
         last_uid = None if prev is None else prev.uid
 
-        for entry in manager.list(cryptoManager, last_uid):
+        for entry in manager.list(crypto_manager, last_uid):
             entry.verify(prev)
             syncEntry = SyncEntry.from_json(entry.getContent().decode())
             collection.apply_sync_entry(syncEntry)

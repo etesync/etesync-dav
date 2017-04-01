@@ -29,17 +29,17 @@ class Authenticator:
 
 
 class RawBase:
-    def __init__(self, cryptoManager, content=None, uid=None):
-        self.cryptoManager = cryptoManager
+    def __init__(self, crypto_manager, content=None, uid=None):
+        self.crypto_manager = crypto_manager
         self.uid = uid
-        self.version = cryptoManager.version
+        self.version = crypto_manager.version
         self.content = content
 
     def getContent(self):
-        return self.cryptoManager.decrypt(self.content)
+        return self.crypto_manager.decrypt(self.content)
 
     def setContent(self, content):
-        self.content = self.cryptoManager.encrypt(content)
+        self.content = self.crypto_manager.encrypt(content)
 
     def to_simple(self):
         content = base64.b64encode(self.content)
@@ -52,17 +52,17 @@ class RawBase:
 
 
 class RawJournal(RawBase):
-    def __init__(self, cryptoManager, content=None, uid=None):
-        super().__init__(cryptoManager, content, uid)
+    def __init__(self, crypto_manager, content=None, uid=None):
+        super().__init__(crypto_manager, content, uid)
         if content is not None:
             self.hmac = content[:HMAC_SIZE]
             self.content = content[HMAC_SIZE:]
 
-    def calcHmac(self):
-        return self.cryptoManager.hmac(self.uid.encode() + self.content)
+    def calc_hmac(self):
+        return self.crypto_manager.hmac(self.uid.encode() + self.content)
 
     def verify(self):
-        self._verify_hmac(self.hmac, self.calcHmac())
+        self._verify_hmac(self.hmac, self.calc_hmac())
 
     def to_simple(self):
         content = base64.b64encode(self.hmac + self.content)
@@ -70,23 +70,23 @@ class RawJournal(RawBase):
 
     def update(self, content):
         self.setContent(content)
-        self.hmac = self.calcHmac()
+        self.hmac = self.calc_hmac()
 
 
 class RawEntry(RawBase):
-    def calcHmac(self, prev):
+    def calc_hmac(self, prev):
         prevUid = b''
         if prev is not None:
             prevUid = prev.uid.encode()
 
-        return self.cryptoManager.hmac(prevUid + self.content)
+        return self.crypto_manager.hmac(prevUid + self.content)
 
     def verify(self, prev):
-        self._verify_hmac(binascii.unhexlify(self.uid), self.calcHmac(prev))
+        self._verify_hmac(binascii.unhexlify(self.uid), self.calc_hmac(prev))
 
     def update(self, content, prev):
         self.setContent(content)
-        self.uid = binascii.hexlify(self.calcHmac(prev)).decode()
+        self.uid = binascii.hexlify(self.calc_hmac(prev)).decode()
 
 
 class BaseManager:
@@ -128,8 +128,8 @@ class JournalManager(BaseManager):
             uid = j['uid']
             version = j['version']
             content = base64.b64decode(j['content'])
-            cryptoManager = CryptoManager(version, password, uid.encode())
-            journal = RawJournal(cryptoManager=cryptoManager, content=content, uid=uid)
+            crypto_manager = CryptoManager(version, password, uid.encode())
+            journal = RawJournal(crypto_manager=crypto_manager, content=content, uid=uid)
             yield journal
 
     def add(self, journal):
@@ -156,11 +156,11 @@ class EntryManager(BaseManager):
         self.remote.path.segments.extend(API_PATH + ('journal', journalId, ''))
         self.remote.path.normalize()
 
-    def list(self, cryptoManager, last=None):
+    def list(self, crypto_manager, last=None):
         remote = self.remote.copy()
         prev = None
         if last is not None:
-            prev = RawEntry(cryptoManager, b'', last)
+            prev = RawEntry(crypto_manager, b'', last)
             remote.args['last'] = last
 
         response = requests.get(remote.url, headers=self.headers)
@@ -169,7 +169,7 @@ class EntryManager(BaseManager):
         for j in data:
             uid = j['uid']
             content = base64.b64decode(j['content'])
-            entry = RawEntry(cryptoManager=cryptoManager, content=content, uid=uid)
+            entry = RawEntry(crypto_manager=crypto_manager, content=content, uid=uid)
             entry.verify(prev)
             prev = entry
             yield entry
