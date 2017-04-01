@@ -54,7 +54,7 @@ class EteSync:
 
         existing = {}
         for journal in self.list():
-            existing[journal.uid] = journal.cache_obj
+            existing[journal.uid] = journal._cache_obj
 
         for entry in manager.list(self.cipher_key):
             entry.verify()
@@ -183,26 +183,26 @@ class EteSync:
 
 class ApiObjectBase:
     def __init__(self, cache_obj):
-        self.cache_obj = cache_obj
+        self._cache_obj = cache_obj
 
     def __repr__(self):
         return '<{} {}>'.format(self.__class__.__name__, self.uid)
 
     @property
     def uid(self):
-        return self.cache_obj.uid
+        return self._cache_obj.uid
 
     @uid.setter
     def uid(self, uid):
-        self.cache_obj.uid = uid
+        self._cache_obj.uid = uid
 
     @property
     def content(self):
-        return self.cache_obj.content
+        return self._cache_obj.content
 
     @content.setter
     def content(self, content):
-        self.cache_obj.content = content
+        self._cache_obj.content = content
 
 
 class Entry(ApiObjectBase):
@@ -213,7 +213,7 @@ class PimObject(ApiObjectBase):
     @classmethod
     def create(cls, journal, uid, content):
         cache_obj = pim.Content()
-        cache_obj.journal = journal.cache_obj
+        cache_obj.journal = journal._cache_obj
         cache_obj.uid = uid
         cache_obj.content = content
         cache_obj.new = True
@@ -221,12 +221,12 @@ class PimObject(ApiObjectBase):
         return cls(cache_obj)
 
     def delete(self):
-        self.cache_obj.deleted = True
-        self.cache_obj.save()
+        self._cache_obj.deleted = True
+        self._cache_obj.save()
 
     def save(self):
-        self.cache_obj.dirty = True
-        self.cache_obj.save()
+        self._cache_obj.dirty = True
+        self._cache_obj.save()
 
 
 class Event(PimObject):
@@ -240,19 +240,19 @@ class Contact(PimObject):
 class BaseCollection:
     def __init__(self, journal):
         self._journal = journal
-        self.cache_obj = journal.cache_obj
-        if self.cache_obj.content is not None:
-            self.journal_info = json.loads(self.cache_obj.content)
+        self._cache_obj = journal._cache_obj
+        if self._cache_obj.content is not None:
+            self._journal_info = json.loads(self._cache_obj.content)
         else:
-            self.journal_info = self._get_default_info()
+            self._journal_info = self._get_default_info()
 
     @property
     def display_name(self):
-        return self.journal_info.get('displayName')
+        return self._journal_info.get('displayName')
 
     @property
     def description(self):
-        return self.journal_info.get('description')
+        return self._journal_info.get('description')
 
     @property
     def journal(self):
@@ -260,16 +260,16 @@ class BaseCollection:
 
     def update_info(self, update_info):
         if update_info is None:
-            self.journal_info = self._get_default_info()
+            self._journal_info = self._get_default_info()
         else:
-            self.journal_info.update(update_info)
-        self.cache_obj.content = json.dumps(self.journal_info, ensure_ascii=False)
+            self._journal_info.update(update_info)
+        self._cache_obj.content = json.dumps(self._journal_info, ensure_ascii=False)
 
     def _get_default_info(self):
         return {'type': self.__class__.TYPE, 'readOnly': False, 'selected': True}
 
     def apply_sync_entry(self, sync_entry):
-        journal = self.cache_obj
+        journal = self._cache_obj
         uid = self.get_uid(sync_entry)
 
         try:
@@ -292,12 +292,12 @@ class BaseCollection:
 
     # CRUD
     def list(self):
-        for content in self.cache_obj.content_set.where(~pim.Content.deleted):
+        for content in self._cache_obj.content_set.where(~pim.Content.deleted):
             yield self.get_content_class()(content)
 
     def get(self, uid):
         try:
-            return self.get_content_class()(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
+            return self.get_content_class()(self._cache_obj.content_set.where(pim.Content.uid == uid).get())
         except cache.Content.DoesNotExist as e:
             raise exceptions.DoesNotExist(e)
 
@@ -314,13 +314,13 @@ class BaseCollection:
         return ret
 
     def delete(self):
-        self.cache_obj.deleted = True
-        self.cache_obj.dirty = True
-        self.cache_obj.save()
+        self._cache_obj.deleted = True
+        self._cache_obj.dirty = True
+        self._cache_obj.save()
 
     def save(self):
-        self.cache_obj.dirty = True
-        self.cache_obj.save()
+        self._cache_obj.dirty = True
+        self._cache_obj.save()
 
 
 class Calendar(BaseCollection):
@@ -353,7 +353,7 @@ class AddressBook(BaseCollection):
 class Journal(ApiObjectBase):
     @property
     def version(self):
-        return self.cache_obj.version
+        return self._cache_obj.version
 
     @property
     def collection(self):
@@ -365,5 +365,5 @@ class Journal(ApiObjectBase):
 
     # CRUD
     def list(self):
-        for entry in self.cache_obj.entries:
+        for entry in self._cache_obj.entries:
             yield Entry(entry)
