@@ -307,12 +307,12 @@ class BaseCollection:
     # CRUD
     def list(self):
         for content in self._cache_obj.content_set.where(~pim.Content.deleted):
-            yield self.get_content_class().from_cache(content)
+            yield self.get_content_class()._from_cache(content)
 
     def get(self, uid):
         try:
-            return self.get_content_class().from_cache(self._cache_obj.content_set.where(pim.Content.uid == uid).get())
-        except cache.Content.DoesNotExist as e:
+            return self.get_content_class()._from_cache(self._cache_obj.content_set.where(pim.Content.uid == uid).get())
+        except pim.Content.DoesNotExist as e:
             raise exceptions.DoesNotExist(e)
 
     @classmethod
