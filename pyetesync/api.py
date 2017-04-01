@@ -239,6 +239,7 @@ class Contact(PimObject):
 
 class BaseCollection:
     def __init__(self, journal):
+        self._journal = journal
         self.cache_obj = journal.cache_obj
         if self.cache_obj.content is not None:
             self.journal_info = json.loads(self.cache_obj.content)
@@ -252,6 +253,10 @@ class BaseCollection:
     @property
     def description(self):
         return self.journal_info.get('description')
+
+    @property
+    def journal(self):
+        return self._journal
 
     def update_info(self, update_info):
         if update_info is None:
