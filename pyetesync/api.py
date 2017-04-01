@@ -230,6 +230,10 @@ class Entry(ApiObjectBase):
 class PimObject(ApiObjectBase):
     _CACHE_OBJ_CLASS = pim.Content
 
+    @classmethod
+    def create(cls, collection, uid, content):
+        return super().create(collection.journal, uid, content)
+
     def delete(self):
         self._cache_obj.deleted = True
         self._cache_obj.save()
