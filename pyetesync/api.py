@@ -194,6 +194,15 @@ class ApiObjectBase:
         ret._cache_obj = cache_obj
         return ret
 
+    @classmethod
+    def create(cls, journal, uid, content):
+        cache_obj = cls._CACHE_OBJ_CLASS()
+        cache_obj.journal = journal._cache_obj
+        cache_obj.uid = uid
+        cache_obj.content = content
+        cache_obj.new = True
+        return cls._from_cache(cache_obj)
+
     @property
     def uid(self):
         return self._cache_obj.uid
@@ -212,18 +221,14 @@ class ApiObjectBase:
 
 
 class Entry(ApiObjectBase):
-    pass
+    _CACHE_OBJ_CLASS = cache.EntryEntity
+
+    def save(self):
+        self._cache_obj.save()
 
 
 class PimObject(ApiObjectBase):
-    @classmethod
-    def create(cls, journal, uid, content):
-        cache_obj = pim.Content()
-        cache_obj.journal = journal._cache_obj
-        cache_obj.uid = uid
-        cache_obj.content = content
-        cache_obj.new = True
-        return cls._from_cache(cache_obj)
+    _CACHE_OBJ_CLASS = pim.Content
 
     def delete(self):
         self._cache_obj.deleted = True
