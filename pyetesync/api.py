@@ -4,7 +4,7 @@ import os
 
 from .crypto import CryptoManager, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
-from . import cache, pim, service, db
+from . import cache, pim, service, db, exceptions
 
 API_URL = 'https://api.etesync.com/'
 
@@ -174,7 +174,11 @@ class EteSync:
             yield Journal(cache_obj)
 
     def get(self, uid):
-        return Journal(self.user.journals.where((cache.JournalEntity.uid == uid) & ~cache.JournalEntity.deleted).get())
+        try:
+            return Journal(self.user.journals.where(
+                (cache.JournalEntity.uid == uid) & ~cache.JournalEntity.deleted).get())
+        except cache.JournalEntity.DoesNotExist as e:
+            raise exceptions.DoesNotExist(e)
 
 
 class ApiObjectBase:
@@ -287,7 +291,10 @@ class BaseCollection:
             yield self.get_content_class()(content)
 
     def get(self, uid):
-        return self.get_content_class()(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
+        try:
+            return self.get_content_class()(self.cache_obj.content_set.where(pim.Content.uid == uid).get())
+        except cache.Content.DoesNotExist as e:
+            raise exceptions.DoesNotExist(e)
 
     @classmethod
     def create(cls, etesync, uid, content):

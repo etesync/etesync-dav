@@ -2,9 +2,11 @@ import requests
 import json
 import base64
 import binascii
+from http import HTTPStatus
 from furl import furl
 
-from pyetesync.crypto import CryptoManager, HMAC_SIZE
+from .crypto import CryptoManager, HMAC_SIZE
+from . import exceptions
 
 API_PATH = ('api', 'v1')
 
@@ -17,6 +19,11 @@ class Authenticator:
 
     def get_auth_token(self, username, password):
         response = requests.post(self.remote.url, data={'username': username, 'password': password})
+        if response.status_code == HTTPStatus.BAD_REQUEST:
+            raise exceptions.UnauthorizedException("Username or password incorrect.")
+        elif response.status_code != requests.codes.ok:
+            raise exceptions.HttpException(response.status_code)
+
         data = response.json()
         return data['token']
 
@@ -38,6 +45,11 @@ class RawBase:
         content = base64.b64encode(self.content)
         return {'uid': self.uid, 'content': content.decode()}
 
+    def _verify_hmac(self, hmac1, hmac2):
+        if hmac1 != hmac2:
+            raise exceptions.IntegrityException("HMAC misatch: {} != {}".format(
+                binascii.hexlify(hmac1).decode(), binascii.hexlify(hmac2).decode()))
+
 
 class RawJournal(RawBase):
     def __init__(self, cryptoManager, content=None, uid=None):
@@ -50,8 +62,7 @@ class RawJournal(RawBase):
         return self.cryptoManager.hmac(self.uid.encode() + self.content)
 
     def verify(self):
-        if self.calcHmac() != self.hmac:
-            raise Exception('HMAC MISMATCH')
+        self._verify_hmac(self.hmac, self.calcHmac())
 
     def to_simple(self):
         content = base64.b64encode(self.hmac + self.content)
@@ -71,8 +82,7 @@ class RawEntry(RawBase):
         return self.cryptoManager.hmac(prevUid + self.content)
 
     def verify(self, prev):
-        if self.calcHmac(prev) != binascii.unhexlify(self.uid):
-            raise Exception('HMAC MISMATCH')
+        self._verify_hmac(binascii.unhexlify(self.uid), self.calcHmac(prev))
 
     def update(self, content, prev):
         self.setContent(content)
@@ -89,6 +99,19 @@ class BaseManager:
         remote.path.normalize()
         return remote
 
+    def _validate_response(self, response):
+        if response.status_code == HTTPStatus.SERVICE_UNAVAILABLE:
+            raise exceptions.ServiceUnavailableException("Service unavailable")
+        elif response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise exceptions.UnauthorizedException("UNAUTHORIZED auth token")
+        elif response.status_code == HTTPStatus.FORBIDDEN:
+            data = response.json()
+            if data.get('code') == 'service_inactive':
+                raise exceptions.UserInactiveException(data.get('detail'))
+        elif response.status_code != requests.codes.ok:
+            raise exceptions.HttpException(response.status_code)
+        return response
+
 
 class JournalManager(BaseManager):
     def __init__(self, remote, auth_token):
@@ -99,6 +122,7 @@ class JournalManager(BaseManager):
 
     def list(self, password):
         response = requests.get(self.remote.url, headers=self.headers)
+        self._validate_response(response)
         data = response.json()
         for j in data:
             uid = j['uid']
@@ -110,16 +134,19 @@ class JournalManager(BaseManager):
 
     def add(self, journal):
         data = journal.to_simple()
-        requests.post(self.remote.url, headers=self.headers, json=data)
+        response = requests.post(self.remote.url, headers=self.headers, json=data)
+        self._validate_response(response)
 
     def delete(self, journal):
         remote = self.detail_url(journal.uid)
-        requests.delete(remote.url, headers=self.headers)
+        response = requests.delete(remote.url, headers=self.headers)
+        self._validate_response(response)
 
     def update(self, journal):
         remote = self.detail_url(journal.uid)
         data = journal.to_simple()
-        requests.put(remote.url, headers=self.headers, json=data)
+        response = requests.put(remote.url, headers=self.headers, json=data)
+        self._validate_response(response)
 
 
 class EntryManager(BaseManager):
@@ -137,6 +164,7 @@ class EntryManager(BaseManager):
             remote.args['last'] = last
 
         response = requests.get(remote.url, headers=self.headers)
+        self._validate_response(response)
         data = response.json()
         for j in data:
             uid = j['uid']
@@ -152,7 +180,8 @@ class EntryManager(BaseManager):
             remote.args['last'] = last
 
         data = list(map(lambda x: x.to_simple(), entries))
-        requests.post(remote.url, headers=self.headers, json=data)
+        response = requests.post(remote.url, headers=self.headers, json=data)
+        self._validate_response(response)
 
 
 class SyncEntry:

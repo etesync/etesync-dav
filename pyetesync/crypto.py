@@ -4,6 +4,8 @@ import hashlib
 import hmac
 import pyscrypt
 
+from . import exceptions
+
 CURRENT_VERSION = 2
 
 HMAC_SIZE = int(256 / 8)  # 256bits in bytes
@@ -26,7 +28,8 @@ def derive_key(user_password, salt):
 class CryptoManager:
     def __init__(self, version, key, salt):
         if version > CURRENT_VERSION:
-            raise Exception("Version is out of range")
+            raise exceptions.VersionTooNew("Found version is too new. Found: {} Current: {}".format(
+                version, CURRENT_VERSION))
         elif version == 1:
             pass
         else:
