@@ -110,7 +110,7 @@ class EteSync:
 
         journal = cache.JournalEntity.get(uid=journal_uid)
         crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
-        collection = Journal(journal).collection
+        collection = Journal._from_cache(journal).collection
 
         prev = self._get_last_entry(journal)
         last_uid = None if prev is None else prev.uid
@@ -171,22 +171,28 @@ class EteSync:
     # CRUD operations
     def list(self):
         for cache_obj in self.user.journals.where(~cache.JournalEntity.deleted):
-            yield Journal(cache_obj)
+            yield Journal._from_cache(cache_obj)
 
     def get(self, uid):
         try:
-            return Journal(self.user.journals.where(
+            return Journal._from_cache(self.user.journals.where(
                 (cache.JournalEntity.uid == uid) & ~cache.JournalEntity.deleted).get())
         except cache.JournalEntity.DoesNotExist as e:
             raise exceptions.DoesNotExist(e)
 
 
 class ApiObjectBase:
-    def __init__(self, cache_obj):
-        self._cache_obj = cache_obj
+    def __init__(self):
+        self._cache_obj = None
 
     def __repr__(self):
         return '<{} {}>'.format(self.__class__.__name__, self.uid)
+
+    @classmethod
+    def _from_cache(cls, cache_obj):
+        ret = cls()
+        ret._cache_obj = cache_obj
+        return ret
 
     @property
     def uid(self):
@@ -217,8 +223,7 @@ class PimObject(ApiObjectBase):
         cache_obj.uid = uid
         cache_obj.content = content
         cache_obj.new = True
-        cache_obj.save()
-        return cls(cache_obj)
+        return cls._from_cache(cache_obj)
 
     def delete(self):
         self._cache_obj.deleted = True
@@ -293,11 +298,11 @@ class BaseCollection:
     # CRUD
     def list(self):
         for content in self._cache_obj.content_set.where(~pim.Content.deleted):
-            yield self.get_content_class()(content)
+            yield self.get_content_class().from_cache(content)
 
     def get(self, uid):
         try:
-            return self.get_content_class()(self._cache_obj.content_set.where(pim.Content.uid == uid).get())
+            return self.get_content_class().from_cache(self._cache_obj.content_set.where(pim.Content.uid == uid).get())
         except cache.Content.DoesNotExist as e:
             raise exceptions.DoesNotExist(e)
 
@@ -308,9 +313,8 @@ class BaseCollection:
         cache_obj.uid = uid
         cache_obj.version = CURRENT_VERSION
 
-        ret = cls(Journal(cache_obj))
+        ret = cls(Journal._from_cache(cache_obj))
         ret.update_info(content)
-        cache_obj.save()
         return ret
 
     def delete(self):
@@ -366,4 +370,4 @@ class Journal(ApiObjectBase):
     # CRUD
     def list(self):
         for entry in self._cache_obj.entries:
-            yield Entry(entry)
+            yield Entry._from_cache(entry)
