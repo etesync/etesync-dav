@@ -91,7 +91,7 @@ class TestCollection:
         with pytest.raises(Exception):
             api.Event.create(b, '2cd64f22-2222-44f5-bc45-53440af38cec', (
                   'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
-                  '747Z\r\nUID:2cd64f22-b51c-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                  '747Z\r\nUID:2cd64f22-2222-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                   '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
                   'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'))
 
