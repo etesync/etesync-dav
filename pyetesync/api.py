@@ -23,6 +23,13 @@ class EteSync:
 
         self.user, created = cache.User.get_or_create(username=email)
 
+    def _set_db(self, database):
+        self._database = database
+
+        db.database_proxy.initialize(database)
+
+        self._init_db_tables(database)
+
     def _init_db(self, db_path):
         from playhouse.sqlite_ext import SqliteExtDatabase
 
@@ -36,9 +43,7 @@ class EteSync:
         database = SqliteExtDatabase(db_path)
         database.connect()
 
-        db.database_proxy.initialize(database)
-
-        self._init_db_tables(database)
+        self._set_db(database)
 
     def _init_db_tables(self, database):
         database.create_tables([pim.Content, cache.User, cache.JournalEntity, cache.EntryEntity], safe=True)
