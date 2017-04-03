@@ -1,6 +1,6 @@
 import pytest
 
-from pyetesync import crypto, exceptions
+from etesync import crypto, exceptions
 
 
 USER_EMAIL = 'test@localhost'

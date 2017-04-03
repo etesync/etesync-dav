@@ -1,9 +1,9 @@
 import pytest
 import binascii
 
-import pyetesync as api
-from pyetesync import exceptions
-from pyetesync.crypto import hmac256
+import etesync as api
+from etesync import exceptions
+from etesync.crypto import hmac256
 
 
 USER_EMAIL = 'test@localhost'

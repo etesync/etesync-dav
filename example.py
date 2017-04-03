@@ -2,7 +2,7 @@
 
 import sys
 
-import pyetesync as api
+import etesync as api
 
 
 def printJournal(entry):

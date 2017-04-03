@@ -34,7 +34,7 @@ class EteSync:
         from playhouse.sqlite_ext import SqliteExtDatabase
 
         if db_path is None:
-            db_path = os.path.join(os.path.expanduser('~'), '.pyetesync', 'data.db')
+            db_path = os.path.join(os.path.expanduser('~'), '.etesync', 'data.db')
 
         directory = os.path.dirname(db_path)
         if directory != '' and not os.path.exists(directory):
