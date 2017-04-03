@@ -11,6 +11,10 @@ from . import exceptions
 API_PATH = ('api', 'v1')
 
 
+def _status_success(status_code):
+    return status_code // 100 == 2
+
+
 class Authenticator:
     def __init__(self, remote):
         self.remote = furl(remote)
@@ -21,7 +25,7 @@ class Authenticator:
         response = requests.post(self.remote.url, data={'username': username, 'password': password})
         if response.status_code == HTTPStatus.BAD_REQUEST:
             raise exceptions.UnauthorizedException("Username or password incorrect.")
-        elif response.status_code != requests.codes.ok:
+        elif not _status_success(response.status_code):
             raise exceptions.HttpException(response.status_code)
 
         data = response.json()
@@ -108,7 +112,7 @@ class BaseManager:
             data = response.json()
             if data.get('code') == 'service_inactive':
                 raise exceptions.UserInactiveException(data.get('detail'))
-        elif response.status_code != requests.codes.ok:
+        elif not _status_success(response.status_code):
             raise exceptions.HttpException(response.status_code)
         return response
 
