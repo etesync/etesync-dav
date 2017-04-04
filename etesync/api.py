@@ -122,9 +122,10 @@ class EteSync:
 
         for entry in manager.list(crypto_manager, last_uid):
             entry.verify(prev)
-            syncEntry = SyncEntry.from_json(entry.getContent().decode())
+            content = entry.getContent().decode()
+            syncEntry = SyncEntry.from_json(content)
             collection.apply_sync_entry(syncEntry)
-            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
+            cache.EntryEntity.create(uid=entry.uid, content=content, journal=journal)
 
             prev = entry
 
@@ -154,14 +155,14 @@ class EteSync:
                 action = 'CHANGE'
             sync_entry = SyncEntry(action, pim_entry.content)
             raw_entry = service.RawEntry(crypto_manager)
-            raw_entry.update(sync_entry.to_json(), prev)
+            raw_entry.update(sync_entry.to_json().encode(), prev)
             entries.append(raw_entry)
 
         manager.add(entries, last_uid)
 
         # Add entries to cache
         for entry in entries:
-            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
+            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent().decode(), journal=journal)
 
         # Clear dirty flags and delete deleted content
         pim.Content.delete().where((pim.Content.journal == journal) & pim.Content.deleted).execute()
