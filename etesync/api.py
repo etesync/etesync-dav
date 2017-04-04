@@ -68,7 +68,7 @@ class EteSync:
                 del existing[journal.uid]
             else:
                 journal = cache.JournalEntity(owner=self.user, version=entry.version, uid=entry.uid)
-            journal.content = entry.getContent()
+            journal.content = entry.getContent().decode()
             journal.save()
 
         # Delete remaining
@@ -84,7 +84,7 @@ class EteSync:
         for journal in changed:
             crypto_manager = CryptoManager(journal.version, self.cipher_key, journal.uid.encode())
             raw_journal = service.RawJournal(crypto_manager, uid=journal.uid)
-            raw_journal.update(journal.content)
+            raw_journal.update(journal.content.encode())
 
             if journal.deleted:
                 manager.delete(raw_journal)
