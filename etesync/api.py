@@ -236,11 +236,24 @@ class PimObject(ApiObjectBase):
     _CACHE_OBJ_CLASS = pim.Content
 
     @classmethod
-    def create(cls, collection, uid, content):
+    def create(cls, collection, content):
         if collection.get_content_class() != cls:
             raise Exception('Collection "{}" does not allow "{}" children.'.format(
                 collection.__class__.__name__, cls.__name__))
-        return super().create(collection.journal, uid, content)
+        ret = super().create(collection.journal, None, None)
+        ret.content = content
+        return ret
+
+    @property
+    def content(self):
+        return self._cache_obj.content
+
+    @content.setter
+    def content(self, content):
+        if isinstance(content, bytes):
+            content = content.decode()
+        self._cache_obj.content = content
+        self.uid = self.__class__.get_uid(content)
 
     def delete(self):
         self._cache_obj.deleted = True
@@ -252,11 +265,17 @@ class PimObject(ApiObjectBase):
 
 
 class Event(PimObject):
-    pass
+    @classmethod
+    def get_uid(cls, content):
+        vobj = vobject.readOne(content)
+        return vobj.vevent.uid.value
 
 
 class Contact(PimObject):
-    pass
+    @classmethod
+    def get_uid(cls, content):
+        vobj = vobject.readOne(content)
+        return vobj.uid.value
 
 
 class BaseCollection:
@@ -292,7 +311,7 @@ class BaseCollection:
 
     def apply_sync_entry(self, sync_entry):
         journal = self._cache_obj
-        uid = self.get_uid(sync_entry)
+        uid = self.get_content_class().get_uid(sync_entry.content)
 
         try:
             content = pim.Content.get(uid=uid, journal=journal)
@@ -347,10 +366,6 @@ class BaseCollection:
 class Calendar(BaseCollection):
     TYPE = 'CALENDAR'
 
-    def get_uid(self, sync_entry):
-        vobj = vobject.readOne(sync_entry.content)
-        return vobj.vevent.uid.value
-
     def get_content_class(self):
         return Event
 
@@ -362,10 +377,6 @@ class Calendar(BaseCollection):
 
 class AddressBook(BaseCollection):
     TYPE = 'ADDRESS_BOOK'
-
-    def get_uid(self, sync_entry):
-        vobj = vobject.readOne(sync_entry.content)
-        return vobj.uid.value
 
     def get_content_class(self):
         return Contact

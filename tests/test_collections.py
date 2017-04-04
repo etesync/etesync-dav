@@ -66,7 +66,7 @@ class TestCollection:
         b = api.AddressBook.create(etesync, get_random_uid(self), {'displayName': 'Test 2'})
         c = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test 3'})
 
-        ev = api.Event.create(a, '2cd64f22-1111-44f5-bc45-53440af38cec',
+        ev = api.Event.create(a,
                               'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                               '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
@@ -84,7 +84,7 @@ class TestCollection:
         assert ev.uid == a.get('2cd64f22-1111-44f5-bc45-53440af38cec').uid
 
         # Fail to create another event with the same uid
-        ev = api.Event.create(a, '2cd64f22-1111-44f5-bc45-53440af38cec',
+        ev = api.Event.create(a,
                               'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                               '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
@@ -99,7 +99,7 @@ class TestCollection:
         # Wrong child in collection
         # FIXME: Test for the correct exception once we have it
         with pytest.raises(Exception):
-            api.Event.create(b, '2cd64f22-2222-44f5-bc45-53440af38cec', (
+            api.Event.create(b, (
                   'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                   '747Z\r\nUID:2cd64f22-2222-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                   '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
@@ -107,7 +107,7 @@ class TestCollection:
 
         # Same uid in different collections
         c.save()
-        ev2 = api.Event.create(c, ev.uid, ev.content)
+        ev2 = api.Event.create(c, ev.content)
         ev2.save()
 
         # # First is still here even after we delete the new one

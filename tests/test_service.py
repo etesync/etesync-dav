@@ -125,7 +125,7 @@ class TestService:
 
         assert len(list(etesync.list())) == 1
 
-        ev = api.Event.create(a, '2cd64f22-1111-44f5-bc45-53440af38cec',
+        ev = api.Event.create(a,
                               'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                               '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
