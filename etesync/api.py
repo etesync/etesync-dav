@@ -250,8 +250,6 @@ class PimObject(ApiObjectBase):
 
     @content.setter
     def content(self, content):
-        if isinstance(content, bytes):
-            content = content.decode()
         self._cache_obj.content = content
         self.uid = self.__class__.get_uid(content)
 

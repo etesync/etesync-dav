@@ -138,7 +138,7 @@ class TestService:
         assert len(list(a.journal.list())) == 1
         assert get_action(list(a.journal.list())[-1]) == 'ADD'
 
-        ev.content = ev.content + b' '
+        ev.content = ev.content + ' '
         ev.save()
 
         etesync.sync()

@@ -199,5 +199,5 @@ class SyncEntry:
         return SyncEntry(data['action'], data['content'])
 
     def to_json(self):
-        data = {'action': self.action, 'content': self.content.decode()}
+        data = {'action': self.action, 'content': self.content}
         return json.dumps(data, ensure_ascii=False)
