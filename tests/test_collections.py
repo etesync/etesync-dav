@@ -83,6 +83,16 @@ class TestCollection:
 
         assert ev.uid == a.get('2cd64f22-1111-44f5-bc45-53440af38cec').uid
 
+        # Fail to create another event with the same uid
+        ev = api.Event.create(a, '2cd64f22-1111-44f5-bc45-53440af38cec',
+                              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+                              '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+        # FIXME: Test for the correct exception once we have it
+        with pytest.raises(Exception):
+            ev.save()
+
         # Trying to add an Event into an AddressBook
         b.save()
 
