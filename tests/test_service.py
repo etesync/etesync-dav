@@ -128,7 +128,7 @@ class TestService:
         ev = api.Event.create(a,
                               'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
-                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:FÖÖBÖÖ\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
                               'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
         ev.save()
 
