@@ -113,3 +113,23 @@ class TestCollection:
         # # First is still here even after we delete the new one
         ev2.delete()
         assert ev.uid == a.get('2cd64f22-1111-44f5-bc45-53440af38cec').uid
+
+    def test_unicode(self, etesync):
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'יוניקוד'})
+
+        # Create the event
+        a.save()
+
+        a2 = etesync.get(a.journal.uid)
+
+        assert a.display_name == a2.collection.display_name
+
+        ev = api.Event.create(a, (
+              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+              '747Z\r\nUID:2cd64f22-2222-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
+              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:יוניקוד\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n'))
+
+        ev.save()
+
+        assert ev.content == a.get(ev.uid).content
