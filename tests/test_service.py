@@ -161,3 +161,8 @@ class TestService:
         assert len(list(a.journal.list())) == 3
         assert get_action(list(a.journal.list())[-1]) == 'DELETE'
         assert len(list(a.list())) == 0
+
+    def test_collection_unicode(self, etesync):
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'fööböö'})
+        a.save()
+        etesync.sync()
