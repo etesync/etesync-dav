@@ -165,4 +165,15 @@ class TestService:
     def test_collection_unicode(self, etesync):
         a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'fööböö'})
         a.save()
+
+        ev = api.Event.create(
+            a,
+            ('BEGIN:VCALENDAR\r\n'
+             'BEGIN:VEVENT\r\n'
+             'UID:test @ foo ät bar град сатану\r\n'
+             'SUMMARY:FÖÖBÖÖ\r\n'
+             'END:VEVENT\r\n'
+             'END:VCALENDAR\r\n')
+        )
+        ev.save()
         etesync.sync()
