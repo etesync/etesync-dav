@@ -1,4 +1,4 @@
-This is a python module for interaction with [EteSync](https://www.etesync.com)
+This is a python client library for [EteSync](https://www.etesync.com)
 
 This module provides a python API to interact with an EteSync server.
 It currently implements AddressBook and Calendar access, and supports two-way
