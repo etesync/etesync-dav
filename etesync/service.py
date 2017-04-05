@@ -95,7 +95,9 @@ class RawEntry(RawBase):
 
 class BaseManager:
     def __init__(self, auth_token):
-        self.headers = {'Authorization': 'Token ' + auth_token}
+        headers = {'Authorization': 'Token ' + auth_token}
+        self.requests = requests.Session()
+        self.requests.headers.update(headers)
 
     def detail_url(self, uid):
         remote = self.remote.copy()
@@ -125,7 +127,7 @@ class JournalManager(BaseManager):
         self.remote.path.normalize()
 
     def list(self, password):
-        response = requests.get(self.remote.url, headers=self.headers)
+        response = self.requests.get(self.remote.url)
         self._validate_response(response)
         data = response.json()
         for j in data:
@@ -138,18 +140,18 @@ class JournalManager(BaseManager):
 
     def add(self, journal):
         data = journal.to_simple()
-        response = requests.post(self.remote.url, headers=self.headers, json=data)
+        response = self.requests.post(self.remote.url, json=data)
         self._validate_response(response)
 
     def delete(self, journal):
         remote = self.detail_url(journal.uid)
-        response = requests.delete(remote.url, headers=self.headers)
+        response = self.requests.delete(remote.url)
         self._validate_response(response)
 
     def update(self, journal):
         remote = self.detail_url(journal.uid)
         data = journal.to_simple()
-        response = requests.put(remote.url, headers=self.headers, json=data)
+        response = self.requests.put(remote.url, json=data)
         self._validate_response(response)
 
 
@@ -167,7 +169,7 @@ class EntryManager(BaseManager):
             prev = RawEntry(crypto_manager, b'', last)
             remote.args['last'] = last
 
-        response = requests.get(remote.url, headers=self.headers)
+        response = self.requests.get(remote.url)
         self._validate_response(response)
         data = response.json()
         for j in data:
@@ -184,7 +186,7 @@ class EntryManager(BaseManager):
             remote.args['last'] = last
 
         data = list(map(lambda x: x.to_simple(), entries))
-        response = requests.post(remote.url, headers=self.headers, json=data)
+        response = self.requests.post(remote.url, json=data)
         self._validate_response(response)
 
 
