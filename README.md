@@ -6,6 +6,12 @@ sync (both push and pull) to the server.
 It doesn't currently implement pushing raw journal entries which are needed for
 people implementing new EteSync journal types which will be implemented soon.
 
+To install, please run:
+
+```
+pip install etesync
+```
+
 The module works and the API is tested (see [tests/](tests/)), however there still
 may be some oddities, so please report if you encounter any.
 
