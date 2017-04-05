@@ -63,8 +63,7 @@ class TestCollection:
 
         # Try saving two collections with the same uid
         c = api.Calendar.create(etesync, a.journal.uid, {'displayName': 'Test'})
-        # FIXME: Test for the correct exception once we have it
-        with pytest.raises(Exception):
+        with pytest.raises(exceptions.AlreadyExists):
             c.save()
 
     def test_content_crud(self, etesync):
@@ -79,8 +78,7 @@ class TestCollection:
                               'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
 
         # Try saving before the journal is saved
-        # FIXME: Test for the correct exception once we have it
-        with pytest.raises(Exception):
+        with pytest.raises(exceptions.DoesNotExist):
             ev.save()
 
         # Create the event
@@ -95,8 +93,7 @@ class TestCollection:
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
                               '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
                               'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
-        # FIXME: Test for the correct exception once we have it
-        with pytest.raises(Exception):
+        with pytest.raises(exceptions.AlreadyExists):
             ev.save()
 
         # Trying to add an Event into an AddressBook

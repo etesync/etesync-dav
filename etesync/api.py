@@ -1,6 +1,7 @@
 import vobject
 import json
 import os
+import peewee
 
 from .crypto import CryptoManager, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
@@ -225,12 +226,18 @@ class ApiObjectBase:
     def content(self, content):
         self._cache_obj.content = content
 
+    def save(self):
+        try:
+            self._cache_obj.save()
+        except peewee.IntegrityError as e:
+            if 'UNIQUE' in str(e):
+                raise exceptions.AlreadyExists(e)
+            else:
+                raise exceptions.DoesNotExist(e)
+
 
 class Entry(ApiObjectBase):
     _CACHE_OBJ_CLASS = cache.EntryEntity
-
-    def save(self):
-        self._cache_obj.save()
 
 
 class PimObject(ApiObjectBase):
@@ -260,7 +267,7 @@ class PimObject(ApiObjectBase):
 
     def save(self):
         self._cache_obj.dirty = True
-        self._cache_obj.save()
+        super().save()
 
 
 class Event(PimObject):
@@ -359,7 +366,10 @@ class BaseCollection:
 
     def save(self):
         self._cache_obj.dirty = True
-        self._cache_obj.save()
+        try:
+            self._cache_obj.save()
+        except peewee.IntegrityError as e:
+            raise exceptions.AlreadyExists(e)
 
 
 class Calendar(BaseCollection):

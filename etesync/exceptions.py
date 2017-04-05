@@ -26,5 +26,13 @@ class IntegrityException(SecurityException):
     pass
 
 
-class DoesNotExist(Exception):
+class StorageException(Exception):
+    pass
+
+
+class DoesNotExist(StorageException):
+    pass
+
+
+class AlreadyExists(StorageException):
     pass
