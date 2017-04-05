@@ -61,6 +61,12 @@ class TestCollection:
         b.delete()
         assert len(list(etesync.list())) == 0
 
+        # Try saving two collections with the same uid
+        c = api.Calendar.create(etesync, a.journal.uid, {'displayName': 'Test'})
+        # FIXME: Test for the correct exception once we have it
+        with pytest.raises(Exception):
+            c.save()
+
     def test_content_crud(self, etesync):
         a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test'})
         b = api.AddressBook.create(etesync, get_random_uid(self), {'displayName': 'Test 2'})
