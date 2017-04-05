@@ -9,6 +9,7 @@ setup(
     author_email='development@etesync.com',
     url='https://github.com/etesync/pyetesync',
     description='Python client library for EteSync',
+    keywords=['etesync', 'encryption', 'sync', 'pim'],
     license='LGPL',
     long_description=open('README.md').read(),
     packages=find_packages(),
