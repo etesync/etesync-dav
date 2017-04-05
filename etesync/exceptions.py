@@ -36,3 +36,7 @@ class DoesNotExist(StorageException):
 
 class AlreadyExists(StorageException):
     pass
+
+
+class TypeMismatch(StorageException):
+    pass

@@ -100,8 +100,7 @@ class TestCollection:
         b.save()
 
         # Wrong child in collection
-        # FIXME: Test for the correct exception once we have it
-        with pytest.raises(Exception):
+        with pytest.raises(exceptions.TypeMismatch):
             api.Event.create(b, (
                   'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                   '747Z\r\nUID:2cd64f22-2222-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +

@@ -246,7 +246,7 @@ class PimObject(ApiObjectBase):
     @classmethod
     def create(cls, collection, content):
         if collection.get_content_class() != cls:
-            raise Exception('Collection "{}" does not allow "{}" children.'.format(
+            raise exceptions.TypeMismatch('Collection "{}" does not allow "{}" children.'.format(
                 collection.__class__.__name__, cls.__name__))
         ret = super().create(collection.journal, None, None)
         ret.content = content
