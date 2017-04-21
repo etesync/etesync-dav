@@ -159,7 +159,7 @@ class EntryManager(BaseManager):
     def __init__(self, remote, auth_token, journalId):
         super().__init__(auth_token)
         self.remote = furl(remote)
-        self.remote.path.segments.extend(API_PATH + ('journal', journalId, ''))
+        self.remote.path.segments.extend(API_PATH + ('journals', journalId, 'entries', ''))
         self.remote.path.normalize()
 
     def list(self, crypto_manager, last=None):
