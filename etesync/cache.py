@@ -8,7 +8,7 @@ class User(db.BaseModel):
 
 
 class JournalEntity(db.BaseModel):
-    owner = pw.ForeignKeyField(User, related_name='journals')
+    local_user = pw.ForeignKeyField(User, related_name='journals')
     version = pw.IntegerField()
     uid = pw.CharField(unique=True, null=False, index=True)
     content = pw.TextField()

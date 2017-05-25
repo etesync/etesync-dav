@@ -68,7 +68,7 @@ class EteSync:
                 journal = existing[entry.uid]
                 del existing[journal.uid]
             else:
-                journal = cache.JournalEntity(owner=self.user, version=entry.version, uid=entry.uid)
+                journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid)
             journal.content = entry.getContent().decode()
             journal.save()
 
@@ -351,7 +351,7 @@ class BaseCollection:
     @classmethod
     def create(cls, etesync, uid, content):
         cache_obj = cache.JournalEntity(new=True)
-        cache_obj.owner = etesync.user
+        cache_obj.local_user = etesync.user
         cache_obj.uid = uid
         cache_obj.version = CURRENT_VERSION
 
