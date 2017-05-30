@@ -1,8 +1,8 @@
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes, padding
+from cryptography.hazmat.primitives.asymmetric import rsa, padding as asym_padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
-import pyaes
 import hashlib
 import hmac
 import pyscrypt
@@ -37,8 +37,8 @@ class AsymmetricKeyPair:
 class AsymmetricCryptoManager:
     def __init__(self, key_pair):
         self.key_pair = key_pair
-        self._padding = padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA1()),
+        self._padding = asym_padding.OAEP(
+            mgf=asym_padding.MGF1(algorithm=hashes.SHA1()),
             algorithm=hashes.SHA1(),
             label=None
         )
@@ -103,19 +103,21 @@ class CryptoManager:
     def decrypt(self, ctext):
         iv = ctext[:AES_BLOCK_SIZE]
         ctext = ctext[AES_BLOCK_SIZE:]
-        aes = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(self.cipher_key, iv=iv))
+        cipher = Cipher(algorithms.AES(self.cipher_key), modes.CBC(iv), backend=default_backend())
+        unpadder = padding.PKCS7(AES_BLOCK_SIZE * 8).unpadder()
+        decryptor = cipher.decryptor()
 
-        ret = aes.feed(ctext)
-        ret += aes.feed()
-        return ret
+        data = decryptor.update(ctext) + decryptor.finalize()
+        return unpadder.update(data) + unpadder.finalize()
 
     def encrypt(self, clear_text):
         iv = os.urandom(AES_BLOCK_SIZE)
-        aes = pyaes.Encrypter(pyaes.AESModeOfOperationCBC(self.cipher_key, iv=iv))
+        cipher = Cipher(algorithms.AES(self.cipher_key), modes.CBC(iv), backend=default_backend())
+        padder = padding.PKCS7(AES_BLOCK_SIZE * 8).padder()
+        encryptor = cipher.encryptor()
+        padded_data = padder.update(clear_text) + padder.finalize()
 
-        ret = aes.feed(clear_text)
-        ret += aes.feed()
-        return iv + ret
+        return iv + encryptor.update(padded_data) + encryptor.finalize()
 
     def hmac(self, data):
         if self.version == 1:
