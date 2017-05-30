@@ -27,23 +27,23 @@ class TestCrypto:
     def test_crypto_v1(self):
         # Just make sure we don't break derivation
         crypto_manager = crypto.CryptoManager(1, DERIVED_KEY, b'TestSaltShouldBeJournalId')
-        clear_text = 'This Is Some Test Cleartext.'
+        clear_text = b'This Is Some Test Cleartext.'
         cipher = crypto_manager.encrypt(clear_text)
-        assert clear_text == crypto_manager.decrypt(cipher).decode()
+        assert clear_text == crypto_manager.decrypt(cipher)
 
         expected = b'/?\x87P\\\xe1\xd4wc\xc6\xe1\x9dB\xb0p\x04mH\xcct\xf4\xba\x0e\xa6;\xc7\xf0x\xf4\x9b^\xd7'
-        assert expected == crypto_manager.hmac('Some test data'.encode())
+        assert expected == crypto_manager.hmac(b'Some test data')
 
     def test_crypto_v2(self):
         # Just make sure we don't break derivation
         crypto_manager = crypto.CryptoManager(2, DERIVED_KEY, b'TestSaltShouldBeJournalId')
-        clear_text = 'This Is Some Test Cleartext.'
+        clear_text = b'This Is Some Test Cleartext.'
         cipher = crypto_manager.encrypt(clear_text)
-        assert clear_text == crypto_manager.decrypt(cipher).decode()
+        assert clear_text == crypto_manager.decrypt(cipher)
 
         expected = (b']\x0f\xc0\xd2\x07\xa7\xb4\xe6\x84\xf7\xc4}\xc37\xf7\xccB\x00\x1e>\x0e\x1fQ\x85\xf0\x9e\x02\xe8' +
                     b'\x98\x89\xba\x9a')
-        assert expected == crypto_manager.hmac('Some test data'.encode())
+        assert expected == crypto_manager.hmac(b'Some test data')
 
     def test_crypto_v_too_new(self):
         with pytest.raises(exceptions.VersionTooNew):
