@@ -59,11 +59,13 @@ class RawBase:
 
 
 class RawJournal(RawBase):
-    def __init__(self, crypto_manager, content=None, uid=None):
+    def __init__(self, crypto_manager, content=None, uid=None, owner=None, encrypted_key=None):
         super().__init__(crypto_manager, content, uid)
         if content is not None:
             self.hmac = content[:HMAC_SIZE]
             self.content = content[HMAC_SIZE:]
+        self.owner = owner
+        self.encrypted_key = encrypted_key
 
     def calc_hmac(self):
         return self.crypto_manager.hmac(self.uid.encode() + self.content)
@@ -94,6 +96,31 @@ class RawEntry(RawBase):
     def update(self, content, prev):
         self.setContent(content)
         self.uid = binascii.hexlify(self.calc_hmac(prev)).decode()
+
+
+class RawUserInfo(RawBase):
+    def __init__(self, crypto_manager, owner=None, pubkey=None, content=None):
+        super().__init__(crypto_manager, content, None)
+        self.owner = owner
+        self.pubkey = pubkey
+        if content is not None:
+            self.hmac = content[:HMAC_SIZE]
+            self.content = content[HMAC_SIZE:]
+
+    def calc_hmac(self):
+        return self.crypto_manager.hmac(self.content + self.pubkey)
+
+    def verify(self):
+        self._verify_hmac(self.hmac, self.calc_hmac())
+
+    def to_simple(self):
+        content = base64.b64encode(self.hmac + self.content)
+        pubkey = base64.b64encode(self.pubkey)
+        return {'owner': self.owner, 'pubkey': pubkey.decode(), 'content': content.decode(), 'version': self.version}
+
+    def update(self, content):
+        self.setContent(content)
+        self.hmac = self.calc_hmac()
 
 
 class BaseManager:
@@ -137,8 +164,12 @@ class JournalManager(BaseManager):
             uid = j['uid']
             version = j['version']
             content = base64.b64decode(j['content'])
+            owner = j['owner']
+            key = j['key']
+            encrypted_key = base64.b64decode(key) if key is not None else None
             crypto_manager = CryptoManager(version, password, uid.encode())
-            journal = RawJournal(crypto_manager=crypto_manager, content=content, uid=uid)
+            journal = RawJournal(crypto_manager=crypto_manager, content=content, uid=uid, owner=owner,
+                                 encrypted_key=encrypted_key)
             yield journal
 
     def add(self, journal):
@@ -155,6 +186,23 @@ class JournalManager(BaseManager):
         remote = self.detail_url(journal.uid)
         data = journal.to_simple()
         response = self.requests.put(remote.url, json=data)
+        self._validate_response(response)
+
+    # Members
+    def _get_member_remote(self, journal, member_user=None):
+        remote = self.detail_url(journal.uid).copy()
+        segments = ['members']
+        if member_user is not None:
+            segments.append(member_user)
+        segments.append('')
+        remote.path.segments.extend(segments)
+        remote.path.normalize()
+        return remote
+
+    def member_add(self, journal, member):
+        remote = self._get_member_remote(journal)
+        data = member.to_simple()
+        response = self.requests.post(remote.url, json=data)
         self._validate_response(response)
 
 
@@ -193,6 +241,41 @@ class EntryManager(BaseManager):
         self._validate_response(response)
 
 
+class UserInfoManager(BaseManager):
+    def __init__(self, remote, auth_token):
+        super().__init__(auth_token)
+        self.remote = furl(remote)
+        self.remote.path.segments.extend(API_PATH + ('user', ''))
+        self.remote.path.normalize()
+
+    def get(self, owner, cipher_key):
+        remote = self.detail_url(owner)
+        response = self.requests.get(remote.url)
+        self._validate_response(response)
+        data = response.json()
+        version = data['version']
+        content = base64.b64decode(data['content'])
+        pubkey = base64.b64decode(data['pubkey'])
+        crypto_manager = CryptoManager(version, cipher_key, b"userInfo")
+        return RawUserInfo(crypto_manager, owner, pubkey, content)
+
+    def add(self, user_info):
+        data = user_info.to_simple()
+        response = self.requests.post(self.remote.url, json=data)
+        self._validate_response(response)
+
+    def delete(self, user_info):
+        remote = self.detail_url(user_info.owner)
+        response = self.requests.delete(remote.url)
+        self._validate_response(response)
+
+    def update(self, user_info):
+        remote = self.detail_url(user_info.owner)
+        data = user_info.to_simple()
+        response = self.requests.put(remote.url, json=data)
+        self._validate_response(response)
+
+
 class SyncEntry:
     def __init__(self, action, content):
         self.action = action
@@ -206,3 +289,13 @@ class SyncEntry:
     def to_json(self):
         data = {'action': self.action, 'content': self.content}
         return json.dumps(data, ensure_ascii=False)
+
+
+class Member:
+    def __init__(self, user, key):
+        self.user = user
+        self.key = key
+
+    def to_simple(self):
+        key = base64.b64encode(self.key)
+        return {'user': self.user, 'key': key.decode()}

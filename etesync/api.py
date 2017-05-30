@@ -3,7 +3,7 @@ import json
 import os
 import peewee
 
-from .crypto import CryptoManager, derive_key, CURRENT_VERSION
+from .crypto import CryptoManager, AsymmetricKeyPair, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
 from . import cache, pim, service, db, exceptions
 
@@ -47,7 +47,8 @@ class EteSync:
         self._set_db(database)
 
     def _init_db_tables(self, database):
-        database.create_tables([pim.Content, cache.User, cache.JournalEntity, cache.EntryEntity], safe=True)
+        database.create_tables([pim.Content, cache.User, cache.JournalEntity,
+                                cache.EntryEntity, cache.UserInfo], safe=True)
 
     def sync(self):
         self.sync_journal_list()
@@ -63,12 +64,15 @@ class EteSync:
             existing[journal.uid] = journal._cache_obj
 
         for entry in manager.list(self.cipher_key):
+            entry.crypto_manager = self._get_journal_cryptomanager(entry)
             entry.verify()
             if entry.uid in existing:
                 journal = existing[entry.uid]
                 del existing[journal.uid]
             else:
-                journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid)
+                journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid,
+                                              owner=entry.owner,
+                                              encrypted_key=entry.encrypted_key)
             journal.content = entry.getContent().decode()
             journal.save()
 
@@ -104,6 +108,24 @@ class EteSync:
         self.pull_journal(uid)
         self.push_journal(uid)
 
+    def _get_journal_cryptomanager(self, journal):
+        if journal.encrypted_key is not None:
+            # If journal is pubkey encrypted, fetch encryption key
+            try:
+                user_info = cache.UserInfo.get(user=self.user)
+            except cache.UserInfo.DoesNotExist:
+                info_manager = service.UserInfoManager(self.remote, self.auth_token)
+                remote_info = info_manager.get(self.user.username, self.cipher_key)
+                remote_info.verify()
+                user_info = cache.UserInfo(user=self.user, pubkey=remote_info.pubkey, content=remote_info.getContent())
+                user_info.save()
+            key_pair = AsymmetricKeyPair(user_info.content, user_info.pubkey)
+            return CryptoManager.create_from_asymmetric_encryted_key(
+                    journal.version, key_pair, journal.encrypted_key)
+        else:
+            cipher_key = self.cipher_key
+            return CryptoManager(journal.version, cipher_key, journal.uid.encode())
+
     def _get_last_entry(self, journal):
         try:
             return journal.entries.order_by(cache.EntryEntity.id.desc()).get()
@@ -115,7 +137,8 @@ class EteSync:
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
         journal = cache.JournalEntity.get(uid=journal_uid)
-        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
+        crypto_manager = self._get_journal_cryptomanager(journal)
+
         collection = Journal._from_cache(journal).collection
 
         prev = self._get_last_entry(journal)

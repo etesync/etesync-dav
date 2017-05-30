@@ -11,6 +11,8 @@ class JournalEntity(db.BaseModel):
     local_user = pw.ForeignKeyField(User, related_name='journals')
     version = pw.IntegerField()
     uid = pw.CharField(null=False, index=True)
+    owner = pw.CharField(null=True)
+    encrypted_key = pw.TextField(null=True)
     content = pw.TextField()
     new = pw.BooleanField(null=False, default=False)
     dirty = pw.BooleanField(null=False, default=False)
@@ -33,3 +35,9 @@ class EntryEntity(db.BaseModel):
             (('journal', 'uid'), True),
         )
         order_by = ('id', )
+
+
+class UserInfo(db.BaseModel):
+    user = pw.ForeignKeyField(User, primary_key=True, related_name='user_info')
+    pubkey = pw.TextField(null=False)
+    content = pw.TextField(null=False)
