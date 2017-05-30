@@ -10,6 +10,7 @@ from etesync.crypto import hmac256
 
 USER_EMAIL = 'test@localhost'
 USER_PASSWORD = 'SomePassword'
+USER2_EMAIL = 'test2@localhost'
 TEST_REMOTE = 'http://localhost:8000/'
 TEST_DB = ':memory:'
 
@@ -177,6 +178,56 @@ class TestService:
         )
         ev.save()
         etesync.sync()
+
+    def test_collection_shared(self, etesync):
+        from etesync import service, crypto
+
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'fööböö'})
+        a.save()
+
+        ev = api.Event.create(
+            a,
+            ('BEGIN:VCALENDAR\r\n'
+             'BEGIN:VEVENT\r\n'
+             'UID:test @ foo ät bar град сатану\r\n'
+             'SUMMARY:FÖÖBÖÖ\r\n'
+             'END:VEVENT\r\n'
+             'END:VCALENDAR\r\n')
+        )
+        ev.save()
+        journal_manager = service.JournalManager(etesync.remote, etesync.auth_token)
+        etesync.sync()
+
+        key_pair = crypto.AsymmetricCryptoManager.generate_key_pair()
+        asymmetric_crypto_manager = crypto.AsymmetricCryptoManager(key_pair)
+        # FIXME: Hack, shouldn't calculate it here
+        cipher_key = hmac256(a.journal.uid.encode(), etesync.cipher_key)
+        encrypted_key = asymmetric_crypto_manager.encrypt(key_pair.public_key, cipher_key)
+        member = service.Member(USER2_EMAIL, encrypted_key)
+
+        # Second user
+        auth = api.Authenticator(TEST_REMOTE)
+        token = auth.get_auth_token(USER2_EMAIL, USER_PASSWORD)
+        etesync2 = api.EteSync(USER2_EMAIL, token, remote=TEST_REMOTE, db_path=TEST_DB)
+        headers = {'Authorization': 'Token ' + etesync2.auth_token}
+        response = requests.post(TEST_REMOTE + 'reset/', headers=headers, allow_redirects=False)
+        assert response.status_code == 200
+
+        journal_manager.member_add(a.journal._cache_obj, member)
+
+        info_manager = service.UserInfoManager(etesync2.remote, etesync2.auth_token)
+        crypto_manager = crypto.CryptoManager(crypto.CURRENT_VERSION, etesync2.cipher_key, b"userInfo")
+        user_info = service.RawUserInfo(crypto_manager, USER2_EMAIL, key_pair.public_key)
+        user_info.update(key_pair.private_key)
+        user_info.verify()
+        info_manager.add(user_info)
+
+        etesync2.sync()
+
+        journal_list = list(etesync2.list())
+        assert len(journal_list) == 1
+
+        assert journal_list[0].uid == a.journal.uid
 
     def test_user_info_manage(self, etesync):
         # FIXME: Shouldn't expose and rely on service

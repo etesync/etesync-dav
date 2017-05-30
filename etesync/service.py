@@ -188,6 +188,23 @@ class JournalManager(BaseManager):
         response = self.requests.put(remote.url, json=data)
         self._validate_response(response)
 
+    # Members
+    def _get_member_remote(self, journal, member_user=None):
+        remote = self.detail_url(journal.uid).copy()
+        segments = ['members']
+        if member_user is not None:
+            segments.append(member_user)
+        segments.append('')
+        remote.path.segments.extend(segments)
+        remote.path.normalize()
+        return remote
+
+    def member_add(self, journal, member):
+        remote = self._get_member_remote(journal)
+        data = member.to_simple()
+        response = self.requests.post(remote.url, json=data)
+        self._validate_response(response)
+
 
 class EntryManager(BaseManager):
     def __init__(self, remote, auth_token, journalId):
@@ -272,3 +289,13 @@ class SyncEntry:
     def to_json(self):
         data = {'action': self.action, 'content': self.content}
         return json.dumps(data, ensure_ascii=False)
+
+
+class Member:
+    def __init__(self, user, key):
+        self.user = user
+        self.key = key
+
+    def to_simple(self):
+        key = base64.b64encode(self.key)
+        return {'user': self.user, 'key': key.decode()}

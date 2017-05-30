@@ -35,3 +35,9 @@ class EntryEntity(db.BaseModel):
             (('journal', 'uid'), True),
         )
         order_by = ('id', )
+
+
+class UserInfo(db.BaseModel):
+    user = pw.ForeignKeyField(User, primary_key=True, related_name='user_info')
+    pubkey = pw.TextField(null=False)
+    content = pw.TextField(null=False)
