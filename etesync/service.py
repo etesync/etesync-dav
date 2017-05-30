@@ -36,8 +36,11 @@ class RawBase:
     def __init__(self, crypto_manager, content=None, uid=None):
         self.crypto_manager = crypto_manager
         self.uid = uid
-        self.version = crypto_manager.version
         self.content = content
+
+    @property
+    def version(self):
+        return self.crypto_manager.version
 
     def getContent(self):
         return self.crypto_manager.decrypt(self.content)
