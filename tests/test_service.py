@@ -177,3 +177,44 @@ class TestService:
         )
         ev.save()
         etesync.sync()
+
+    def test_user_info_manage(self, etesync):
+        # FIXME: Shouldn't expose and rely on service
+        from etesync import service
+        from etesync.crypto import CryptoManager, CURRENT_VERSION
+
+        # Failed get
+        info_manager = service.UserInfoManager(etesync.remote, etesync.auth_token)
+        with pytest.raises(exceptions.HttpException):
+            info_manager.get(USER_EMAIL, etesync.cipher_key)
+
+        # Add
+        crypto_manager = CryptoManager(CURRENT_VERSION, etesync.cipher_key, b"userInfo")
+        user_info = service.RawUserInfo(crypto_manager, USER_EMAIL, b"pubkeyTest")
+        user_info.update(b"contentTest")
+        user_info.verify()
+
+        info_manager.add(user_info)
+
+        user_info2 = info_manager.get(USER_EMAIL, etesync.cipher_key)
+        user_info2.verify()
+
+        assert user_info.content == user_info2.content
+        assert user_info.pubkey == user_info2.pubkey
+        assert user_info.owner == user_info2.owner
+
+        # Update
+        user_info.update(b"contentTest2")
+        info_manager.update(user_info)
+
+        user_info2 = info_manager.get(USER_EMAIL, etesync.cipher_key)
+        user_info2.verify()
+
+        assert user_info.content == user_info2.content
+        assert user_info.pubkey == user_info2.pubkey
+        assert user_info.owner == user_info2.owner
+
+        # Delete
+        info_manager.delete(user_info)
+        with pytest.raises(exceptions.HttpException):
+            info_manager.get(USER_EMAIL, etesync.cipher_key)
