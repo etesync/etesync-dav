@@ -45,6 +45,20 @@ class TestCrypto:
                     b'\x98\x89\xba\x9a')
         assert expected == crypto_manager.hmac(b'Some test data')
 
+    def test_asymmetric_crypto(self):
+        key_pair = crypto.AsymmetricCryptoManager.generate_key_pair()
+        asymmetric_crypto_manager = crypto.AsymmetricCryptoManager(key_pair)
+        encrypted_key = asymmetric_crypto_manager.encrypt(key_pair.public_key, DERIVED_KEY)
+        decrypted_key = asymmetric_crypto_manager.decrypt(encrypted_key)
+
+        assert DERIVED_KEY == decrypted_key
+
+        crypto_manager = crypto.CryptoManager(2, DERIVED_KEY, b'TestSaltShouldBeJournalId')
+        clear_text = b'This Is Some Test Cleartext.'
+        cipher = (b'\x109\xc3_\x1dM\xcd\xcf\x0e>_\xcb\x10\xff7\x07\xe3\xc6/\x17Y\x94} \x04\x1f\x11g\xa3\x1e\x11\xe5' +
+                  b'\xfe#\xbb]JZm\x1dk\xb2\x97\xde\xfcdo\xd3')
+        assert clear_text == crypto_manager.decrypt(cipher)
+
     def test_crypto_v_too_new(self):
         with pytest.raises(exceptions.VersionTooNew):
             crypto.CryptoManager(293, DERIVED_KEY, b'TestSalt')
