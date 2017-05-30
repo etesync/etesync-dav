@@ -68,7 +68,9 @@ class EteSync:
                 journal = existing[entry.uid]
                 del existing[journal.uid]
             else:
-                journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid)
+                journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid,
+                                              owner=entry.owner,
+                                              encrypted_key=entry.encrypted_key)
             journal.content = entry.getContent().decode()
             journal.save()
 

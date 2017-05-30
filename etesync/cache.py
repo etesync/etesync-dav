@@ -11,6 +11,8 @@ class JournalEntity(db.BaseModel):
     local_user = pw.ForeignKeyField(User, related_name='journals')
     version = pw.IntegerField()
     uid = pw.CharField(null=False, index=True)
+    owner = pw.CharField(null=True)
+    encrypted_key = pw.TextField(null=True)
     content = pw.TextField()
     new = pw.BooleanField(null=False, default=False)
     dirty = pw.BooleanField(null=False, default=False)
