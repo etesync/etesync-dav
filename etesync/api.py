@@ -311,18 +311,16 @@ class BaseCollection:
     def __init__(self, journal):
         self._journal = journal
         self._cache_obj = journal._cache_obj
-        if self._cache_obj.content is not None:
-            self._journal_info = json.loads(self._cache_obj.content)
-        else:
-            self._journal_info = self._get_default_info()
+        if self._journal.info is None:
+            self.update_info(None)
 
     @property
     def display_name(self):
-        return self._journal_info.get('displayName')
+        return self._journal.info.get('displayName')
 
     @property
     def description(self):
-        return self._journal_info.get('description')
+        return self._journal.info.get('description')
 
     @property
     def journal(self):
@@ -330,10 +328,9 @@ class BaseCollection:
 
     def update_info(self, update_info):
         if update_info is None:
-            self._journal_info = self._get_default_info()
+            self._journal.update_info(self._get_default_info())
         else:
-            self._journal_info.update(update_info)
-        self._cache_obj.content = json.dumps(self._journal_info, ensure_ascii=False)
+            self._journal.update_info(update_info)
 
     def _get_default_info(self):
         return {'type': self.__class__.TYPE, 'readOnly': False, 'selected': True}
@@ -421,11 +418,26 @@ class Journal(ApiObjectBase):
 
     @property
     def collection(self):
-        journal_info = json.loads(self.content)
+        journal_info = self.info
         if journal_info.get('type') == AddressBook.TYPE:
             return AddressBook(self)
         elif journal_info.get('type') == Calendar.TYPE:
             return Calendar(self)
+
+    @property
+    def info(self):
+        if self._cache_obj.content is not None:
+            return json.loads(self._cache_obj.content)
+
+    def update_info(self, update_info):
+        if update_info is None:
+            raise RuntimeError("update_info can't be None.")
+        else:
+            journal_info = self.info
+            if journal_info is None:
+                journal_info = {}
+            journal_info.update(update_info)
+        self._cache_obj.content = json.dumps(journal_info, ensure_ascii=False)
 
     # CRUD
     def list(self):
