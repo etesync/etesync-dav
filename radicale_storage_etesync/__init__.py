@@ -1,0 +1,490 @@
+from contextlib import contextmanager
+import hashlib
+import posixpath
+import threading
+import time
+
+from .creds import Credentials
+
+import etesync as api
+from radicale.storage import (
+        BaseCollection, sanitize_path, Item, ComponentNotFoundError, get_etag, UnsafePathError, groupby, get_uid
+    )
+import vobject
+
+
+CONFIG_SECTION = "etesync_storage"
+
+
+class MetaMapping:
+    # Mappings between etesync meta and radicale
+    _mappings = {
+            "D:displayname": ("displayName", None, None),
+        }
+
+    @classmethod
+    def _reverse_mapping(cls, mappings):
+        mappings.update({i[1][0]: (i[0], i[1][1], i[1][2]) for i in mappings.items()})
+
+    def _mapping_get(self, key):
+        return self.__class__._mappings.get(key, (key, None, None))
+
+    def map_get(self, info, key):
+        key, get_transform, set_transform = self._mapping_get(key)
+        value = info.get(key, None)
+        if get_transform is not None:
+            value = get_transform(value)
+
+        return key, value
+
+    def map_set(self, key, value):
+        key, get_transform, set_transform = self._mapping_get(key)
+        if set_transform is not None:
+            value = set_transform(value)
+
+        return key, value
+
+
+def RgbToInt(str_color):
+    if str_color is None:
+        return None
+
+    str_color = str_color[1:]
+    color = int(str_color, 16)
+
+    if len(str_color) == 8:  # RGBA
+        alpha = color & 0xFF
+        color = color >> 8
+    else:
+        alpha = 0xFF
+
+    color |= alpha << 24
+    return color
+
+
+def IntToRgb(color):
+    if color is None:
+        return None
+
+    blue = color & 0xFF
+    green = (color >> 8) & 0xFF
+    red = (color >> 16) & 0xFF
+    alpha = (color >> 24) & 0xFF
+
+    return '#%02x%02x%02x%02x' % (red, green, blue, alpha or 0xFF)
+
+
+class MetaMappingCalendar(MetaMapping):
+    _mappings = MetaMapping._mappings.copy()
+    _mappings.update({
+            "C:calendar-description": ("description", None, None),
+            "ICAL:calendar-color": ("color", IntToRgb, RgbToInt),
+        })
+    MetaMapping._reverse_mapping(_mappings)
+
+
+class MetaMappingContacts(MetaMapping):
+    _mappings = MetaMapping._mappings.copy()
+    _mappings.update({
+            "CR:addressbook-description": ("description", None, None),
+        })
+    MetaMapping._reverse_mapping(_mappings)
+
+
+def _trim_suffix(path, suffixes):
+    for suffix in suffixes:
+        if path.endswith(suffix):
+            path = path[:-len(suffix)]
+            break
+
+    return path
+
+
+def _is_principal(path):
+    sane_path = sanitize_path(path).strip("/")
+    attributes = sane_path.split("/")
+    if not attributes[0]:
+        attributes.pop()
+
+    # It's a principal if all we have is the user
+    return len(attributes) == 1
+
+
+def _get_attributes_from_path(path):
+    sane_path = sanitize_path(path).strip("/")
+    attributes = sane_path.split("/")
+    if not attributes[0]:
+        attributes.pop()
+
+    return attributes
+
+
+class PrincipalNotAllowedError(UnsafePathError):
+    def __init__(self, path):
+        message = "Creating a principal collection is not allowed: %r" % path
+        super().__init__(message)
+
+
+class EteSyncItem(Item):
+    def __init__(self, collection, item, href, last_modified=None, etesync_item=None):
+        super().__init__(collection, item, href, last_modified)
+        self.etesync_item = etesync_item
+
+    @property
+    def etag(self):
+        """Encoded as quoted-string (see RFC 2616)."""
+        return get_etag(self.item.serialize())
+
+
+class Collection(BaseCollection):
+    """Collection stored in several files per calendar."""
+
+    def __init__(self, path, principal=False, folder=None, tag=None):
+        attributes = _get_attributes_from_path(path)
+        self.etesync = self.__class__.etesync
+        if len(attributes) == 2:
+            self.uid = attributes[-1]
+            self.journal = self.etesync.get(self.uid)
+            self.collection = self.journal.collection
+            if isinstance(self.collection, api.Calendar):
+                self.tag = "VCALENDAR"
+                self.meta_mappings = MetaMappingCalendar()
+                self.content_suffix = ".ics"
+            elif isinstance(self.collection, api.AddressBook):
+                self.tag = "VADDRESSBOOK"
+                self.meta_mappings = MetaMappingContacts()
+                self.content_suffix = ".vcf"
+
+            if tag is not None and tag != self.tag:
+                raise RuntimeError("Tag mismatch")
+
+            self.is_fake = False
+        else:
+            self.is_fake = True
+
+        # Needed by Radicale
+        self.path = sanitize_path(path).strip("/")
+        self.is_principal = principal
+
+    @classmethod
+    def discover(cls, path, depth="0"):
+        """Discover a list of collections under the given ``path``.
+
+        If ``depth`` is "0", only the actual object under ``path`` is
+        returned.
+
+        If ``depth`` is anything but "0", it is considered as "1" and direct
+        children are included in the result.
+
+        The ``path`` is relative.
+
+        The root collection "/" must always exist.
+
+        """
+
+        # Path should already be sanitized
+        attributes = _get_attributes_from_path(path)
+
+        try:
+            if len(attributes) == 3:
+                # If an item, create a collection for the item.
+                item = attributes.pop()
+                path = "/".join(attributes)
+                collection = cls(path, _is_principal(path))
+                yield collection.get(item)
+                return
+
+            collection = cls(path, _is_principal(path))
+        except api.exceptions.DoesNotExist:
+            return
+
+        yield collection
+
+        if depth == "0":
+            return
+
+        if len(attributes) == 0:
+            yield cls(posixpath.join(path, cls.user), principal=True)
+        elif len(attributes) == 1:
+            for journal in cls.etesync.list():
+                yield cls(posixpath.join(path, journal.uid), principal=False)
+        elif len(attributes) == 2:
+            for item in collection.list():
+                yield collection.get(item)
+
+        elif len(attributes) > 2:
+            raise RuntimeError("Found more than one attribute. Shouldn't happen")
+
+    @property
+    def etag(self):
+        """Encoded as quoted-string (see RFC 2616)."""
+        if self.is_fake:
+            return
+
+        entry = None
+        for entry in self.journal.list():
+            pass
+
+        return entry.uid if entry is not None else hashlib.sha256(b"").hexdigest()
+
+    @classmethod
+    def create_collection(cls, href, collection=None, props=None):
+        """Create a collection.
+
+        If the collection already exists and neither ``collection`` nor
+        ``props`` are set, this method shouldn't do anything. Otherwise the
+        existing collection must be replaced.
+
+        ``collection`` is a list of vobject components.
+
+        ``props`` are metadata values for the collection.
+
+        ``props["tag"]`` is the type of collection (VCALENDAR or
+        VADDRESSBOOK). If the key ``tag`` is missing, it is guessed from the
+        collection.
+
+        """
+        # Path should already be sanitized
+        attributes = _get_attributes_from_path(href)
+        if len(attributes) <= 1:
+            raise PrincipalNotAllowedError
+
+        # Try to infer tag
+        if not props:
+            props = {}
+        if not props.get("tag") and collection:
+            props["tag"] = collection[0].name
+
+        # Try first getting the collection if exists, or create a new one otherwise.
+        try:
+            self = cls(href, principal=False, tag=props.get("tag"))
+        except api.exceptions.DoesNotExist:
+            user_path = posixpath.join('/', cls.user)
+            collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
+            sane_path = posixpath.join(user_path, collection_name)
+
+            if props.get("tag") == "VCALENDAR":
+                inst = api.Calendar.create(cls.etesync, collection_name, None)
+            elif props.get("tag") == "VADDRESSBOOK":
+                inst = api.AddressBook.create(cls.etesync, collection_name, None)
+            else:
+                raise RuntimeError("Bad tag.")
+
+            inst.save()
+            self = cls(sane_path, principal=False)
+
+        self.set_meta(props)
+
+        if collection:
+            if props.get("tag") == "VCALENDAR":
+                collection, = collection
+                items = []
+                for content in ("vevent", "vtodo", "vjournal"):
+                    items.extend(
+                        getattr(collection, "%s_list" % content, []))
+                items_by_uid = groupby(sorted(items, key=get_uid), get_uid)
+                vobject_items = {}
+                for uid, items in items_by_uid:
+                    new_collection = vobject.iCalendar()
+                    for item in items:
+                        new_collection.add(item)
+                    href = self._find_available_file_name(
+                        vobject_items.get)
+                    vobject_items[href] = new_collection
+                self.upload_all_nonatomic(vobject_items)
+            elif props.get("tag") == "VADDRESSBOOK":
+                vobject_items = {}
+                for card in collection:
+                    href = self._find_available_file_name(
+                        vobject_items.get)
+                    vobject_items[href] = card
+                self.upload_all_nonatomic(vobject_items)
+
+        return self
+
+    def list(self):
+        """List collection items."""
+        if self.is_fake:
+            return
+
+        for item in self.collection.list():
+            yield item.uid + self.content_suffix
+
+    def get(self, href):
+        """Fetch a single item."""
+        if self.is_fake:
+            return
+
+        uid = _trim_suffix(href, ('.ics', '.ical', '.vcf'))
+        etesync_item = self.collection.get(uid)
+        if etesync_item is None:
+            return None
+
+        try:
+            item = vobject.readOne(etesync_item.content)
+        except Exception as e:
+            raise RuntimeError("Failed to parse item %r in %r" %
+                               (href, self.path)) from e
+        # FIXME: Make this sensible
+        last_modified = time.strftime(
+            "%a, %d %b %Y %H:%M:%S GMT",
+            time.gmtime(time.time()))
+        return EteSyncItem(self, item, href, last_modified=last_modified, etesync_item=etesync_item)
+
+    def upload(self, href, vobject_item):
+        """Upload a new or replace an existing item."""
+        if self.is_fake:
+            return
+
+        content = vobject_item.serialize()
+        try:
+            item = self.get(href)
+            etesync_item = item.etesync_item
+            etesync_item.content = content
+        except api.exceptions.DoesNotExist:
+            etesync_item = self.collection.get_content_class().create(self.collection, content)
+
+        etesync_item.save()
+
+        return self.get(href)
+
+    def delete(self, href=None):
+        """Delete an item.
+
+        When ``href`` is ``None``, delete the collection.
+
+        """
+        if self.is_fake:
+            return
+
+        if href is None:
+            self.collection.delete()
+            return
+
+        item = self.get(href)
+        if item is None:
+            raise ComponentNotFoundError(href)
+
+        item.etesync_item.delete()
+
+    def get_meta(self, key):
+        """Get metadata value for collection."""
+        if self.is_fake:
+            return
+
+        if key == "tag":
+            return self.tag
+        else:
+            key, value = self.meta_mappings.map_get(self.journal.info, key)
+            return value
+
+    def set_meta(self, _props):
+        """Set metadata values for collection."""
+        props = {}
+        for key, value in _props.items():
+            key, value = self.meta_mappings.map_set(key, value)
+            props[key] = value
+
+        # Pop out tag which we don't want
+        props.pop("tag", None)
+
+        self.journal.update_info({})
+        self.journal.update_info(props)
+        self.journal.save()
+
+    @property
+    def last_modified(self):
+        """Get the HTTP-datetime of when the collection was modified."""
+        # FIXME: Make this sensible
+        last_modified = time.strftime(
+            "%a, %d %b %Y %H:%M:%S GMT",
+            time.gmtime(time.time()))
+        return last_modified
+
+    def serialize(self):
+        """Get the unicode string representing the whole collection."""
+        import datetime
+        items = []
+        time_begin = datetime.datetime.now()
+        for href in self.list():
+            items.append(self.get(href).item)
+        time_end = datetime.datetime.now()
+        self.logger.info(
+            "Collection read %d items in %s sec from %s", len(items),
+            (time_end - time_begin).total_seconds(), self._filesystem_path)
+        if self.get_meta("tag") == "VCALENDAR":
+            collection = vobject.iCalendar()
+            for item in items:
+                for content in ("vevent", "vtodo", "vjournal"):
+                    if content in item.contents:
+                        for item_part in getattr(item, "%s_list" % content):
+                            collection.add(item_part)
+                        break
+            return collection.serialize()
+        elif self.get_meta("tag") == "VADDRESSBOOK":
+            return "".join([item.serialize() for item in items])
+        return ""
+
+    _last_sync = 0
+
+    @classmethod
+    def _should_sync(cls):
+        return time.time() - cls._last_sync >= 2 * 60  # In seconds
+
+    @classmethod
+    def _mark_sync(cls):
+        cls._last_sync = time.time()
+
+    _etesync_cache = {}
+
+    @classmethod
+    def _get_etesync_for_user(cls, user):
+        if user in cls._etesync_cache:
+            return cls._etesync_cache[user]
+
+        remote_url = cls.configuration.get(CONFIG_SECTION, "remote_url")
+        db_path = cls.configuration.get(CONFIG_SECTION, "database_filename")
+        creds_path = cls.configuration.get(CONFIG_SECTION, "credentials_filename")
+
+        creds = Credentials(creds_path)
+        auth_token, cipher_key = creds.get(user)
+
+        etesync = api.EteSync(user, auth_token, remote=remote_url, db_path=db_path)
+        etesync.cipher_key = cipher_key
+
+        cls._etesync_cache[user] = etesync
+
+        return etesync
+
+    _lock = threading.Lock()
+
+    @classmethod
+    @contextmanager
+    def acquire_lock(cls, mode, user=None):
+        """Set a context manager to lock the whole storage.
+
+        ``mode`` must either be "r" for shared access or "w" for exclusive
+        access.
+
+        ``user`` is the name of the logged in user or empty.
+
+        """
+        with cls._lock:
+            cls.user = user
+
+            cls.etesync = cls._get_etesync_for_user(cls.user)
+
+            if cls._should_sync():
+                cls._mark_sync()
+                cls.etesync.sync_journal_list()
+                for journal in cls.etesync.list():
+                    cls.etesync.pull_journal(journal.uid)
+            yield
+            if cls.etesync.journal_list_is_dirty():
+                cls.etesync.sync_journal_list()
+            for journal in cls.etesync.list():
+                if cls.etesync.journal_is_dirty(journal.uid):
+                    cls.etesync.sync_journal(journal.uid)
+
+            cls.etesync = None
+            cls.user = None
