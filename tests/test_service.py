@@ -60,7 +60,15 @@ class TestService:
 
         assert len(list(etesync.list())) == 2
 
+        # Make sure we detect dirty correctly
+        assert etesync.journal_list_is_dirty()
+        assert not etesync.journal_is_dirty(a.journal.uid)
+
         etesync.sync()
+
+        # Make sure they are not dirty anymore
+        assert not etesync.journal_list_is_dirty()
+        assert not etesync.journal_is_dirty(a.journal.uid)
 
         # Reset the db
         etesync._init_db(TEST_DB)
@@ -126,6 +134,9 @@ class TestService:
 
         assert len(list(etesync.list())) == 1
 
+        # A journal is only dirty if content is dirty
+        assert not etesync.journal_is_dirty(a.journal.uid)
+
         ev = api.Event.create(a,
                               'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
                               '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
@@ -133,7 +144,14 @@ class TestService:
                               'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
         ev.save()
 
+        # We have new content, make sure journal is marked as dirty
+        assert etesync.journal_is_dirty(a.journal.uid)
+
         etesync.sync()
+
+        # We just synced, not dirty anymore.
+        assert not etesync.journal_is_dirty(a.journal.uid)
+
         ev = a.get(ev.uid)
 
         assert len(list(a.journal.list())) == 1

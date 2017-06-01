@@ -81,10 +81,17 @@ class EteSync:
             journal.deleted = True
             journal.save()
 
+    def _journal_list_dirty_get(self):
+        return self.user.journals.where(cache.JournalEntity.dirty | cache.JournalEntity.new)
+
+    def journal_list_is_dirty(self):
+        changed = list(self._journal_list_dirty_get())
+        return len(changed) > 0
+
     def push_journal_list(self):
         manager = JournalManager(self.remote, self.auth_token)
 
-        changed = self.user.journals.where(cache.JournalEntity.dirty | cache.JournalEntity.new)
+        changed = self._journal_list_dirty_get()
 
         for journal in changed:
             crypto_manager = CryptoManager(journal.version, self.cipher_key, journal.uid.encode())
@@ -153,6 +160,14 @@ class EteSync:
 
             prev = entry
 
+    def _journal_dirty_get(self, journal):
+        return journal.content_set.where(pim.Content.new | pim.Content.dirty | pim.Content.deleted)
+
+    def journal_is_dirty(self, uid):
+        journal = cache.JournalEntity.get(uid=uid)
+        changed = list(self._journal_dirty_get(journal))
+        return len(changed) > 0
+
     def push_journal(self, uid):
         # FIXME: Implement pushing in chunks
         journal_uid = uid
@@ -160,7 +175,7 @@ class EteSync:
 
         journal = cache.JournalEntity.get(uid=journal_uid)
         crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
-        changed_set = journal.content_set.where(pim.Content.new | pim.Content.dirty | pim.Content.deleted)
+        changed_set = self._journal_dirty_get(journal)
         changed = list(changed_set)
 
         if len(changed) == 0:
