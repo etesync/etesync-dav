@@ -125,7 +125,7 @@ class EteSync:
                 remote_info = info_manager.get(self.user.username, self.cipher_key)
                 remote_info.verify()
                 user_info = cache.UserInfo(user=self.user, pubkey=remote_info.pubkey, content=remote_info.getContent())
-                user_info.save()
+                user_info.save(force_insert=True)
             key_pair = AsymmetricKeyPair(user_info.content, user_info.pubkey)
             return CryptoManager.create_from_asymmetric_encryted_key(
                     journal.version, key_pair, journal.encrypted_key)
