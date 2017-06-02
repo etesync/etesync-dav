@@ -34,10 +34,14 @@ class TestCollection:
         assert len(list(etesync.list())) == 0
 
         # Create
-        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test'})
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test', 'description': 'Test desc'})
         b = api.AddressBook.create(etesync, get_random_uid(self), {'displayName': 'Test 2'})
         assert a is not None
         assert b is not None
+
+        # Description is what we expect
+        assert a.description == 'Test desc'
+
         # Still empty because we haven't saved
         assert len(list(etesync.list())) == 0
 
@@ -54,6 +58,9 @@ class TestCollection:
         # Get
         assert a.journal.uid == etesync.get(a.journal.uid).uid
         assert b.journal.uid == etesync.get(b.journal.uid).uid
+
+        # Check version is correct
+        assert a.journal.version > 0
 
         # Delete
         a.delete()
@@ -112,9 +119,18 @@ class TestCollection:
         ev2 = api.Event.create(c, ev.content)
         ev2.save()
 
+        # Check it's actually there
+        assert len(list(c.list())) == 1
+
         # # First is still here even after we delete the new one
         ev2.delete()
+        assert len(list(c.list())) == 0
+
         assert ev.uid == a.get('2cd64f22-1111-44f5-bc45-53440af38cec').uid
+
+        # Check fetching a non-existent item
+        with pytest.raises(exceptions.DoesNotExist):
+            c.get('bla')
 
     def test_unicode(self, etesync):
         a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'יוניקוד'})
@@ -135,3 +151,6 @@ class TestCollection:
         ev.save()
 
         assert ev.content == a.get(ev.uid).content
+
+        # Test repr works
+        repr(ev)
