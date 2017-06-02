@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='radicale_storage_etesync',
-    version='0.1.0',
+    version='0.1.1',
     author='EteSync',
     author_email='development@etesync.com',
     url='https://github.com/etesync/radicale_storage_etesync',
