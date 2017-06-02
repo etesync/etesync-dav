@@ -413,11 +413,6 @@ class Calendar(BaseCollection):
     def get_content_class(self):
         return Event
 
-    def _get_default_info(self):
-        ret = super()._get_default_info()
-        ret.update({'supportsVEVENT': True})
-        return ret
-
 
 class AddressBook(BaseCollection):
     TYPE = 'ADDRESS_BOOK'
