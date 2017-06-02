@@ -2,6 +2,7 @@
 
 import argparse
 from configparser import RawConfigParser as ConfigParser
+import getpass
 import random
 import string
 
@@ -75,12 +76,17 @@ if args.command == 'add':
     if exists:
         raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
 
+    login_password = (getattr(args, 'login_password') or
+                      getpass.getpass(prompt="Please enter the EteSync login password: "))
+    encryption_password = (getattr(args, 'encryption_password') or
+                           getpass.getpass(prompt="Please enter your encryption password: "))
+
     print("Fetching auth token")
-    auth_token = api.Authenticator(remote_url).get_auth_token(args.username, args.login_password)
+    auth_token = api.Authenticator(remote_url).get_auth_token(args.username, login_password)
 
     print("Deriving password")
     etesync = api.EteSync(args.username, auth_token, remote=remote_url)
-    cipher_key = etesync.derive_key(args.encryption_password)
+    cipher_key = etesync.derive_key(encryption_password)
 
     print("Saving config")
     generated_password = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
