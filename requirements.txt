@@ -1,0 +1,2 @@
+etesync==0.5.0
+Radicale==2.0.0
