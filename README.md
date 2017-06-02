@@ -9,8 +9,6 @@ date as "now" (not the end of the world as etag is implemented correctly).
 
 # Installation
 
-Note: not yet available on PyPi but will be uploaded soon.
-
 `pip install radicale radicale_storage_etesync`
 
 # Configuration
