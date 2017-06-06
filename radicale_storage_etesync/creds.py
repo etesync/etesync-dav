@@ -13,7 +13,7 @@ class Credentials:
 
     def save(self):
         with open(self.filename, "w") as f:
-            json.dump(f, self.content)
+            json.dump(self.content, f)
 
     def get(self, username):
         users = self.content['users']
@@ -24,7 +24,7 @@ class Credentials:
         users = self.content['users']
         user = {
                 'authToken': auth_token,
-                'cipherKey': base64.b64encode(cipher_key),
+                'cipherKey': base64.b64encode(cipher_key).decode(),
             }
         users[username] = user
 
