@@ -13,7 +13,6 @@ from radicale_storage_etesync import creds, CONFIG_SECTION
 HTPASSWD_FILE = './htpaswd'
 CREDS_FILE = './etesync_creds'
 RADICALE_CONFIG_FILE = './radicale.conf'
-ETESYNC_PORT = 37358
 
 
 class Htpasswd:
@@ -41,8 +40,6 @@ class Htpasswd:
 
 
 def print_credentials(htpasswd, username):
-    print("Please configure your email client to use the following credentials:\n")
-    print("Server: http://localhost:{}".format(ETESYNC_PORT))
     print("User: {}\nPassword: {}".format(args.username, htpasswd.get(args.username)))
 
 
