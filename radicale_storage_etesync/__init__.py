@@ -164,6 +164,7 @@ class Collection(BaseCollection):
 
         # Needed by Radicale
         self.path = sanitize_path(path).strip("/")
+        self.owner = attributes[0] if len(attributes) > 1 else None
         self.is_principal = principal
 
     @classmethod
