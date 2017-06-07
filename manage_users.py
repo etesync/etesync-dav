@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import argparse
-from appdirs import user_config_dir
 from configparser import RawConfigParser as ConfigParser
 import getpass
 import os
@@ -11,10 +10,7 @@ import string
 import etesync as api
 from radicale_storage_etesync import creds, CONFIG_SECTION
 
-CONFIG_DIR = user_config_dir("etesync-dav", "etesync")
-HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
-CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
-RADICALE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'radicale.conf')
+from etesync_dav.config import CONFIG_DIR, HTPASSWD_FILE, CREDS_FILE, RADICALE_CONFIG_FILE
 
 
 class Htpasswd:
@@ -71,6 +67,8 @@ parser.add_argument("--encryption-password",
                     help="The encryption password")
 args = parser.parse_args()
 
+if not os.path.exists(CONFIG_DIR):
+    os.mkdir(CONFIG_DIR)
 
 htpasswd = Htpasswd(HTPASSWD_FILE)
 creds = creds.Credentials(CREDS_FILE)
