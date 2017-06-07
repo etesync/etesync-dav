@@ -5,7 +5,7 @@ CONFIG_DIR = user_config_dir("etesync-dav", "etesync")
 HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
 CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
 RADICALE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'radicale.conf')
-ETESYNC_URL = "https://api.etesync.com/"
+ETESYNC_URL = os.environ.get('ETESYNC_URL', 'https://api.etesync.com/')
 DATABASE_FILE = os.path.join(CONFIG_DIR, 'etesync_data.db')
 
 RADICALE_CONFIG = """
