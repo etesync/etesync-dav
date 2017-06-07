@@ -18,8 +18,11 @@ class Htpasswd:
         self.load()
 
     def load(self):
-        with open(self.filename, "r") as f:
-            self.content = dict(map(lambda x: x.strip(), line.split(':', 1)) for line in f)
+        if os.path.exists(self.filename):
+            with open(self.filename, "r") as f:
+                self.content = dict(map(lambda x: x.strip(), line.split(':', 1)) for line in f)
+        else:
+            self.content = {}
 
     def save(self):
         with open(self.filename, "w") as f:
