@@ -9,7 +9,7 @@ This depends on the [radicale_storage_etesync](https://github.com/etesync/radica
 
 # Installation
 
-`pip install etesync-dav
+`pip install etesync-dav`
 
 # Configuration and running
 
