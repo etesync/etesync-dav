@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 import argparse
-from configparser import RawConfigParser as ConfigParser
 import getpass
 import os
 import random
 import string
 
 import etesync as api
-from radicale_storage_etesync import creds, CONFIG_SECTION
+from radicale_storage_etesync import creds
 
-from etesync_dav.config import CONFIG_DIR, HTPASSWD_FILE, CREDS_FILE, RADICALE_CONFIG_FILE
+from etesync_dav.config import CONFIG_DIR, HTPASSWD_FILE, CREDS_FILE, ETESYNC_URL, DATABASE_FILE
 
 
 class Htpasswd:
@@ -72,12 +71,10 @@ if not os.path.exists(CONFIG_DIR):
 
 htpasswd = Htpasswd(HTPASSWD_FILE)
 creds = creds.Credentials(CREDS_FILE)
-radicale_config = ConfigParser()
-radicale_config.read(RADICALE_CONFIG_FILE)
 
-remote_url = radicale_config.get(CONFIG_SECTION, "remote_url")
-db_path = radicale_config.get(CONFIG_SECTION, "database_filename")
-creds_path = radicale_config.get(CONFIG_SECTION, "credentials_filename")
+remote_url = ETESYNC_URL
+db_path = DATABASE_FILE
+creds_path = CREDS_FILE
 
 if args.command == 'add':
     exists = validate_username(htpasswd, args.username)
