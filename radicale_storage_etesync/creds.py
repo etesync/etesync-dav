@@ -1,5 +1,6 @@
-import json
 import base64
+import json
+import os
 
 
 class Credentials:
@@ -8,8 +9,11 @@ class Credentials:
         self.load()
 
     def load(self):
-        with open(self.filename, "r") as f:
-            self.content = json.load(f)
+        if os.path.exists(self.filename):
+            with open(self.filename, "r") as f:
+                self.content = json.load(f)
+        else:
+            self.content = {'users': {}}
 
     def save(self):
         with open(self.filename, "w") as f:
