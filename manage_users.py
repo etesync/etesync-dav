@@ -38,6 +38,18 @@ class Htpasswd:
     def delete(self, username):
         self.content.pop(username, None)
 
+    def list(self):
+        for item in self.content.keys():
+            yield item
+
+
+def validate_username(htpasswd, username):
+    if username is None:
+        raise RuntimeError("Username is required")
+    if ':' in username:
+        raise RuntimeError("Username can't include a colon.")
+    return htpasswd.get(username) is not None
+
 
 def print_credentials(htpasswd, username):
     print("User: {}\nPassword: {}".format(args.username, htpasswd.get(args.username)))
@@ -45,9 +57,11 @@ def print_credentials(htpasswd, username):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("command",
-                    choices=('add', 'del', 'get'),
-                    help="Either add to add a user, del to remove a user, or get to show login creds.")
+                    choices=('add', 'del', 'get', 'list'),
+                    help="Either add to add a user, del to remove a user, get to show login creds, " +
+                         "or list to list all users.")
 parser.add_argument("username",
+                    nargs='?',
                     help="The username used with EteSync")
 parser.add_argument("--login-password",
                     help="The password to login to the EteSync server.")
@@ -55,9 +69,6 @@ parser.add_argument("--encryption-password",
                     help="The encryption password")
 args = parser.parse_args()
 
-
-if ':' in args.username:
-    raise RuntimeError("Username can't include a colon.")
 
 htpasswd = Htpasswd(HTPASSWD_FILE)
 creds = creds.Credentials(CREDS_FILE)
@@ -67,9 +78,9 @@ radicale_config.read(RADICALE_CONFIG_FILE)
 remote_url = radicale_config.get(CONFIG_SECTION, "remote_url")
 db_path = radicale_config.get(CONFIG_SECTION, "database_filename")
 creds_path = radicale_config.get(CONFIG_SECTION, "credentials_filename")
-exists = htpasswd.get(args.username) is not None
 
 if args.command == 'add':
+    exists = validate_username(htpasswd, args.username)
     if exists:
         raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
 
@@ -95,6 +106,7 @@ if args.command == 'add':
     print_credentials(htpasswd, args.username)
 
 elif args.command == 'del':
+    exists = validate_username(htpasswd, args.username)
     if not exists:
         raise RuntimeError("User not found")
 
@@ -105,7 +117,12 @@ elif args.command == 'del':
     creds.save()
 
 elif args.command == 'get':
+    exists = validate_username(htpasswd, args.username)
     if not exists:
         raise RuntimeError("User not found")
 
     print_credentials(htpasswd, args.username)
+
+elif args.command == 'list':
+    for user in htpasswd.list():
+        print(user)
