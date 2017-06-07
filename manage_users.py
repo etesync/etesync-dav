@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 
 import argparse
+from appdirs import user_config_dir
 from configparser import RawConfigParser as ConfigParser
 import getpass
+import os
 import random
 import string
 
 import etesync as api
 from radicale_storage_etesync import creds, CONFIG_SECTION
 
-
-HTPASSWD_FILE = './htpaswd'
-CREDS_FILE = './etesync_creds'
-RADICALE_CONFIG_FILE = './radicale.conf'
+CONFIG_DIR = user_config_dir("etesync-dav", "etesync")
+HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
+CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
+RADICALE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'radicale.conf')
 
 
 class Htpasswd:
