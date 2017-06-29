@@ -51,6 +51,10 @@ def validate_username(htpasswd, username):
     return htpasswd.get(username) is not None
 
 
+def generate_pasword():
+    return ''.join([random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16)])
+
+
 def print_credentials(htpasswd, username):
     print("User: {}\nPassword: {}".format(args.username, htpasswd.get(args.username)))
 
@@ -97,7 +101,7 @@ if args.command == 'add':
     cipher_key = etesync.derive_key(encryption_password)
 
     print("Saving config")
-    generated_password = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
+    generated_password = generate_pasword()
     htpasswd.set(args.username, generated_password)
     creds.set(args.username, auth_token, cipher_key)
     htpasswd.save()
