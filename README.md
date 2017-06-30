@@ -33,7 +33,7 @@ On most clients this should automatically detect your calendars/address books.
 If it doesn't, it means you'd have to set your exact collection url for each
 collection which is not trivial to get at this point. In order to get it, you'd
 either need to get it using [example.py](https://github.com/etesync/pyetesync/blob/master/example.py) from pyetesync,
-or copy it from the debug page in the EteSync app.
+or copy it from the debug page in the EteSync app. When using example.py, the EteSync server address that should be used is https://api.etesync.com when interacting with the production server.
 
 # Client support
 
