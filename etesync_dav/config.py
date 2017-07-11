@@ -12,15 +12,13 @@ RADICALE_CONFIG = """
 [server]
 hosts = localhost:37358
 
-[storage]
-type = radicale_storage_etesync
-
 [auth]
 type = htpasswd
 htpasswd_filename = {}
 htpasswd_encryption = plain
 
-[etesync_storage]
+[storage]
+type = radicale_storage_etesync
 database_filename = {}
 remote_url = {}
 credentials_filename = {}
