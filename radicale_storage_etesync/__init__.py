@@ -13,7 +13,7 @@ from radicale.storage import (
 import vobject
 
 
-CONFIG_SECTION = "etesync_storage"
+CONFIG_SECTION = "storage"
 
 
 class MetaMapping:
