@@ -74,7 +74,7 @@ parser.add_argument("--encryption-password",
 args = parser.parse_args()
 
 if not os.path.exists(CONFIG_DIR):
-    os.mkdir(CONFIG_DIR)
+    os.makedirs(CONFIG_DIR)
 
 htpasswd = Htpasswd(HTPASSWD_FILE)
 creds = creds.Credentials(CREDS_FILE)
