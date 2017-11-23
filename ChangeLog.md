@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.3
+* Fix issue with the config dir not being created if more than 1 level deep.
+
 ## Version 0.1.2
 * Fix to work with Radicale version >= 2.1.0. - Thanks to @LogicalDash for reporting.
 
