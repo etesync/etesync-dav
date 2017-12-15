@@ -1,7 +1,7 @@
 from appdirs import user_config_dir
 import os
 
-CONFIG_DIR = user_config_dir("etesync-dav", "etesync")
+CONFIG_DIR = os.environ.get('ETESYNC_CONFIG_DIR', user_config_dir("etesync-dav", "etesync"))
 HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
 CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
 RADICALE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'radicale.conf')
