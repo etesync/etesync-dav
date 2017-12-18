@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.4
+* Added a way to override the config path from the environment
+
 ## Version 0.1.3
 * Fix issue with the config dir not being created if more than 1 level deep.
 
