@@ -1,7 +1,9 @@
-This is a CalDAV and CardDAV front-end for [EteSync](https://www.etesync.com).
+This is a CalDAV and CardDAV front-end/proxy for [EteSync](https://www.etesync.com).
 
 This package provides a local CalDAV and CardDAV server that proxies requests
 to an EteSync server for use with desktop CalDAV and CardDAV clients.
+
+If all you want is to access your data from a computer, you are probably better off using [the web app](https://client.etesync.com).
 
 This is essentially a compatibility layer between EteSync and DAV clients.
 
