@@ -1,7 +1,11 @@
-This is an [EteSync](https://www.etesync.com) storage plugin for [Radicale](http://radicale.org/).
+# This is an [EteSync](https://www.etesync.com) storage plugin for [Radicale](http://radicale.org/).
 
 This plugin makes Radicale use EteSync as the storage module, essentially
 making Radicale a CalDav/CardDav frontend for EteSync.
+
+![GitHub tag](https://img.shields.io/github/tag/etesync/radicale_storage_etesync.svg)
+[![PyPI](https://img.shields.io/pypi/v/radicale_storage_etesync.svg)](https://pypi.python.org/pypi/radicale_storage_etesync/)
+[![Chat on freenode](https://img.shields.io/badge/irc.freenode.net-%23EteSync-blue.svg)](https://webchat.freenode.net/?channels=#etesync)
 
 For all I can tell, everything works as expected, with the exception of
 Last-Modified which is not yet implemented and just returns the modification
