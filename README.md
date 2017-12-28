@@ -1,4 +1,8 @@
-This is a python client library for [EteSync](https://www.etesync.com)
+# This is a python client library for [EteSync](https://www.etesync.com)
+
+![GitHub tag](https://img.shields.io/github/tag/etesync/pyetesync.svg)
+[![PyPI](https://img.shields.io/pypi/v/etesync.svg)](https://pypi.python.org/pypi/etesync/)
+[![Chat on freenode](https://img.shields.io/badge/irc.freenode.net-%23EteSync-blue.svg)](https://webchat.freenode.net/?channels=#etesync)
 
 This module provides a python API to interact with an EteSync server.
 It currently implements AddressBook and Calendar access, and supports two-way
