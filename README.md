@@ -1,4 +1,8 @@
-This is a CalDAV and CardDAV front-end/proxy for [EteSync](https://www.etesync.com).
+# This is a CalDAV and CardDAV front-end/proxy for [EteSync](https://www.etesync.com).
+
+![GitHub tag](https://img.shields.io/github/tag/etesync/etesync-dav.svg)
+[![PyPI](https://img.shields.io/pypi/v/etesync-dav.svg)](https://pypi.python.org/pypi/etesync-dav/)
+[![Chat on freenode](https://img.shields.io/badge/irc.freenode.net-%23EteSync-blue.svg)](https://webchat.freenode.net/?channels=#etesync)
 
 This package provides a local CalDAV and CardDAV server that proxies requests
 to an EteSync server for use with desktop CalDAV and CardDAV clients.
