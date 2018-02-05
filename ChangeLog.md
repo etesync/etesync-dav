@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.5
+* Upgrade radicale_etesync.
+
 ## Version 0.1.4
 * Added a way to override the config path from the environment
 
