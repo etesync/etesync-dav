@@ -18,7 +18,6 @@ DERIVED_KEY = (b'\x1a\x99\xfa\x8f\xa5\x89\xff\xd2ImY\x16\x86a\x1ff9jJ\x9b9\xaf\x
 
 
 class TestCrypto:
-    @pytest.mark.skip(reason='Too slow to always test.')
     def test_derive(self):
         # Just make sure we don't break derivation
         key = crypto.derive_key(USER_PASSWORD, USER_EMAIL)

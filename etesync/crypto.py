@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 import hashlib
 import hmac
-import pyscrypt
+import scrypt
 
 from . import exceptions
 
@@ -20,12 +20,12 @@ def hmac256(key, data):
 
 
 def derive_key(user_password, salt):
-    return pyscrypt.hash(password=user_password.encode(),
-                         salt=salt.encode(),
-                         N=16384,
-                         r=8,
-                         p=1,
-                         dkLen=190)
+    return scrypt.hash(password=user_password.encode(),
+                       salt=salt.encode(),
+                       N=16384,
+                       r=8,
+                       p=1,
+                       buflen=190)
 
 
 class AsymmetricKeyPair:
