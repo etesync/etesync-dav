@@ -5,7 +5,7 @@ cffi==1.10.0
 chardet==3.0.3
 coverage==4.4.1
 cryptography==1.9
-etesync==0.5.0
+etesync==0.5.1
 furl==1.0.0
 idna==2.5
 orderedmultidict==0.7.11
@@ -15,11 +15,11 @@ py==1.4.33
 pyasn1==0.2.3
 pycparser==2.17
 pyparsing==2.2.0
-pyscrypt==1.6.2
 python-dateutil==2.6.0
 Radicale==2.0.0
-radicale-storage-etesync==0.1.3
+radicale-storage-etesync==0.1.4
 requests==2.17.3
+scrypt==0.8.0
 six==1.10.0
 urllib3==1.21.1
 vobject==0.9.4.1
