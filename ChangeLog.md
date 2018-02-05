@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.4
+* Upgrade pyetesync version requirement
+
 ## Version 0.1.3
 * Fix to work with Radicale version >= 2.1.0 - Thanks to @LogicalDash for reporting.
 
