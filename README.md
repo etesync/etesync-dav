@@ -33,3 +33,37 @@ for a more complete example.
 While this is stable enough for usage, it still may be subject to change, so
 please watch out for the changelog when updating version.
 Docs are currently missing but are planned.
+
+## Running
+
+You'll need virtualenv to get the dependencies:
+
+```
+pip3 install virtualenv
+```
+
+Check out this repository:
+
+```
+git clone git@github.com:etesync/pyetesync.git
+cd pyetesync
+git checkout v0.5.0
+```
+
+Install dependencies:
+
+```
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Run `example.py` to export your data:
+
+```
+python3 example.py <email> <auth password> <encryption password> https://api.etesync.com
+```
+
+You may need to surround your passwords in quotes and you may need to escape special characters with a `\`.
+
+And all of your data will be copied to a local database located at `~/.etesync/data.db`.
