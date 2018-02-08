@@ -34,23 +34,29 @@ While this is stable enough for usage, it still may be subject to change, so
 please watch out for the changelog when updating version.
 Docs are currently missing but are planned.
 
-## Running
+## Running example
 
-You'll need virtualenv to get the dependencies:
+You'll need virtualenv to get the dependencies.
+
+Either install your distro's package, for example `python3-virtualenv`
+
+or get it from pip:
 
 ```
 pip3 install virtualenv
 ```
+
+You may also need to make sure you have the OpenSSL development package
+installed (e.g. `openssl-dev`).
 
 Check out this repository:
 
 ```
 git clone git@github.com:etesync/pyetesync.git
 cd pyetesync
-git checkout v0.5.0
 ```
 
-Install dependencies:
+Setup the environment:
 
 ```
 virtualenv venv
@@ -65,5 +71,7 @@ python3 example.py <email> <auth password> <encryption password> https://api.ete
 ```
 
 You may need to surround your passwords in quotes and you may need to escape special characters with a `\`.
+Please note, that depending on your setup, passing your passwords as command line parameters may not be completely secure,
+so it would be better if you manually edit the file.
 
 And all of your data will be copied to a local database located at `~/.etesync/data.db`.
