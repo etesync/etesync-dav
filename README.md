@@ -29,7 +29,7 @@ You need to first add an EteSync user using `etesync-dav-manage`, for example:
 
 `etesync-dav-manage add me@etesync.com`
 
-*Substitute “me@etesync.com” with the username or email you use with your
+*Substitute “`me@etesync.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
@@ -44,15 +44,14 @@ Depending on the client you use, the server path should either be:
 * `http://localhost:37358/`
 * `http://localhost:37358/me@etesync.com/`
 
-On most clients this should automatically detect your calendars/address
-books.
+On most clients this should automatically detect your collections (i.e.
+calendars and address books).
 
-If your client does not automatically detect your collections (calendars or
-address books), you will need to manually add them. You need to find the
-“collection URL” for each calendar and address book you want to add.
-Currently, the simplest way to do this is to log in to the web interface
-provided by the internal Radicale server. Just open
-[http://localhost:37358/](http://localhost:37358/) in your browser (or
+If your client does not automatically detect your collections, you will
+need to manually add them. You need to find the “collection URL” for each
+collection you want to add. Currently, the simplest way to do this is to
+log in to the web interface provided by the internal Radicale server. Just
+open [http://localhost:37358/](http://localhost:37358/) in your browser (or
 substitute “localhost” for the hostname or IP address of the etesync-dav
 instance). Then you will need to log in using the username and password
 given by the `etesync-dav-manage` tool as described above (run `etesync-dav
