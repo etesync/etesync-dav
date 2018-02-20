@@ -12,7 +12,7 @@ setup(
     keywords=['etesync', 'encryption', 'sync', 'pim'],
     license='LGPL',
     long_description=open('DESCRIPTION.rst').read(),
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     install_requires=[
        'appdirs>=1.4',
