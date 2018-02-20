@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.5.2
+* Don't install tests as a package
+
 ## Version 0.5.1
 * Change from pyscrypt to scrypt (much faster and widely adopted)
 
