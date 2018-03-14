@@ -17,6 +17,8 @@ This depends on the [radicale_storage_etesync](https://github.com/etesync/radica
 
 `pip install etesync-dav`
 
+The above should be either run as root, or better yet, inside a python "virtualenv".
+
 # Configuration and running
 
 If you are self-hosting the EteSync server, you will need to set the
