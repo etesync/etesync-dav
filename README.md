@@ -19,6 +19,10 @@ This depends on the [radicale_storage_etesync](https://github.com/etesync/radica
 
 The above should be either run as root, or better yet, inside a python "virtualenv".
 
+## Arch Linux
+
+The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
+
 # Configuration and running
 
 If you are self-hosting the EteSync server, you will need to set the
