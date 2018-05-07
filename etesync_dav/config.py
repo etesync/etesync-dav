@@ -1,6 +1,8 @@
 from appdirs import user_config_dir
 import os
 
+LISTEN_ADDRESS = os.environ.get('ETESYNC_LISTEN_ADDRESS', 'localhost')
+LISTEN_PORT = os.environ.get('ETESYNC_LISTEN_PORT', '37358')
 CONFIG_DIR = os.environ.get('ETESYNC_CONFIG_DIR', user_config_dir("etesync-dav", "etesync"))
 HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
 CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
@@ -10,7 +12,7 @@ DATABASE_FILE = os.path.join(CONFIG_DIR, 'etesync_data.db')
 
 RADICALE_CONFIG = """
 [server]
-hosts = localhost:37358
+hosts = {}:{}
 
 [auth]
 type = htpasswd
@@ -22,7 +24,9 @@ type = radicale_storage_etesync
 database_filename = {}
 remote_url = {}
 credentials_filename = {}
-""".format(HTPASSWD_FILE,
+""".format(LISTEN_ADDRESS,
+           LISTEN_PORT,
+           HTPASSWD_FILE,
            DATABASE_FILE,
            ETESYNC_URL,
            CREDS_FILE)

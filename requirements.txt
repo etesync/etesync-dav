@@ -15,7 +15,7 @@ py==1.4.33
 pyasn1==0.2.3
 pycparser==2.17
 pyparsing==2.2.0
-python-dateutil==2.6.0
+python-dateutil==2.7.2
 Radicale==2.0.0
 radicale-storage-etesync==0.1.4
 requests==2.17.3
