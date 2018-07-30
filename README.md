@@ -23,6 +23,10 @@ The above should be either run as root, or better yet, inside a python "virtuale
 
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
 
+## Windows systems
+
+A working python3 installation is required. Python for windows is available [here](https://www.python.org/downloads/windows).
+
 # Configuration and running
 
 If you are self-hosting the EteSync server, you will need to set the
@@ -35,11 +39,21 @@ You need to first add an EteSync user using `etesync-dav-manage`, for example:
 
 `etesync-dav-manage add me@etesync.com`
 
+*On Windows systems, you may have to navigate to the location of the python script etesync-dav-manage.py (e.g. C:\Python\Python36\Scripts) and run*
+
+`python etesync-dav-manage add me@etesync.com`
+
 *Substitute “`me@etesync.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
 `etesync-dav`
+
+*On Windows systems, you may have to navigate to the location of the etesync-dav.py script and run*
+
+`python etesync-dav`
+
+*Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
 After this, set up your CalDAV/CardDAV client to use the username and password
 you got from `etesync-dav-manage`, or alternatively run:
