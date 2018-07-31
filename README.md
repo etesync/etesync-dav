@@ -74,7 +74,7 @@ log in to the web interface provided by the internal Radicale server. Just
 open [http://localhost:37358/](http://localhost:37358/) in your browser (or
 substitute “localhost” for the hostname or IP address of the etesync-dav
 instance). Then you will need to log in using the username and password
-given by the `etesync-dav-manage` tool as described above (run `etesync-dav
+given by the `etesync-dav-manage` tool as described above (run `etesync-dav-manage
 get me@etesync.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and
