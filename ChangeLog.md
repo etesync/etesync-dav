@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.5
+* Upgrade pyetesync and radicale
+
 ## Version 0.1.4
 * Upgrade pyetesync version requirement
 
