@@ -12,10 +12,10 @@ py==1.4.33
 pyasn1==0.2.3
 pycparser==2.17
 pyparsing==2.2.0
+pyscrypt==1.6.2
 pytest==3.0.7
 pytest-cov==2.4.0
 python-dateutil==2.6.0
 requests==2.13.0
-scrypt==0.8.0
 six==1.10.0
 vobject==0.9.4.1

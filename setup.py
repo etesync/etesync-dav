@@ -29,7 +29,7 @@ setup(
        'pyasn1>=0.2',
        'pycparser>=2.17',
        'pyparsing>=2.2',
-       'scrypt>=0.8.0',
+       'pyscrypt>=1.6',
        'python-dateutil>=2.6',
        'requests>=2.13',
        'six>=1.10',
