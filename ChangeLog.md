@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.6
+* Upgrade radicale_etesync.
+
 ## Version 0.1.5
 * Upgrade radicale_etesync.
 
