@@ -20,6 +20,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'appdirs>=1.4.3',
-        'radicale_storage_etesync>=0.1.4',
+        'radicale_storage_etesync>=0.1.5',
     ]
 )
