@@ -15,7 +15,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'etesync>=0.5.1',
+        'etesync>=0.5.4',
         'Radicale>=2.1.9',
     ]
 )
