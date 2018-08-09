@@ -27,6 +27,19 @@ The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packag
 
 A working python3 installation is required. Python for windows is available [here](https://www.python.org/downloads/windows).
 
+## Docker
+Build the Docker image
+
+    docker build . -t etesync-dav:latest
+
+Run setup and persist configuration into a docker volume
+
+    docker run -it --rm -v etesync:/data etesync-dav:latest setup
+
+Run etesync-dav server in background
+
+    docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync-dav:latest
+
 # Configuration and running
 
 If you are self-hosting the EteSync server, you will need to set the
@@ -119,6 +132,17 @@ be set to v4.0 when prompted
         * Requires the
           [Lightning](https://addons.mozilla.org/en-US/thunderbird/addon/lightning/)
 add-on.
+* OSX
+    * CalDAV: Works.
+    * How to setup:
+      * Internet Accounts->Add Other Account->CalDAV account
+        * Account Type: Advanced
+        * Username: me@etesync.com
+        * Password: generated etesync-dav password
+        * Server Address: localhost
+        * Server Path: /
+        * Port: 37358
+        * Uncheck Use SSL
 
 # Known issues
 
