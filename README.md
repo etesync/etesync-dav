@@ -23,6 +23,10 @@ The above should be either run as root, or better yet, inside a python "virtuale
 
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
 
+## Windows systems
+
+A working python3 installation is required. Python for windows is available [here](https://www.python.org/downloads/windows).
+
 ## Docker
 Build the Docker image
 
@@ -48,11 +52,21 @@ You need to first add an EteSync user using `etesync-dav-manage`, for example:
 
 `etesync-dav-manage add me@etesync.com`
 
+*On Windows systems, you may have to navigate to the location of the python script etesync-dav-manage.py (e.g. C:\Python\Python36\Scripts) and run*
+
+`python etesync-dav-manage add me@etesync.com`
+
 *Substitute “`me@etesync.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
 `etesync-dav`
+
+*On Windows systems, you may have to navigate to the location of the etesync-dav.py script and run*
+
+`python etesync-dav`
+
+*Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
 After this, set up your CalDAV/CardDAV client to use the username and password
 you got from `etesync-dav-manage`, or alternatively run:
@@ -73,7 +87,7 @@ log in to the web interface provided by the internal Radicale server. Just
 open [http://localhost:37358/](http://localhost:37358/) in your browser (or
 substitute “localhost” for the hostname or IP address of the etesync-dav
 instance). Then you will need to log in using the username and password
-given by the `etesync-dav-manage` tool as described above (run `etesync-dav
+given by the `etesync-dav-manage` tool as described above (run `etesync-dav-manage
 get me@etesync.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and
