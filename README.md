@@ -148,4 +148,3 @@ add-on.
 # Known issues
 
 * This package is missing startups script for automatic execution on startup.
-* Due to an issue with one of the dependencies, some contacts, namely groups, will sometimes fail to work. Revelant PR: https://github.com/eventable/vobject/pull/77
