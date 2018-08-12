@@ -38,7 +38,7 @@ Run etesync-dav server in background
 
 ## Windows systems
 
-A working python3 installation is required. Python for windows is available [here](https://www.python.org/downloads/windows).
+You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
 
 
 # Configuration and running
