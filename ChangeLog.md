@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.5.4
+* Fix peewee dep to be < 3.0.0
+
 ## Version 0.5.3
 * Change back to pyscript, because scrypt has proven very problematic
 * Update all the deps
