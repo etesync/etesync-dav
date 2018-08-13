@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='etesync',
-    version='0.5.3',
+    version='0.5.4',
     author='EteSync',
     author_email='development@etesync.com',
     url='https://github.com/etesync/pyetesync',
@@ -24,7 +24,7 @@ setup(
        'idna>=2.5',
        'orderedmultidict>=0.7',
        'packaging>=16.8',
-       'peewee>=2.9',
+       'peewee>=2.9,<3.0',
        'py>=1.4',
        'pyasn1>=0.2',
        'pycparser>=2.17',
