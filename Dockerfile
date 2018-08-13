@@ -1,11 +1,10 @@
-FROM python:3.6
+FROM python:3.7
 
 ENV ETESYNC_CONFIG_DIR "/data"
 ENV ETESYNC_LISTEN_ADDRESS "0.0.0.0"
 ENV ETESYNC_LISTEN_PORT "37358"
 
-COPY . /tmp
-RUN cd /tmp && python setup.py install
+RUN pip install etesync-dav
 
 VOLUME /data
 EXPOSE 37358
