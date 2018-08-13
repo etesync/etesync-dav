@@ -24,6 +24,12 @@ The above should be either run as root, or better yet, inside a python "virtuale
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
 
 ## Docker
+
+Clone this repo
+
+    git clone https://github.com/etesync/etesync-dav
+    cd etesync-dav
+
 Build the Docker image
 
     docker build . -t etesync-dav:latest
