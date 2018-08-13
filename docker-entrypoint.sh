@@ -6,5 +6,8 @@ if [ "$1" == "setup" ]; then
   exit 0
 fi
 
+echo "Upgrading etesync-dav if necessary"
+pip install --upgrade etesync-dav
+
 echo "Running etesync-dav"
 etesync-dav
