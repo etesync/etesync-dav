@@ -25,22 +25,17 @@ The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packag
 
 ## Docker
 
-Clone this repo
+Run one time initial setup to persist the required configuration into a docker volume
 
-    git clone https://github.com/etesync/etesync-dav
-    cd etesync-dav
+    docker run -it --rm -v etesync:/data etesync/etesync-dav setup
 
-Build the Docker image
+Run etesync-dav in a background docker container with configuration from previous step
 
-    docker build . -t etesync-dav:latest
+    docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync/etesync-dav
 
-Run setup and persist configuration into a docker volume
+Getting log output from container if you run into any issues
 
-    docker run -it --rm -v etesync:/data etesync-dav:latest setup
-
-Run etesync-dav server in background
-
-    docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync-dav:latest
+    docker logs etesync-dav
 
 ## Windows systems
 
