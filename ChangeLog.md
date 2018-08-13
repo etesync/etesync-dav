@@ -2,6 +2,7 @@
 
 ## Version 0.5.3
 * Change back to pyscript, because scrypt has proven very problematic
+* Update all the deps
 
 ## Version 0.5.2
 * Don't install tests as a package
