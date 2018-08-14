@@ -29,7 +29,7 @@ Run one time initial setup to persist the required configuration into a docker v
 
     docker run -it --rm -v etesync:/data etesync/etesync-dav setup
 
-Run etesync-dav in a background docker container with configuration from previous step
+Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
 
     docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync/etesync-dav
 
