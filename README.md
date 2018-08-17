@@ -37,17 +37,28 @@ Getting log output from container if you run into any issues
 
     docker logs etesync-dav
 
-## Python virtual environment
-
-    pacman -S python-virtualenv
-    virtualenv venv
-    source venv/bin/activate
-    pip install etesync-dav
-    ./venv/bin/etesync-dav-manage  # And the rest of the etesync commands
-
 ## Windows systems
 
 You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
+
+## Python virtual environment (Linux and Mac)
+
+Install virtual env from your package manager, for example on Arch:
+
+    pacman -S python-virtualenv
+
+Set up the virtual env:
+
+    virtualenv venv
+    source venv/bin/activate
+    pip install etesync-dav
+
+Run the etesync commands as explained in the "Configuration and running" section:
+
+    ./venv/bin/etesync-dav-manage ...
+    ./venv/bin/etesync-dav ...
+
+Please note that you'll have to run `source venv/bin/activate` every time you'd like to run the EteSync commands.
 
 
 # Configuration and running
