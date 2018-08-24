@@ -168,6 +168,10 @@ class Collection(BaseCollection):
         self.is_principal = principal
 
     @classmethod
+    def static_init(cls):
+        pass
+
+    @classmethod
     def discover(cls, path, depth="0"):
         """Discover a list of collections under the given ``path``.
 
