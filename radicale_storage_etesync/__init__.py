@@ -164,8 +164,6 @@ class Collection(BaseCollection):
 
         # Needed by Radicale
         self.path = sanitize_path(path).strip("/")
-        self.owner = attributes[0] if len(attributes) > 1 else None
-        self.is_principal = principal
 
     @classmethod
     def static_init(cls):
@@ -372,19 +370,27 @@ class Collection(BaseCollection):
 
         item.etesync_item.delete()
 
-    def get_meta(self, key):
+    def get_meta(self, key=None):
         """Get metadata value for collection."""
         if self.is_fake:
-            return
+            return {}
 
         if key == "tag":
             return self.tag
+        elif key is None:
+            ret = {}
+            for key in self.journal.info.keys():
+                ret[key] = self.meta_mappings.map_get(self.journal.info, key)[1]
+            return ret
         else:
             key, value = self.meta_mappings.map_get(self.journal.info, key)
             return value
 
     def set_meta(self, _props):
         """Set metadata values for collection."""
+        if self.is_fake:
+            return
+
         props = {}
         for key, value in _props.items():
             key, value = self.meta_mappings.map_set(key, value)
@@ -396,6 +402,20 @@ class Collection(BaseCollection):
         self.journal.update_info({})
         self.journal.update_info(props)
         self.journal.save()
+
+    # FIXME: Copied from Radicale because of their bug
+    def set_meta_all(self, props):
+        """Set metadata values for collection.
+
+        ``props`` a dict with values for properties.
+
+        """
+        delta_props = self.get_meta()
+        for key in delta_props.keys():
+            if key not in props:
+                delta_props[key] = None
+        delta_props.update(props)
+        self.set_meta(delta_props)
 
     @property
     def last_modified(self):
