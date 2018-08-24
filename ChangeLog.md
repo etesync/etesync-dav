@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.1.6
+* Fix a few weird behaviours that should improve compatability
+* Got Apple Calendar to work (but not Contacts)
+* Workaround the Radicale bug in 2.1.10
+* Update radicale minimum version requirements
+
 ## Version 0.1.5
 * Upgrade pyetesync and radicale
 
