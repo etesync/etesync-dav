@@ -1,0 +1,74 @@
+# A systemd Unit file to install and start etesync-dav.
+# This Unit is for those that want to isolate the etesync-dav code from
+# their system as much as possible, this is why DynamicUser and other
+# isolation options are present.
+# Debian does not provide etesync-dav so this unit installs it each time the service is started.
+# This will slow down startup but make it easier to have the most recent version.
+# The isolation options mean that the caches is not kept across reboots also slowing down startup.
+
+# Put this file in /etc/systemd/system/etesync-dav@.service and
+# create etesync-dav configuration files ~/.config/etesync-dav using
+# etesync-dav-manage in a VM or by copying them from another machine.
+#
+# sudo systemctl daemon-reload && sudo systemctl restart etesync-dav@$USER; systemctl status --no-pager etesync-dav@$USER
+# to set EYESYNC_DAV_ARGS or PIP_ARGS use: sudo systemctl edit etesync-dav@$USER
+# sudo systemctl enable etesync-dav@$USER
+# journalctl -f -u etesync-dav@$USER
+#
+# Developer notes:
+# With radicale master and libsystemd-dev will be able to use
+# systemd socket activation and thus avoid race conditions at startup:
+# https://github.com/Kozea/Radicale/commit/2275ba4f9323e87eeac61f8811a4cc2773061e70
+# Don't use the forking mode and the --daemon flag or logs go to /dev/null.
+[Unit]
+Description=EteSync CalDAV and CardDAV front-end/proxy for %i
+Documentation=https://github.com/etesync/etesync-dav
+After=network-online.target
+[Service]
+UMask=022
+RuntimeDirectory=%N
+RuntimeDirectoryMode=0700
+Environment=ETESYNC_CONFIG_DIR=%t/%N
+Environment=CONFFILES="radicale.conf htpaswd etesync_creds"
+WorkingDirectory=%t/%N
+# The pip3 install must be on a filesystem that is not mounted noexec, %t (/run) is mounted noexec
+Environment=HOME=/tmp/%N
+Environment=PIP_MODULES="pytz etesync-dav"
+ExecStartPre=+sh -c 'runuser -u %i -- sh -c "tar -C \\$HOME/.config/etesync-dav -hc $CONFFILES" > creds.tar'
+ExecStartPre=tar --unlink-first -f creds.tar -x
+ExecStartPre=sed -i -e "s^ = /.*/^ = ${ETESYNC_CONFIG_DIR}/^" radicale.conf
+ExecStartPre=mkdir -m 0700 $HOME
+ExecStartPre=pip3 --cache-dir %t/%N/pip3-cache $PIP_ARGS install $PIP_MODULES
+ExecStart=python3 ${HOME}/.local/bin/etesync-dav $EYESYNC_DAV_ARGS
+ExecStopPost=rm $CONFFILES creds.tar
+
+# Some of these isolation options are from https://radicale.org/setup/
+DynamicUser=true
+RuntimeDirectoryPreserve=true
+DevicePolicy=closed
+CapabilityBoundingSet=
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictRealtime=true
+#MemoryDenyWriteExecute=true
+SystemCallFilter=@system-service
+TemporaryFileSystem=/var:ro /docker:ro /media:ro /opt:ro
+InaccessiblePaths=/mnt /boot
+MemoryHigh=512M
+CPUQuota=90%
+TasksMax=10
+TimeoutStartSec=10m
+
+Restart=on-failure
+RestartSec=30min 1s
+
+[Install]
+WantedBy=multi-user.target
