@@ -5,7 +5,28 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 import hashlib
 import hmac
-import pyscrypt
+
+try:
+    import scrypt
+
+    def derive_key(user_password, salt):
+        return scrypt.hash(password=user_password.encode(),
+                           salt=salt.encode(),
+                           N=16384,
+                           r=8,
+                           p=1,
+                           bufLen=190)
+
+except ImportError:
+    import pyscrypt
+
+    def derive_key(user_password, salt):
+        return pyscrypt.hash(password=user_password.encode(),
+                             salt=salt.encode(),
+                             N=16384,
+                             r=8,
+                             p=1,
+                             dkLen=190)
 
 from . import exceptions
 
@@ -17,15 +38,6 @@ AES_BLOCK_SIZE = int(128 / 8)  # 128bits in bytes
 
 def hmac256(key, data):
     return hmac.new(key, data, digestmod=hashlib.sha256).digest()
-
-
-def derive_key(user_password, salt):
-    return pyscrypt.hash(password=user_password.encode(),
-                         salt=salt.encode(),
-                         N=16384,
-                         r=8,
-                         p=1,
-                         dkLen=190)
 
 
 class AsymmetricKeyPair:
