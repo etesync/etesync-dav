@@ -10,4 +10,4 @@ echo "Upgrading etesync-dav if necessary"
 pip install --upgrade etesync-dav
 
 echo "Running etesync-dav"
-etesync-dav
+exec etesync-dav
