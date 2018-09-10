@@ -7,7 +7,7 @@ if [ "$1" == "setup" ]; then
 fi
 
 echo "Upgrading etesync-dav if necessary"
-pip install --upgrade etesync-dav
+pip install --upgrade etesync etesync-dav radicale_storage_etesync
 
 echo "Running etesync-dav"
 exec etesync-dav
