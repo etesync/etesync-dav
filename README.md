@@ -19,6 +19,8 @@ This depends on the [radicale_storage_etesync](https://github.com/etesync/radica
 
 The above should be either run as root, or better yet, inside a python "virtualenv".
 
+**Note:** Python 3 is required.
+
 ## Arch Linux
 
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
