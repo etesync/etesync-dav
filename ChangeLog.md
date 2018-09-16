@@ -3,6 +3,7 @@
 ## Version 0.5.5
 * Automatically detect if scrypt is available. If so use it, otherwise revert to pyscript. Setup.py dep remains on pyscypt.
   * This is to help distors that don't package pyscrypt
+* Update peewee to support version 3 and up
 
 ## Version 0.5.4
 * Fix peewee dep to be < 3.0.0
