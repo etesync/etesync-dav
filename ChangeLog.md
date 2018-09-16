@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.1.7
+* Bump pyetesync version
+
 ## Version 0.1.6
 * Fix a few weird behaviours that should improve compatability
 * Got Apple Calendar to work (but not Contacts)
