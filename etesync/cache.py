@@ -12,8 +12,8 @@ class JournalEntity(db.BaseModel):
     version = pw.IntegerField()
     uid = pw.CharField(null=False, index=True)
     owner = pw.CharField(null=True)
-    encrypted_key = pw.TextField(null=True)
-    content = pw.TextField()
+    encrypted_key = pw.BlobField(null=True)
+    content = pw.BlobField()
     new = pw.BooleanField(null=False, default=False)
     dirty = pw.BooleanField(null=False, default=False)
     deleted = pw.BooleanField(null=False, default=False)
@@ -27,7 +27,7 @@ class JournalEntity(db.BaseModel):
 class EntryEntity(db.BaseModel):
     journal = pw.ForeignKeyField(JournalEntity, related_name='entries')
     uid = pw.CharField(null=False, index=True)
-    content = pw.TextField()
+    content = pw.BlobField()
     new = pw.BooleanField(null=False, default=False)
 
     class Meta:
@@ -39,5 +39,5 @@ class EntryEntity(db.BaseModel):
 
 class UserInfo(db.BaseModel):
     user = pw.ForeignKeyField(User, primary_key=True, related_name='user_info')
-    pubkey = pw.TextField(null=False)
-    content = pw.TextField(null=False)
+    pubkey = pw.BlobField(null=False)
+    content = pw.BlobField(null=False)

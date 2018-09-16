@@ -24,7 +24,7 @@ setup(
        'idna>=2.5',
        'orderedmultidict>=0.7',
        'packaging>=16.8',
-       'peewee>=2.9,<3.0',
+       'peewee>=3.7.0',
        'py>=1.4',
        'pyasn1>=0.2',
        'pycparser>=2.17',
