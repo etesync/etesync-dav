@@ -15,7 +15,7 @@ try:
                            N=16384,
                            r=8,
                            p=1,
-                           bufLen=190)
+                           buflen=190)
 
 except ImportError:
     import pyscrypt
