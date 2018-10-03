@@ -87,6 +87,10 @@ class TestService:
 
         etesync.sync()
 
+        with pytest.raises(RuntimeError):
+            # Hackily try and update the Journal info's directly
+            a.journal.update_info(None)
+
         # Reset the db
         etesync._init_db(TEST_DB)
         assert len(list(etesync.list())) == 0
