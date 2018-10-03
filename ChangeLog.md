@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5.6
+* Fix broken calling to scrypt
+* Fix sync (was broken in some cases) and tests
+
 ## Version 0.5.5
 * Automatically detect if scrypt is available. If so use it, otherwise revert to pyscript. Setup.py dep remains on pyscypt.
   * This is to help distors that don't package pyscrypt
