@@ -73,7 +73,7 @@ class EteSync:
                 journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid,
                                               owner=entry.owner,
                                               encrypted_key=entry.encrypted_key)
-            journal.content = entry.getContent().decode()
+            journal.content = entry.getContent()
             journal.save()
 
         # Delete remaining
@@ -96,7 +96,7 @@ class EteSync:
         for journal in changed:
             crypto_manager = CryptoManager(journal.version, self.cipher_key, journal.uid.encode())
             raw_journal = service.RawJournal(crypto_manager, uid=journal.uid)
-            raw_journal.update(journal.content.encode())
+            raw_journal.update(journal.content)
 
             if journal.deleted:
                 manager.delete(raw_journal)
@@ -153,8 +153,8 @@ class EteSync:
 
         for entry in manager.list(crypto_manager, last_uid):
             entry.verify(prev)
-            content = entry.getContent().decode()
-            syncEntry = SyncEntry.from_json(content)
+            content = entry.getContent()
+            syncEntry = SyncEntry.from_json(content.decode())
             collection.apply_sync_entry(syncEntry)
             cache.EntryEntity.create(uid=entry.uid, content=content, journal=journal)
 
@@ -201,7 +201,7 @@ class EteSync:
 
         # Add entries to cache
         for entry in entries:
-            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent().decode(), journal=journal)
+            cache.EntryEntity.create(uid=entry.uid, content=entry.getContent(), journal=journal)
 
         # Clear dirty flags and delete deleted content
         pim.Content.delete().where((pim.Content.journal == journal) & pim.Content.deleted).execute()
@@ -437,7 +437,7 @@ class Journal(ApiObjectBase):
     @property
     def info(self):
         if self._cache_obj.content is not None:
-            return json.loads(self._cache_obj.content)
+            return json.loads(self._cache_obj.content.decode())
 
     def update_info(self, update_info):
         if update_info is None:
@@ -447,7 +447,7 @@ class Journal(ApiObjectBase):
             if journal_info is None:
                 journal_info = {}
             journal_info.update(update_info)
-        self._cache_obj.content = json.dumps(journal_info, ensure_ascii=False)
+        self._cache_obj.content = json.dumps(journal_info, ensure_ascii=False).encode()
 
     # CRUD
     def list(self):
