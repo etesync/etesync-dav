@@ -13,6 +13,8 @@ This is essentially a compatibility layer between EteSync and DAV clients.
 
 This depends on the [radicale_storage_etesync](https://github.com/etesync/radicale_storage_etesync) module and the [Radicale server](http://radicale.org) for operation.
 
+**Note:** This software is still in beta. It should work well and is used daily by many users, but there may be some rough edges.
+
 # Installation
 
 `pip install etesync-dav`
