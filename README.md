@@ -167,7 +167,47 @@ add-on.
         * Server Address: localhost
         * Server Path: /
         * Port: 37358
-        * Uncheck Use SSL
+        * Uncheck Use SSL (does nothing under macOS Mojave, SSL is always enabled)
+    * CardDAV: Works:
+    * How to setup:
+        * Internet Accounts->Add Other Account->CardDAV account
+        * Account Type: Manual
+        * Username: me@etesync.com
+        * Password: generated etesync-dav password
+        * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
+
+# macOS Mojave
+
+macOS Mojave enforces the use of SSL, *regardless* of whether you enable the
+checkbox for SSL or not. So to use EteSync, you have to enable SSL. You can
+do so by following these steps:
+
+Go to the configuration directory of EteSync DAV:
+
+   cd ~/Library/Application\ Support/etesync-dav
+
+Create a self-signed SSL certificate:    
+   
+   openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 1825 -nodes -subj '/CN=localhost'
+
+(This creates a certificate that expires in 5 years.)
+
+Tell macOS to trust this certificate for SSL connections:     
+
+        security import cert.pem    
+        security add-trusted-cert -p ssl cert.pm     
+
+If this fails, open the Keychain application and import the certificate there. Remember to also trust it for SSL connections.    
+
+Edit `radicale.conf` (in the same directory) and add the following lines in the `[server]` section:     
+
+        ssl = yes
+        certificate = <your home directory>/Library/Application Support/etesync-dav/cert.pm
+        key = <your home directory>/Library/Application Support/etesync-dav/key.pm
+
+Restart `etesync-dav`
+
+Configure CardDAV and CalDAV as described above.
 
 # Known issues
 
