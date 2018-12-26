@@ -158,23 +158,21 @@ be set to v4.0 when prompted
           [Lightning](https://addons.mozilla.org/en-US/thunderbird/addon/lightning/)
 add-on.
 * OSX
-    * CalDAV: Works.
-    * How to setup:
+    * CalDAV: Works. Setup instructions:
       * Internet Accounts->Add Other Account->CalDAV account
-        * Account Type: Advanced
-        * Username: me@etesync.com
-        * Password: generated etesync-dav password
-        * Server Address: localhost
-        * Server Path: /
-        * Port: 37358
-        * Uncheck Use SSL (does nothing under macOS Mojave, SSL is always enabled)
-    * CardDAV: Works:
-    * How to setup:
-        * Internet Accounts->Add Other Account->CardDAV account
-        * Account Type: Manual
-        * Username: me@etesync.com
-        * Password: generated etesync-dav password
-        * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
+      * Account Type: Advanced
+      * Username: me@etesync.com
+      * Password: generated etesync-dav password
+      * Server Address: localhost
+      * Server Path: /
+      * Port: 37358
+      * Uncheck Use SSL (does nothing under macOS Mojave, SSL is always enabled)
+    * CardDAV: Works. Setup instructions:
+      * Internet Accounts->Add Other Account->CardDAV account
+      * Account Type: Manual
+      * Username: me@etesync.com
+      * Password: generated etesync-dav password
+      * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
 
 # macOS Mojave
 
