@@ -1,131 +1,211 @@
 #!/usr/local/bin/python3
 # pylint: disable = C0103,C0111
-""" Sets up SSL for the etesync DAV client.
+"""Sets up SSL for the etesync DAV client.
+
 Copyright 2018 Odin Kroeger
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-OR OTHER DEALINGS IN THE SOFTWARE."""
+"""
 
 from argparse import ArgumentParser
 from configparser import ConfigParser
-from os import chdir, path
+from os import chdir, getuid, path
+from pwd import getpwuid
 from shutil import copyfile
 from subprocess import check_call
-# pylint: disable=W0622
-from sys import argv, exit, platform, stderr
+from sys import argv, platform, stderr
 
 from etesync_dav.config import CONFIG_DIR
-
 
 CONFIG_FILE = 'radicale.conf'
 CERT_FILE = 'cert.pem'
 KEY_FILE = 'key.pem'
-BACKUP_SUFFIX = '.orig'
+CONFIG_PATH = path.join(CONFIG_DIR, CONFIG_FILE)
+CERT_PATH = path.join(CONFIG_DIR, CERT_FILE)
+KEY_PATH = path.join(CONFIG_DIR, KEY_FILE)
 KEY_CIPHER = 'rsa'
 KEY_SIZE = 2048
-KEY_DAYS = 1096
+KEY_DAYS = 1826 # That's 3 years.
+BACKUP_SUFFIX = '.orig'
 VERBOSE = True
 FORCE = False
+
+
+# pylint: disable=R0903
+class Error(Exception):
+    pass
 
 
 def warn(message, **kwargs):
     print(': '.join((argv[0], message.format(**kwargs))), file=stderr)
 
+# pylint: disable=W0621
+def trimsubpath(path, sub):
+    if sub.startswith(path):
+        return sub[len(path) + 1:]
+    return sub
 
-# pylint: disable=R0913,R0914
-def certgen(keychain: str,
-            config_dir: str = CONFIG_DIR, config_file: str = CONFIG_FILE,
-            cert_file: str = CERT_FILE, key_file: str = KEY_FILE,
-            backup_to: str = BACKUP_SUFFIX, key_cipher: str = KEY_CIPHER,
-            key_size: int = KEY_SIZE, key_days: int = KEY_DAYS,
-            force: bool = FORCE, verbose: bool = False):
-    chdir(config_dir)
-    config = ConfigParser()
-    config.read(config_file)
-    server = config['server']
-    if server.getboolean('ssl') and not force:
-        warn('SSL appears to be enabled already, aborting.')
-        warn('but you can --force me to continue.')
-        exit(78)
-    for file in (cert_file, key_file, config_file):
-        if path.exists(file):
-            backup = file + backup_to
-            copyfile(file, backup)
-            if verbose:
-                warn('saved current "{current}" as "{backup}".',
-                     current=file, backup=backup)
+# pylint: disable=W0621
+def collapseuser(path):
+    homedir = getpwuid(getuid()).pw_dir
+    if path.startswith(homedir):
+        return '~' + path[len(homedir):]
+    return path
+
+def make_backup(original: str, backup_suffix: str, verbose: bool = False):
+    if path.exists(original):
+        backup = original + backup_suffix
+        copyfile(original, backup)
+        if verbose:
+            warn("""
+            saved: {original}
+               as: {backup}""",
+                 original=collapseuser(original), backup=collapseuser(backup))
+
+# pylint: disable=R0913
+def generate_cert(cert_path: str = CERT_PATH, key_path: str = KEY_PATH,
+                  key_cipher: str = KEY_CIPHER, key_size: int = KEY_SIZE,
+                  key_days: int = KEY_DAYS, backup_suffix: str = BACKUP_SUFFIX,
+                  verbose: bool = False):
+    for original in (cert_path, key_path):
+        make_backup(original, backup_suffix, verbose)
     check_call(['openssl', 'req', '-x509', '-nodes',
                 '-newkey', key_cipher + ':' + str(key_size),
-                '-keyout', key_file, '-out', cert_file, '-days', str(key_days),
+                '-keyout', key_path, '-out', cert_path, '-days', str(key_days),
                 '-subj', '/CN=localhost'])
-    cert_path = path.join(config_dir, cert_file)
-    key_path = path.join(config_dir, key_file)
     if verbose:
-        warn("""Created:
-        {cert_path}
-        {key_path}""", cert_path=cert_path, key_path=key_path)
+        warn("""created:
+            {cert_path}
+            {key_path}""",
+             cert_path=collapseuser(cert_path),
+             key_path=collapseuser(key_path))
+
+# pylint: disable=R0913
+def configure_etesync_dav(config_path: str = CONFIG_PATH,
+                          cert_path: str = CERT_PATH,
+                          key_path: str = KEY_PATH,
+                          backup_suffix: str = BACKUP_SUFFIX,
+                          force: bool = FORCE,
+                          verbose: bool = False):
+    config = ConfigParser()
+    config.read(config_path)
+    server = config['server']
+    if server.getboolean('ssl') and not force:
+        raise Error('SSL appears to be enabled already, aborting.')
+    make_backup(config_path, backup_suffix)
     server['ssl'] = "yes"
     server['certificate'] = cert_path
     server['key'] = key_path
-    with open(config_file, 'w') as config_fh:
+    with open(config_path, 'w') as config_fh:
         config.write(config_fh)
-    if platform == 'darwin':
-        keychain_opts = ['-k', keychain] if keychain else []
-        check_call(['security', 'import', cert_file] + keychain_opts)
-        check_call(['security', 'add-trusted-cert', '-p', 'ssl', cert_file] +
-                   keychain_opts)
-        if verbose:
-            warn('added {cert} to keychain.', cert=cert_file)
-    elif verbose:
-        warn('you may need to tell your system to trust {cert}.',
-             cert=cert_file)
+    if verbose:
+        warn("""enabled SSL in:
+            {config_path}""", config_path=collapseuser(config_path))
 
-# pylint: disable=C0330
+def macos_trust_cert(cert_path: str = CERT_PATH, keychain: str = '',
+                     verbose: bool = False):
+    if platform != 'darwin':
+        raise Error('this is not macOS.')
+    keychain_option = ['-k', keychain] if keychain else []
+    check_call(['security', 'import', cert_path] + keychain_option)
+    check_call(['security', 'add-trusted-cert', '-p', 'ssl', cert_path] +
+               keychain_option)
+    if verbose:
+        warn("""
+              added: {cert}
+        to keychain: {keychain}""", cert=collapseuser(cert_path),
+             keychain='default keychain' if not keychain else
+             collapseuser(keychain))
+
+# pylint: disable=C0303,C0330
 def main():
-    parser = ArgumentParser(description='enable SSL for eteSync DAV client.')
-    parser.add_argument('--config-dir', metavar='DIR', default=CONFIG_DIR,
-        help="""assume configuration files are (should be) in DIR
-            (default: {})""".format(CONFIG_DIR))
-    parser.add_argument('--config-file', metavar='FILE', default=CONFIG_FILE,
-        help='read configuration from FILE (default: {})'.format(CONFIG_FILE))
-    parser.add_argument('--cert-file', metavar='NAME', default=CERT_FILE,
-        help='write certificate to NAME (default: {})'.format(CERT_FILE))
-    parser.add_argument('--key-file', metavar='NAME', default=KEY_FILE,
-        help='write key to NAME (default: {})'.format(KEY_FILE))
-    parser.add_argument('--key-cipher', '-c', metavar='ALGO',
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument('--config-dir', default=CONFIG_DIR)
+    parser.add_argument('--config-file', default=CONFIG_FILE)
+    parser.add_argument('--force', '-f', action='store_true', default=False)
+    args, other_args = parser.parse_known_args()
+    chdir(args.config_dir)
+    config = ConfigParser()
+    config.read(args.config_file)
+    server = config['server']
+    cert_file = server.get('certificate', CERT_FILE)
+    key_file = server.get('key', KEY_FILE)
+    enable_ssl = (not server.getboolean('ssl')) or args.force
+    generate_cert_ = not(path.exists(cert_file) or
+        path.exists(key_file)) or args.force
+
+    parser = ArgumentParser('enable SSL for eteSync DAV client.',
+        epilog='defaults respond to your configuration!')
+    config_group = parser.add_argument_group('configuration files')
+    config_group.add_argument('--config-dir', metavar='DIR',
+        default=args.config_dir, help="""assume configuration files are in DIR
+            (default: {})""".format(collapseuser(args.config_dir)))
+    config_group.add_argument('--config-file', dest='config_path',
+        metavar='FILE', type=path.abspath, default=args.config_file,
+        help="""read configuration from FILE
+            (default: {})""".format(args.config_file))
+    config_group.add_argument('--dont-enable-ssl', dest='enable_ssl',
+        default=enable_ssl, action='store_false',
+        help="don't enable SSL (default: {})".format(
+            'do it' if enable_ssl else "don't do it"))
+
+    cert_group = parser.add_argument_group('certificate generation')
+    cert_group.add_argument('--dont-gen-cert', dest='generate_cert',
+        default=generate_cert_, action='store_false',
+        help="don't generate certificate (default: {})".format(
+            'do it' if generate_cert_ else "don't do it"))
+    cert_group.add_argument('--cert-file',
+        dest='cert_path', metavar='NAME', type=path.abspath, default=cert_file,
+        help='write certificate to NAME (default: {})'.format(
+            trimsubpath(args.config_dir, cert_file)))
+    cert_group.add_argument('--key-file',
+        dest='key_path', metavar='NAME', type=path.abspath, default=key_file,
+        help='write key to NAME (default: {})'.format(
+            trimsubpath(args.config_dir, key_file)))
+    cert_group.add_argument('--key-cipher', '-c', metavar='ALGO',
         default=KEY_CIPHER,
         help='encrypt with ALGO (default: {})'.format(KEY_CIPHER))
-    parser.add_argument('--key-size', '-s', metavar='BITS', type=int,
+    cert_group.add_argument('--key-size', '-s', metavar='BITS', type=int,
         default=KEY_SIZE,
         help='make key BITS long (default: {})'.format(KEY_SIZE))
-    parser.add_argument('--key-days', '-d', metavar='N', type=int,
+    cert_group.add_argument('--key-days', '-d', metavar='N', type=int,
         default=KEY_DAYS,
         help='key expires after N days (default: {})'.format(KEY_DAYS))
+
     if platform == 'darwin':
-        parser.add_argument('--keychain', '-k', metavar='KEYCHAIN',
-            help='add certificate to KEYCHAIN (default: login keychain)')
-    parser.add_argument('--backup-to', metavar='SUFFIX',
-        default=BACKUP_SUFFIX, help='use SUFFIX for backups')
-    parser.add_argument('--quiet', '-q', dest='verbose', action='store_false',
+        trust_group = parser.add_argument_group('certificate trust')
+        trust_group.add_argument('--trust-cert', '-t', action='store_true',
+            help="make OS trust the certificate (default: don't do it)")
+        trust_group.add_argument('--keychain', '-k', metavar='KEYCHAIN',
+            help='add certificate to KEYCHAIN (default: default keychain)')
+    general = parser.add_argument_group('general')
+    general.add_argument('--backup', dest='backup_suffix', metavar='SUFFIX',
+        default=BACKUP_SUFFIX, help='use SUFFIX for backup filenames')
+    general.add_argument('--quiet', '-q', dest='verbose', action='store_false',
         help='keep quiet')
-    parser.add_argument('--force', '-f', action='store_true',
-        help='overwrite existing configuration')
-    certgen(**vars(parser.parse_args()))
+    general.add_argument('--force', action='store_true',
+        default=args.force, help='overwrite existing files')
+    
+    args = parser.parse_args(other_args)
+    args_d = vars(args)
+    subargs = lambda x: {i: args_d[i] for i in x}
+    if args.generate_cert:
+        generate_cert(**subargs(('cert_path', 'key_path', 'key_cipher',
+                                 'key_size', 'key_days',
+                                 'backup_suffix', 'verbose')))
+    elif args.verbose:
+        warn("""there is a certificate already, won't overwrite it
+            (but you can --force me).""")
+    if args.enable_ssl:
+        configure_etesync_dav(**subargs(('config_path', 'cert_path',
+                                  'key_path', 'backup_suffix',
+                                  'force', 'verbose')))
+    elif args.verbose:
+        warn("""SSL is already set up, won't change your configuration
+            (but you can --force me).""")
+    if args.trust_cert:
+        macos_trust_cert(**subargs(('cert_path', 'keychain', 'verbose')))
+    elif platform == 'darwin' and args.verbose:
+        warn("""won't make the system trust the certificate
+            (unless you tell me with --trust-cert).""")
 
 
 if __name__ == '__main__':
