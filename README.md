@@ -193,15 +193,15 @@ Create a self-signed SSL certificate:
 Tell macOS to trust this certificate for SSL connections:     
 
         security import cert.pem    
-        security add-trusted-cert -p ssl cert.pm     
+        security add-trusted-cert -p ssl cert.pem     
 
 If this fails, open the Keychain application and import the certificate there. Remember to also trust it for SSL connections.    
 
 Edit `radicale.conf` (in the same directory) and add the following lines in the `[server]` section:     
 
         ssl = yes
-        certificate = <your home directory>/Library/Application Support/etesync-dav/cert.pm
-        key = <your home directory>/Library/Application Support/etesync-dav/key.pm
+        certificate = <your home directory>/Library/Application Support/etesync-dav/cert.pem
+        key = <your home directory>/Library/Application Support/etesync-dav/key.pem
 
 Restart `etesync-dav`
 
