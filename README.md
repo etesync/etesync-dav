@@ -178,34 +178,28 @@ add-on.
 
 macOS Mojave enforces the use of SSL, *regardless* of whether you enable the
 checkbox for SSL or not. So to use EteSync, you have to enable SSL. You can
-do so by following these steps:
+do so by using the `etesync-dav-certgen` utility. It will generate a
+self-signed SSL certificate, configure etesync-dav to use that certificate,
+and -- if you request that -- will make your system trust it.
 
-Go to the configuration directory of EteSync DAV:
+You can do all of this by:
 
-   cd ~/Library/Application\ Support/etesync-dav
+    etesync-dav-certgen --trust-cert
 
-Create a self-signed SSL certificate:    
-   
-   openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 1825 -nodes -subj '/CN=localhost'
+You will be prompted for your login password. This is because `--trust-cert`
+imports the certificate into your login keychain and then instructs the
+system to trust it for SSL connections.
 
-(This creates a certificate that expires in 5 years.)
+Once you have run `etesync-dav-certgen`, you need to restart `etesync-dav`
+for the changes to take effect. Then proceed to configure CalDAV and CardDAV
+as described above.
 
-Tell macOS to trust this certificate for SSL connections:     
+If you have already configured `etesync-dav` to use SSL, 
+`etesync-dav-certgen` will use your existing settings; in won't
+reconfigure `etesync-dav`. It also won't overwrite existing
+certificates. `--trust-cert` works on macOS 10.3 or newer only.
+See `etesync-dav-certgen --help` for details.
 
-        security import cert.pem    
-        security add-trusted-cert -p ssl cert.pem     
-
-If this fails, open the Keychain application and import the certificate there. Remember to also trust it for SSL connections.    
-
-Edit `radicale.conf` (in the same directory) and add the following lines in the `[server]` section:     
-
-        ssl = yes
-        certificate = <your home directory>/Library/Application Support/etesync-dav/cert.pem
-        key = <your home directory>/Library/Application Support/etesync-dav/key.pem
-
-Restart `etesync-dav`
-
-Configure CardDAV and CalDAV as described above.
 
 # Known issues
 
