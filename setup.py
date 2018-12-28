@@ -15,7 +15,8 @@ setup(
     packages=find_packages(),
     scripts=[
         'scripts/etesync-dav',
-        'scripts/etesync-dav-manage'
+        'scripts/etesync-dav-manage',
+        'scripts/etesync-dav-certgen'
     ],
     include_package_data=True,
     install_requires=[
