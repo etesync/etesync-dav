@@ -210,7 +210,8 @@ class Collection(BaseCollection):
             yield cls(posixpath.join(path, cls.user), principal=True)
         elif len(attributes) == 1:
             for journal in cls.etesync.list():
-                yield cls(posixpath.join(path, journal.uid), principal=False)
+                if journal.collection.TYPE in (api.AddressBook.TYPE, api.Calendar.TYPE):
+                    yield cls(posixpath.join(path, journal.uid), principal=False)
         elif len(attributes) == 2:
             for item in collection.list():
                 yield collection.get(item)
