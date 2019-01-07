@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.0
+* Add support for tasks
+* Correctly advertise calendars only support vevents.
+
 ## Version 0.1.8
 * Ignore journals of unknown types
 * Bump pyetesync version
