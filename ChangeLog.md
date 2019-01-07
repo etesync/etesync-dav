@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.6.0
+* Add tasks support
+
 ## Version 0.5.6
 * Fix broken calling to scrypt
 * Fix sync (was broken in some cases) and tests
