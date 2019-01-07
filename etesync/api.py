@@ -322,6 +322,13 @@ class Contact(PimObject):
         return vobj.uid.value
 
 
+class Task(PimObject):
+    @classmethod
+    def get_uid(cls, content):
+        vobj = vobject.readOne(content)
+        return vobj.vtodo.uid.value
+
+
 class BaseCollection:
     def __init__(self, journal):
         self._journal = journal
@@ -414,6 +421,13 @@ class Calendar(BaseCollection):
         return Event
 
 
+class TaskList(BaseCollection):
+    TYPE = 'TASKS'
+
+    def get_content_class(self):
+        return Task
+
+
 class AddressBook(BaseCollection):
     TYPE = 'ADDRESS_BOOK'
 
@@ -433,6 +447,8 @@ class Journal(ApiObjectBase):
             return AddressBook(self)
         elif journal_info.get('type') == Calendar.TYPE:
             return Calendar(self)
+        elif journal_info.get('type') == TaskList.TYPE:
+            return TaskList(self)
 
     @property
     def info(self):
