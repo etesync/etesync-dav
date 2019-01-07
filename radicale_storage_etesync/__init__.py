@@ -87,6 +87,10 @@ class MetaMappingCalendar(MetaMapping):
     MetaMapping._reverse_mapping(_mappings)
 
 
+class MetaMappingTaskList(MetaMappingCalendar):
+    supported_calendar_component = 'VTODO'
+
+
 class MetaMappingContacts(MetaMapping):
     _mappings = MetaMapping._mappings.copy()
     _mappings.update({
@@ -154,6 +158,10 @@ class Collection(BaseCollection):
                 self.tag = "VCALENDAR"
                 self.meta_mappings = MetaMappingCalendar()
                 self.content_suffix = ".ics"
+            elif isinstance(self.collection, api.TaskList):
+                self.tag = "VCALENDAR"
+                self.meta_mappings = MetaMappingTaskList()
+                self.content_suffix = ".ics"
             elif isinstance(self.collection, api.AddressBook):
                 self.tag = "VADDRESSBOOK"
                 self.meta_mappings = MetaMappingContacts()
@@ -214,7 +222,7 @@ class Collection(BaseCollection):
             yield cls(posixpath.join(path, cls.user), principal=True)
         elif len(attributes) == 1:
             for journal in cls.etesync.list():
-                if journal.collection.TYPE in (api.AddressBook.TYPE, api.Calendar.TYPE):
+                if journal.collection.TYPE in (api.AddressBook.TYPE, api.Calendar.TYPE, api.TaskList.TYPE):
                     yield cls(posixpath.join(path, journal.uid), principal=False)
         elif len(attributes) == 2:
             for item in collection.list():
