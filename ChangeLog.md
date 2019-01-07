@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.1.8
+* Ignore journals of unknown types
+* Bump pyetesync version
+
 ## Version 0.1.7
 * Bump pyetesync version
 
