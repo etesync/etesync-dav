@@ -35,6 +35,9 @@ class MetaMapping:
         if get_transform is not None:
             value = get_transform(value)
 
+        if key == 'C:supported-calendar-component-set':
+            return key, getattr(self, 'supported_calendar_component', None)
+
         return key, value
 
     def map_set(self, key, value):
@@ -75,6 +78,7 @@ def IntToRgb(color):
 
 
 class MetaMappingCalendar(MetaMapping):
+    supported_calendar_component = 'VEVENT'
     _mappings = MetaMapping._mappings.copy()
     _mappings.update({
             "C:calendar-description": ("description", None, None),
