@@ -29,9 +29,9 @@ The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packag
 
 ## Docker
 
-Run one time initial setup to persist the required configuration into a docker volume
+Run one time initial setup to persist the required configuration into a docker volume. This is equivalent to running etesync-dav-manage, check out the configuration section below for more information.
 
-    docker run -it --rm -v etesync:/data etesync/etesync-dav setup
+    docker run -it --rm -v etesync:/data etesync/etesync-dav manage add USER_EMAIL
 
 Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
 
@@ -40,6 +40,10 @@ Run etesync-dav in a background docker container with configuration from previou
 Getting log output from container if you run into any issues
 
     docker logs etesync-dav
+
+If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
+
+  --env "ETESYNC_URL=https://your-etesync-url.com"
 
 ## Windows systems
 
