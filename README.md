@@ -54,7 +54,7 @@ Install virtual env from your package manager, for example:
 
 Set up the virtual env:
 
-    virtualenv venv
+    virtualenv3 venv
     source venv/bin/activate
     pip install etesync-dav
 
