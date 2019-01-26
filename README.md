@@ -43,7 +43,7 @@ Getting log output from container if you run into any issues
 
 If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
 
-  --env "ETESYNC_URL=https://your-etesync-url.com"
+    --env "ETESYNC_URL=https://your-etesync-url.com"
 
 ## Windows systems
 
