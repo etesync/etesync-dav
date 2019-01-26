@@ -19,7 +19,7 @@ This depends on the [radicale_storage_etesync](https://github.com/etesync/radica
 
 `pip install etesync-dav`
 
-The above should be either run as root, or better yet, inside a python "virtualenv".
+The above should be either run as root, or better yet, inside a [python virtualenv](#python-virtual-environment-linux-and-mac).
 
 **Note:** Python 3 is required.
 
@@ -47,9 +47,10 @@ You can either follow the Docker instructions above (get Docker [here](https://w
 
 ## Python virtual environment (Linux and Mac)
 
-Install virtual env from your package manager, for example on Arch:
+Install virtual env from your package manager, for example:
 
-    pacman -S python-virtualenv
+- Arch Linux: pacman -S python-virtualenv
+- Debian/Ubuntu: apt-get install python3-virtualenv
 
 Set up the virtual env:
 
