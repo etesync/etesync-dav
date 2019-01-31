@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.2.1
+* Bump pyetesync version that fixes potential integrity issue
+
 ## Version 0.2.0
 * Add support for tasks
 * Correctly advertise calendars only support vevents.
