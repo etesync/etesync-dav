@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='etesync-dav',
-    version='0.2.0',
+    version='0.2.1',
     author='EteSync',
     author_email='development@etesync.com',
     url='https://github.com/etesync/etesync-dav',
