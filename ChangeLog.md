@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.2.1
+* Upgrade radicale_etesync - fixes potential intetgrity issue
+
 ## Version 0.2.0
 * Upgrade radicale_etesync (adds Tasks support!)
 
