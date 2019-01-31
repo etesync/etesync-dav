@@ -1,13 +1,18 @@
 import pytest
 import binascii
+import requests
 
 import etesync as api
 from etesync import exceptions
 from etesync.crypto import hmac256
 
+# Not public API, used for verification
+from etesync.service import EntryManager, RawJournal, CryptoManager
+
 
 USER_EMAIL = 'test@localhost'
-TEST_REMOTE = 'http://localhost:8000'
+USER_PASSWORD = 'SomePassword'
+TEST_REMOTE = 'http://localhost:8000/'
 TEST_DB = ':memory:'
 
 
@@ -20,12 +25,18 @@ def get_random_uid(context):
 
 @pytest.fixture(scope="module")
 def etesync():
-    return api.EteSync(USER_EMAIL, '', remote=TEST_REMOTE, db_path=TEST_DB)
+    auth = api.Authenticator(TEST_REMOTE)
+    token = auth.get_auth_token(USER_EMAIL, USER_PASSWORD)
+    return api.EteSync(USER_EMAIL, token, remote=TEST_REMOTE, db_path=TEST_DB)
 
 
 class TestCollection:
     @pytest.fixture(autouse=True)
     def transact(self, request, etesync):
+        # Clear the db for this user
+        headers = {'Authorization': 'Token ' + etesync.auth_token}
+        response = requests.post(TEST_REMOTE + 'reset/', headers=headers, allow_redirects=False)
+        assert response.status_code == 200
         etesync._init_db(TEST_DB)
         yield
 
@@ -131,6 +142,52 @@ class TestCollection:
         # Check fetching a non-existent item
         with pytest.raises(exceptions.DoesNotExist):
             c.get('bla')
+
+    def test_syncing(self, etesync):
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test'})
+
+        ev = api.Event.create(a,
+                              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+                              '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+
+        # Create the event
+        a.save()
+        ev.save()
+
+        # Add another and then sync (check we can sync more than one)
+        ev = api.Event.create(a,
+                              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+                              '747Z\r\nUID:2cd64f22-1111-44f5-bc45-aaaaaaaaaaac\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed 2\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+        ev.save()
+
+        assert len(list(a.list())) == 2
+
+        etesync.sync()
+
+        ev.delete()
+        assert len(list(a.list())) == 1
+
+        etesync.sync()
+
+        # Verify we created valid journal entries
+        journal_uid = a.journal.uid
+        manager = EntryManager(etesync.remote, etesync.auth_token, journal_uid)
+
+        crypto_manager = CryptoManager(a.journal.version, etesync.cipher_key, journal_uid.encode())
+        journal = RawJournal(crypto_manager, uid=journal_uid)
+        crypto_manager = etesync._get_journal_cryptomanager(journal)
+
+        prev = None
+        last_uid = None
+
+        for entry in manager.list(crypto_manager, last_uid):
+            entry.verify(prev)
+
+            prev = entry
 
     def test_unicode(self, etesync):
         a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'יוניקוד'})

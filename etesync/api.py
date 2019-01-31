@@ -196,6 +196,8 @@ class EteSync:
             raw_entry.update(sync_entry.to_json().encode(), prev)
             entries.append(raw_entry)
 
+            prev = raw_entry
+
         manager.add(entries, last_uid)
 
         # Add entries to cache
