@@ -110,8 +110,7 @@ class EteSync:
             journal.save()
 
     def sync_journal(self, uid):
-        # FIXME: At the moment if there's a conflict remote would win, which is
-        # not good and doesn't conform to java client. Copy what's done there.
+        # FIXME: At the moment if there's a conflict remote would win.
         self.pull_journal(uid)
         self.push_journal(uid)
 
