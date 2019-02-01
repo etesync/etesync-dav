@@ -1,31 +1,19 @@
-# This is a CalDAV and CardDAV bridge/proxy for [EteSync](https://www.etesync.com).
+# This is a CalDAV and CardDAV adapter for [EteSync](https://www.etesync.com)
 
 ![GitHub tag](https://img.shields.io/github/tag/etesync/etesync-dav.svg)
 [![PyPI](https://img.shields.io/pypi/v/etesync-dav.svg)](https://pypi.python.org/pypi/etesync-dav/)
 [![Chat on freenode](https://img.shields.io/badge/irc.freenode.net-%23EteSync-blue.svg)](https://webchat.freenode.net/?channels=#etesync)
 
-This package provides a local CalDAV and CardDAV server that proxies requests
-to an EteSync server for use with desktop CalDAV and CardDAV clients.
+This package provides a local CalDAV and CardDAV server that acts as an EteSync compatibility layer (adapter).
+It's meant for letting desktop CalDAV and CardDAV clients such as Thunderbird, Outlook and Apple Contacts connect with EteSync.
 
 If all you want is to access your data from a computer, you are probably better off using [the web app](https://client.etesync.com).
 
-This is essentially a compatibility layer between EteSync and DAV clients.
-
-This depends on the [radicale_storage_etesync](https://github.com/etesync/radicale_storage_etesync) module and the [Radicale server](http://radicale.org) for operation.
-
 **Note:** This software is still in beta. It should work well and is used daily by many users, but there may be some rough edges.
 
-# Installation
+# Quick Setup
 
-`pip install etesync-dav`
-
-The above should be either run as root, or better yet, inside a [python virtualenv](#python-virtual-environment-linux-and-mac).
-
-**Note:** Python 3 is required.
-
-## Arch Linux
-
-The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
+Installation is very easy when using Docker, the recommended installation method. All you need to do is follow the instructions below.
 
 ## Docker
 
@@ -36,14 +24,22 @@ Run one time initial setup to persist the required configuration into a docker v
 Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
 
     docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync/etesync-dav
+    
+After this, skip directly to the [Setting up clients](#setting-up-clients) section below and start using it!
 
-Getting log output from container if you run into any issues
-
-    docker logs etesync-dav
+### Note for self-hosting:
 
 If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
 
     --env "ETESYNC_URL=https://your-etesync-url.com"
+    
+# Alternative Installation Methods
+
+This methods are not as easy as the Docker method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section below.
+        
+## Arch Linux
+
+The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
 
 ## Windows systems
 
@@ -51,7 +47,7 @@ You can either follow the Docker instructions above (get Docker [here](https://w
 
 ## Python virtual environment (Linux and Mac)
 
-Install virtual env from your package manager, for example:
+Install virtual env (for **Python 3**) from your package manager, for example:
 
 - Arch Linux: pacman -S python-virtualenv
 - Debian/Ubuntu: apt-get install python3-virtualenv
@@ -64,7 +60,7 @@ Set up the virtual env:
     source venv/bin/activate
     pip install etesync-dav
 
-Run the etesync commands as explained in the "Configuration and running" section:
+Run the etesync commands as explained in the [Configuration and running](#configuration-and-running) section:
 
     ./venv/bin/etesync-dav-manage ...
     ./venv/bin/etesync-dav ...
@@ -100,8 +96,10 @@ and then run the server:
 
 *Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
+## Setting up clients
+
 After this, set up your CalDAV/CardDAV client to use the username and password
-you got from `etesync-dav-manage`, or alternatively run:
+you got from when adding your account to EteSync DAV before, or alternatively run
 `etesync-dav-manage get me@etesync.com` to get them again.
 
 Depending on the client you use, the server path should either be:
@@ -124,14 +122,6 @@ get me@etesync.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and
 paste the collection names as well, and select a color manually.
-
-Alternative ways to get collection URLs include programmatically using the
-`pyetesync` module (see
-[example.py](https://github.com/etesync/pyetesync/blob/master/example.py)
-for example usage), or copy it from the debug page in the EteSync Android
-app. When using `example.py`, the EteSync server address that should be
-used is `https://api.etesync.com` when interacting with the production
-server.
 
 
 ## Config files
@@ -207,7 +197,11 @@ reconfigure `etesync-dav`. It also won't overwrite existing
 certificates. `--trust-cert` works on macOS 10.3 or newer only.
 See `etesync-dav-certgen --help` for details.
 
-
 # Known issues
 
 * This package is missing startups script for automatic execution on startup.
+
+
+# Notes
+
+This depends on the [radicale_storage_etesync](https://github.com/etesync/radicale_storage_etesync) module and the [Radicale server](http://radicale.org) for operation.
