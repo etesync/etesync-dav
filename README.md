@@ -34,7 +34,7 @@ While this is stable enough for usage, it still may be subject to change, so
 please watch out for the changelog when updating version.
 Docs are currently missing but are planned.
 
-## Running example
+## Running the example script
 
 You'll need virtualenv to get the dependencies.
 
@@ -75,3 +75,19 @@ Please note, that depending on your setup, passing your passwords as command lin
 so it would be better if you manually edit the file.
 
 And all of your data will be copied to a local database located at `~/.etesync/data.db`.
+
+## Running the tests
+
+Some to the tests are unit tests, but some are integration tests who need an actual EteSync service with a few user names set up in order for them to work.
+
+You'd need to run your local server: https://github.com/etesync/server-skeleton/
+
+And then add two users:
+
+  - test@localhost
+  - test2@localhost
+
+Password for both: SomePassword
+
+That's it.
+
