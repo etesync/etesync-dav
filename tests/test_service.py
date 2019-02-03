@@ -7,6 +7,8 @@ import etesync as api
 from etesync import exceptions
 from etesync.crypto import hmac256
 
+# Not public API, used for verification
+from etesync.service import EntryManager, RawJournal, CryptoManager
 
 USER_EMAIL = 'test@localhost'
 USER_PASSWORD = 'SomePassword'
@@ -291,3 +293,49 @@ class TestService:
         info_manager.delete(user_info)
         with pytest.raises(exceptions.HttpException):
             info_manager.get(USER_EMAIL, etesync.cipher_key)
+
+    def test_collection_sync(self, etesync):
+        a = api.Calendar.create(etesync, get_random_uid(self), {'displayName': 'Test'})
+
+        ev = api.Event.create(a,
+                              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+                              '747Z\r\nUID:2cd64f22-1111-44f5-bc45-53440af38cec\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed cat\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+
+        # Create the event
+        a.save()
+        ev.save()
+
+        # Add another and then sync (check we can sync more than one)
+        ev = api.Event.create(a,
+                              'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:+//Yo\r\nBEGIN:VEVENT\r\nDTSTAMP:20170324T164' +
+                              '747Z\r\nUID:2cd64f22-1111-44f5-bc45-aaaaaaaaaaac\r\nDTSTART;VALUE\u003dDATE:20170324' +
+                              '\r\nDTEND;VALUE\u003dDATE:20170325\r\nSUMMARY:Feed 2\r\nSTATUS:CONFIRMED\r\nTRANSP:' +
+                              'TRANSPARENT\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n')
+        ev.save()
+
+        assert len(list(a.list())) == 2
+
+        etesync.sync()
+
+        ev.delete()
+        assert len(list(a.list())) == 1
+
+        etesync.sync()
+
+        # Verify we created valid journal entries
+        journal_uid = a.journal.uid
+        manager = EntryManager(etesync.remote, etesync.auth_token, journal_uid)
+
+        crypto_manager = CryptoManager(a.journal.version, etesync.cipher_key, journal_uid.encode())
+        journal = RawJournal(crypto_manager, uid=journal_uid)
+        crypto_manager = etesync._get_journal_cryptomanager(journal)
+
+        prev = None
+        last_uid = None
+
+        for entry in manager.list(crypto_manager, last_uid):
+            entry.verify(prev)
+
+            prev = entry
