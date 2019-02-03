@@ -22,7 +22,7 @@ pyscrypt==1.6.2
 pytest==3.7.1
 pytest-cov==2.5.1
 python-dateutil==2.7.3
-requests==2.19.1
+requests==2.21.0
 six==1.10.0
 urllib3==1.23
 vobject==0.9.6.1
