@@ -1,4 +1,9 @@
-# This is a CalDAV and CardDAV adapter for [EteSync](https://www.etesync.com)
+<p align="center">
+  <img width="120" src="icon.svg" />
+  <h1 align="center">EteSync - Secure Data Sync</h1>
+</p>
+
+This is a CalDAV and CardDAV adapter for [EteSync](https://www.etesync.com)
 
 ![GitHub tag](https://img.shields.io/github/tag/etesync/etesync-dav.svg)
 [![PyPI](https://img.shields.io/pypi/v/etesync-dav.svg)](https://pypi.python.org/pypi/etesync-dav/)
