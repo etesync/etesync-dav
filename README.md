@@ -1,4 +1,9 @@
-# This is a python client library for [EteSync](https://www.etesync.com)
+<p align="center">
+  <img width="120" src="icon.svg" />
+  <h1 align="center">EteSync - Secure Data Sync</h1>
+</p>
+
+This is a python client library for [EteSync](https://www.etesync.com)
 
 ![GitHub tag](https://img.shields.io/github/tag/etesync/pyetesync.svg)
 [![PyPI](https://img.shields.io/pypi/v/etesync.svg)](https://pypi.python.org/pypi/etesync/)
