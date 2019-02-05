@@ -21,6 +21,9 @@ class Credentials:
 
     def get(self, username):
         users = self.content['users']
+        if username not in users:
+            return None, None
+
         user = users[username]
         return user['authToken'], base64.b64decode(user['cipherKey'])
 

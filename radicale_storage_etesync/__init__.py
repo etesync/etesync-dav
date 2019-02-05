@@ -486,6 +486,13 @@ class Collection(BaseCollection):
 
         creds = Credentials(creds_path)
         auth_token, cipher_key = creds.get(user)
+        if auth_token is None:
+            # Retry if we don't have the user in our cache
+            creds.load()
+            auth_token, cipher_key = creds.get(user)
+
+        if auth_token is None:
+            raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
 
         etesync = api.EteSync(user, auth_token, remote=remote_url, db_path=db_path)
         etesync.cipher_key = cipher_key
