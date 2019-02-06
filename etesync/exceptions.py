@@ -14,6 +14,10 @@ class ServiceUnavailableException(HttpException):
     pass
 
 
+class HttpNotFound(HttpException):
+    pass
+
+
 class VersionTooNew(Exception):
     pass
 

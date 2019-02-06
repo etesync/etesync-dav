@@ -144,6 +144,8 @@ class BaseManager:
             data = response.json()
             if data.get('code') == 'service_inactive':
                 raise exceptions.UserInactiveException(data.get('detail'))
+        elif response.status_code == HTTPStatus.NOT_FOUND:
+            raise exceptions.HttpNotFound(response.status_code)
         elif not _status_success(response.status_code):
             raise exceptions.HttpException(response.status_code)
         return response
