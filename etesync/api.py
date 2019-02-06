@@ -3,7 +3,7 @@ import json
 import os
 import peewee
 
-from .crypto import CryptoManager, AsymmetricKeyPair, derive_key, CURRENT_VERSION
+from .crypto import CryptoManager, AsymmetricCryptoManager, AsymmetricKeyPair, derive_key, CURRENT_VERSION
 from .service import JournalManager, EntryManager, SyncEntry
 from . import cache, pim, service, db, exceptions
 
@@ -50,7 +50,33 @@ class EteSync:
         database.create_tables([pim.Content, cache.User, cache.JournalEntity,
                                 cache.EntryEntity, cache.UserInfo], safe=True)
 
+    def get_or_create_user_info(self):
+        try:
+            user_info = cache.UserInfo.get(user=self.user)
+        except cache.UserInfo.DoesNotExist:
+            info_manager = service.UserInfoManager(self.remote, self.auth_token)
+            remote_info = None
+            try:
+                remote_info = info_manager.get(self.user.username, self.cipher_key)
+            except exceptions.HttpNotFound:
+                pass
+
+            if remote_info:
+                remote_info.verify()
+            else:
+                key_pair = AsymmetricCryptoManager.generate_key_pair()
+                crypto_manager = CryptoManager(CURRENT_VERSION, self.cipher_key, b'userInfo')
+                remote_info = service.RawUserInfo(crypto_manager, self.user.username, key_pair.public_key)
+                remote_info.update(key_pair.private_key)
+                remote_info.verify()
+                info_manager.add(remote_info)
+
+            user_info = cache.UserInfo(user=self.user, pubkey=remote_info.pubkey, content=remote_info.getContent())
+            user_info.save(force_insert=True)
+        return user_info
+
     def sync(self):
+        self.get_or_create_user_info()
         self.sync_journal_list()
         for journal in self.list():
             self.sync_journal(journal.uid)
@@ -117,14 +143,7 @@ class EteSync:
     def _get_journal_cryptomanager(self, journal):
         if journal.encrypted_key is not None:
             # If journal is pubkey encrypted, fetch encryption key
-            try:
-                user_info = cache.UserInfo.get(user=self.user)
-            except cache.UserInfo.DoesNotExist:
-                info_manager = service.UserInfoManager(self.remote, self.auth_token)
-                remote_info = info_manager.get(self.user.username, self.cipher_key)
-                remote_info.verify()
-                user_info = cache.UserInfo(user=self.user, pubkey=remote_info.pubkey, content=remote_info.getContent())
-                user_info.save(force_insert=True)
+            user_info = self.get_or_create_user_info()
             key_pair = AsymmetricKeyPair(user_info.content, user_info.pubkey)
             return CryptoManager.create_from_asymmetric_encryted_key(
                     journal.version, key_pair, journal.encrypted_key)

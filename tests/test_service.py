@@ -222,13 +222,6 @@ class TestService:
         journal_manager = service.JournalManager(etesync.remote, etesync.auth_token)
         etesync.sync()
 
-        key_pair = crypto.AsymmetricCryptoManager.generate_key_pair()
-        asymmetric_crypto_manager = crypto.AsymmetricCryptoManager(key_pair)
-        # FIXME: Hack, shouldn't calculate it here
-        cipher_key = hmac256(a.journal.uid.encode(), etesync.cipher_key)
-        encrypted_key = asymmetric_crypto_manager.encrypt(key_pair.public_key, cipher_key)
-        member = service.Member(USER2_EMAIL, encrypted_key)
-
         # Second user
         auth = api.Authenticator(TEST_REMOTE)
         token = auth.get_auth_token(USER2_EMAIL, USER_PASSWORD)
@@ -237,14 +230,14 @@ class TestService:
         response = requests.post(TEST_REMOTE + 'reset/', headers=headers, allow_redirects=False)
         assert response.status_code == 200
 
-        journal_manager.member_add(a.journal._cache_obj, member)
+        user_info = etesync2.get_or_create_user_info()
+        key_pair = crypto.AsymmetricKeyPair(user_info.content, user_info.pubkey)
+        asymmetric_crypto_manager = crypto.AsymmetricCryptoManager(key_pair)
+        cipher_key = hmac256(a.journal.uid.encode(), etesync.cipher_key)
+        encrypted_key = asymmetric_crypto_manager.encrypt(key_pair.public_key, cipher_key)
 
-        info_manager = service.UserInfoManager(etesync2.remote, etesync2.auth_token)
-        crypto_manager = crypto.CryptoManager(crypto.CURRENT_VERSION, etesync2.cipher_key, b"userInfo")
-        user_info = service.RawUserInfo(crypto_manager, USER2_EMAIL, key_pair.public_key)
-        user_info.update(key_pair.private_key)
-        user_info.verify()
-        info_manager.add(user_info)
+        member = service.Member(USER2_EMAIL, encrypted_key)
+        journal_manager.member_add(a.journal._cache_obj, member)
 
         etesync2.sync()
 
