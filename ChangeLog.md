@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.3.0
+* Fetch user info on every sync
+* Reload credentials file when trying to access credentials of a user that's not found.
+* Bump pyetesync version
+
 ## Version 0.2.1
 * Bump pyetesync version that fixes potential integrity issue
 
