@@ -50,10 +50,14 @@ class EteSync:
         database.create_tables([pim.Content, cache.User, cache.JournalEntity,
                                 cache.EntryEntity, cache.UserInfo], safe=True)
 
-    def get_or_create_user_info(self):
+    def get_or_create_user_info(self, force_fetch=False):
+        user_info = None
         try:
             user_info = cache.UserInfo.get(user=self.user)
         except cache.UserInfo.DoesNotExist:
+            pass
+
+        if user_info is None or force_fetch:
             info_manager = service.UserInfoManager(self.remote, self.auth_token)
             remote_info = None
             try:
@@ -71,12 +75,14 @@ class EteSync:
                 remote_info.verify()
                 info_manager.add(remote_info)
 
+            new_user_info = user_info is None
             user_info = cache.UserInfo(user=self.user, pubkey=remote_info.pubkey, content=remote_info.getContent())
-            user_info.save(force_insert=True)
+            user_info.save(force_insert=new_user_info)
+
         return user_info
 
     def sync(self):
-        self.get_or_create_user_info()
+        self.get_or_create_user_info(force_fetch=True)
         self.sync_journal_list()
         for journal in self.list():
             self.sync_journal(journal.uid)
