@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.6.3
+* Sync: automatically create user info if doesn't exist
+
 ## Version 0.6.2
 * Add shell scripts for executing tests
 
