@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.7.0
+* Fix user info to use the correct asymmetric key format
+* Sync user info on every protocl sync - needed for encryption password changes.
+
 ## Version 0.6.3
 * Sync: automatically create user info if doesn't exist
 
