@@ -521,6 +521,7 @@ class Collection(BaseCollection):
 
             if cls._should_sync():
                 cls._mark_sync()
+                cls.etesync.get_or_create_user_info()
                 cls.etesync.sync_journal_list()
                 for journal in cls.etesync.list():
                     cls.etesync.pull_journal(journal.uid)
