@@ -65,9 +65,9 @@ class AsymmetricCryptoManager:
         return AsymmetricKeyPair(
                 private_key.private_bytes(encryption_algorithm=serialization.NoEncryption(),
                                           encoding=serialization.Encoding.DER,
-                                          format=serialization.PrivateFormat.TraditionalOpenSSL),
+                                          format=serialization.PrivateFormat.PKCS8),
                 private_key.public_key().public_bytes(encoding=serialization.Encoding.DER,
-                                                      format=serialization.PublicFormat.PKCS1))
+                                                      format=serialization.PublicFormat.SubjectPublicKeyInfo))
 
     def decrypt(self, ctext):
         private_key = serialization.load_der_private_key(
