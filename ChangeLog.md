@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.4.0
+* Make it possible to have a different database per user
+* Make the sync throttle per user rather than instance
+* Verify that the user creds haven't changed or removed before using the cached etesync.
+* Creds: only reload the file if it has changed.
+* Fix fetching of user info to always fetch from the server.
+
 ## Version 0.3.0
 * Fetch user info on every sync
 * Reload credentials file when trying to access credentials of a user that's not found.
