@@ -24,11 +24,11 @@ Installation is very easy when using Docker, the recommended installation method
 
 Run one time initial setup to persist the required configuration into a docker volume. This is equivalent to running etesync-dav-manage, check out the configuration section below for more information.
 
-    docker run -it --rm -v etesync:/data etesync/etesync-dav manage add USER_EMAIL
+    docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
 
 Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
 
-    docker run --name etesync-dav -d -v etesync:/data -p 37358:37358 --restart=always etesync/etesync-dav
+    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
     
 After this, skip directly to the [Setting up clients](#setting-up-clients) section below and start using it!
 
