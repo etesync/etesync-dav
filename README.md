@@ -50,7 +50,7 @@ The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packag
 
 You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
 
-## Python virtual environment (Linux and Mac)
+## Python virtual environment (Linux, BSD and Mac)
 
 Install virtual env (for **Python 3**) from your package manager, for example:
 
