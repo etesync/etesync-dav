@@ -474,22 +474,29 @@ class Collection(BaseCollection):
         cls._last_sync = time.time()
 
     _etesync_cache = {}
+    creds = None
 
     @classmethod
     def _get_etesync_for_user(cls, user):
-        if user in cls._etesync_cache:
-            return cls._etesync_cache[user]
+        if cls.creds:
+            # Always attempt a reload
+            cls.creds.load()
+
+            # Used the cached etesync for the user unless the cipher_key or auth_token have changed.
+            if user in cls._etesync_cache:
+                etesync = cls._etesync_cache[user]
+                if (etesync.auth_token, etesync.cipher_key) == cls.creds.get(user):
+                    return etesync
+                else:
+                    del cls._etesync_cache[user]
+        else:
+            creds_path = cls.configuration.get(CONFIG_SECTION, "credentials_filename")
+            cls.creds = Credentials(creds_path)
 
         remote_url = cls.configuration.get(CONFIG_SECTION, "remote_url")
         db_path = cls.configuration.get(CONFIG_SECTION, "database_filename")
-        creds_path = cls.configuration.get(CONFIG_SECTION, "credentials_filename")
 
-        creds = Credentials(creds_path)
-        auth_token, cipher_key = creds.get(user)
-        if auth_token is None:
-            # Retry if we don't have the user in our cache
-            creds.load()
-            auth_token, cipher_key = creds.get(user)
+        auth_token, cipher_key = cls.creds.get(user)
 
         if auth_token is None:
             raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
