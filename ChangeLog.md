@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.3.0
+* Docker: make the container run as an unprivileged user.
+* Fix etesync-dav-manage to not create a database (as it doesn't need to)
+* Upgrade radicale_etesync.
+
 ## Version 0.2.1
 * Upgrade radicale_etesync - fixes potential intetgrity issue
 
