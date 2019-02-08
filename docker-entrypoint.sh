@@ -6,8 +6,4 @@ if [ "$1" == "manage" ]; then
   exit 0
 fi
 
-echo "Upgrading etesync-dav if necessary"
-pip install --upgrade etesync-dav scrypt
-
-echo "Running etesync-dav"
 exec etesync-dav "$@"

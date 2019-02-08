@@ -6,8 +6,15 @@ ENV ETESYNC_LISTEN_PORT "37358"
 
 RUN pip install etesync-dav scrypt
 
+RUN set -ex ;\
+        useradd etesync ;\
+        mkdir -p /data ;\
+        chown -R etesync: /data
+
 VOLUME /data
 EXPOSE 37358
+
+USER etesync
 
 COPY docker-entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
