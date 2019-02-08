@@ -6,14 +6,17 @@ import os
 class Credentials:
     def __init__(self, filename):
         self.filename = filename
+        self.last_mtime = 0
+        self.content = {'users': {}}
         self.load()
 
     def load(self):
         if os.path.exists(self.filename):
-            with open(self.filename, "r") as f:
-                self.content = json.load(f)
-        else:
-            self.content = {'users': {}}
+            mtime = os.path.getmtime(self.filename)
+            if mtime != self.last_mtime:
+                with open(self.filename, "r") as f:
+                    self.content = json.load(f)
+            self.last_mtime = mtime
 
     def save(self):
         with open(self.filename, "w") as f:
