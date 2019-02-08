@@ -97,7 +97,7 @@ if args.command == 'add':
     auth_token = api.Authenticator(remote_url).get_auth_token(args.username, login_password)
 
     print("Deriving password")
-    etesync = api.EteSync(args.username, auth_token, remote=remote_url)
+    etesync = api.EteSync(args.username, auth_token, remote=remote_url, db_path=':memory:')
     cipher_key = etesync.derive_key(encryption_password)
 
     print("Saving config")
