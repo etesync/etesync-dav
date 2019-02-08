@@ -4,6 +4,8 @@ import posixpath
 import threading
 import time
 
+from urllib.parse import quote
+
 from .creds import Credentials
 
 import etesync as api
@@ -491,10 +493,14 @@ class Collection(BaseCollection):
             creds_path = cls.configuration.get(CONFIG_SECTION, "credentials_filename")
             cls.creds = Credentials(creds_path)
 
-        remote_url = cls.configuration.get(CONFIG_SECTION, "remote_url")
-        db_path = cls.configuration.get(CONFIG_SECTION, "database_filename")
-
         auth_token, cipher_key = cls.creds.get(user)
+
+        # Create a unique filename for user and cipher_key combos. So we don't use old caches that are no longer valid.
+        unique_name_sha = hashlib.sha256(cipher_key)
+        db_name_unique = '{}-{}'.format(quote(user, safe=''), unique_name_sha.hexdigest())
+
+        remote_url = cls.configuration.get(CONFIG_SECTION, "remote_url")
+        db_path = cls.configuration.get(CONFIG_SECTION, "database_filename").format(db_name_unique)
 
         if auth_token is None:
             raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
