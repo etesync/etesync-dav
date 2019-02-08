@@ -463,15 +463,13 @@ class Collection(BaseCollection):
             return "".join([item.serialize() for item in items])
         return ""
 
-    _last_sync = 0
-
     @classmethod
     def _should_sync(cls):
-        return time.time() - cls._last_sync >= 2 * 60  # In seconds
+        return time.time() - cls.etesync.last_sync >= 2 * 60  # In seconds
 
     @classmethod
     def _mark_sync(cls):
-        cls._last_sync = time.time()
+        cls.etesync.last_sync = time.time()
 
     _etesync_cache = {}
     creds = None
@@ -506,6 +504,7 @@ class Collection(BaseCollection):
 
         cls._etesync_cache[user] = etesync
 
+        etesync.last_sync = 0
         return etesync
 
     _lock = threading.Lock()
