@@ -32,6 +32,12 @@ Run etesync-dav in a background docker container with configuration from previou
     
 After this, skip directly to the [Setting up clients](#setting-up-clients) section below and start using it!
 
+### Updating
+
+To update to the latest version of the docker image run:
+
+    docker pull etesync/etesync-dav
+
 ### Note for self-hosting:
 
 If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
