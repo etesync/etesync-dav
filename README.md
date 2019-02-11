@@ -34,7 +34,7 @@ After this, skip directly to the [Setting up clients](#setting-up-clients) secti
 
 ### Updating
 
-To update to the latest version of the docker image run:
+To update to the latest version of the docker image, run:
 
     docker pull etesync/etesync-dav
 
