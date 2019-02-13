@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.8.0
+* Add support for read only journals
+* Fix issue with having the same journals in the db for different users.
+* Journal list fetching: fix stale cache issue.
+
 ## Version 0.7.0
 * Fix user info to use the correct asymmetric key format
 * Sync user info on every protocl sync - needed for encryption password changes.
