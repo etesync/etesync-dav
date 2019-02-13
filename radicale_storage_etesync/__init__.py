@@ -4,9 +4,8 @@ import posixpath
 import threading
 import time
 
-from urllib.parse import quote
 
-from .creds import Credentials
+from .etesync_cache import EteSyncCache
 
 import etesync as api
 from radicale.storage import (
@@ -473,44 +472,22 @@ class Collection(BaseCollection):
     def _mark_sync(cls):
         cls.etesync.last_sync = time.time()
 
-    _etesync_cache = {}
-    creds = None
+    _etesync_cache = None
 
     @classmethod
     def _get_etesync_for_user(cls, user):
-        if cls.creds:
-            # Always attempt a reload
-            cls.creds.load()
+        if cls._etesync_cache is None:
+            cls._etesync_cache = EteSyncCache(
+                creds_path=cls.configuration.get(CONFIG_SECTION, "credentials_filename"),
+                db_path=cls.configuration.get(CONFIG_SECTION, "database_filename"),
+                remote_url=cls.configuration.get(CONFIG_SECTION, "remote_url"),
+            )
 
-            # Used the cached etesync for the user unless the cipher_key or auth_token have changed.
-            if user in cls._etesync_cache:
-                etesync = cls._etesync_cache[user]
-                if (etesync.auth_token, etesync.cipher_key) == cls.creds.get(user):
-                    return etesync
-                else:
-                    del cls._etesync_cache[user]
-        else:
-            creds_path = cls.configuration.get(CONFIG_SECTION, "credentials_filename")
-            cls.creds = Credentials(creds_path)
+        etesync, created = cls._etesync_cache.etesync_for_user(user)
 
-        auth_token, cipher_key = cls.creds.get(user)
+        if created:
+            etesync.last_sync = 0
 
-        # Create a unique filename for user and cipher_key combos. So we don't use old caches that are no longer valid.
-        unique_name_sha = hashlib.sha256(cipher_key)
-        db_name_unique = '{}-{}'.format(quote(user, safe=''), unique_name_sha.hexdigest())
-
-        remote_url = cls.configuration.get(CONFIG_SECTION, "remote_url")
-        db_path = cls.configuration.get(CONFIG_SECTION, "database_filename").format(db_name_unique)
-
-        if auth_token is None:
-            raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
-
-        etesync = api.EteSync(user, auth_token, remote=remote_url, db_path=db_path)
-        etesync.cipher_key = cipher_key
-
-        cls._etesync_cache[user] = etesync
-
-        etesync.last_sync = 0
         return etesync
 
     _lock = threading.Lock()
