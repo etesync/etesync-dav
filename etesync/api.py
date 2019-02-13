@@ -185,7 +185,7 @@ class EteSync:
         journal_uid = uid
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
-        journal = cache.JournalEntity.get(uid=journal_uid)
+        journal = cache.JournalEntity.get(local_user=self.user, uid=journal_uid)
         crypto_manager = self._get_journal_cryptomanager(journal)
 
         collection = Journal._from_cache(journal).collection
@@ -206,7 +206,7 @@ class EteSync:
         return journal.content_set.where(pim.Content.new | pim.Content.dirty | pim.Content.deleted)
 
     def journal_is_dirty(self, uid):
-        journal = cache.JournalEntity.get(uid=uid)
+        journal = cache.JournalEntity.get(local_user=self.user, uid=uid)
         changed = list(self._journal_dirty_get(journal))
         return len(changed) > 0
 
@@ -215,7 +215,7 @@ class EteSync:
         journal_uid = uid
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
-        journal = cache.JournalEntity.get(uid=journal_uid)
+        journal = cache.JournalEntity.get(local_user=self.user, uid=journal_uid)
         crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
         changed_set = self._journal_dirty_get(journal)
         changed = list(changed_set)
