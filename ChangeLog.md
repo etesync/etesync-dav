@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.4.0
+* Include the new rights module (read only journals) in the default config
+* Upgrade radicale_etesync.
+
 ## Version 0.3.0
 * Docker: make the container run as an unprivileged user.
 * Fix etesync-dav-manage to not create a database (as it doesn't need to)
