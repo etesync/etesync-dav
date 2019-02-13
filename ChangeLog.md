@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5.0
+* Add a rights module to handle read only journals.
+* Bump pyetesync version
+
 ## Version 0.4.0
 * Make it possible to have a different database per user
 * Make the sync throttle per user rather than instance
