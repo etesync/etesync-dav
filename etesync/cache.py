@@ -3,6 +3,10 @@ import peewee as pw
 from . import db
 
 
+class Config(db.BaseModel):
+    db_version = pw.IntegerField()
+
+
 class User(db.BaseModel):
     username = pw.CharField(unique=True, null=False)
 
@@ -17,6 +21,7 @@ class JournalEntity(db.BaseModel):
     new = pw.BooleanField(null=False, default=False)
     dirty = pw.BooleanField(null=False, default=False)
     deleted = pw.BooleanField(null=False, default=False)
+    read_only = pw.BooleanField(null=False, default=False)
 
     class Meta:
         indexes = (

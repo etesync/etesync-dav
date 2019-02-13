@@ -47,8 +47,24 @@ class EteSync:
         self._set_db(database)
 
     def _init_db_tables(self, database):
-        database.create_tables([pim.Content, cache.User, cache.JournalEntity,
+        database.create_tables([cache.Config, pim.Content, cache.User, cache.JournalEntity,
                                 cache.EntryEntity, cache.UserInfo], safe=True)
+
+        db_version = cache.Config.get_or_none()
+        if db_version is None:
+            from playhouse.migrate import SqliteMigrator, migrate
+            # Essentially version 0 so do first migration.
+            migrator = SqliteMigrator(database)
+
+            try:
+                migrate(
+                    migrator.add_column('journalentity', 'read_only', cache.JournalEntity.read_only),
+                )
+            except peewee.OperationalError:
+                # A hack because we don't have a db config yet.
+                pass
+
+            cache.Config.insert(db_version=1).execute()
 
     def get_or_create_user_info(self, force_fetch=False):
         user_info = None
@@ -104,7 +120,8 @@ class EteSync:
             else:
                 journal = cache.JournalEntity(local_user=self.user, version=entry.version, uid=entry.uid,
                                               owner=entry.owner,
-                                              encrypted_key=entry.encrypted_key)
+                                              encrypted_key=entry.encrypted_key,
+                                              read_only=entry.read_only)
             journal.content = entry.getContent()
             journal.save()
 
@@ -465,6 +482,10 @@ class Journal(ApiObjectBase):
     @property
     def version(self):
         return self._cache_obj.version
+
+    @property
+    def read_only(self):
+        return self._cache_obj.read_only
 
     @property
     def collection(self):
