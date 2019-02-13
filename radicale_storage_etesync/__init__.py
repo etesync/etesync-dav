@@ -503,6 +503,9 @@ class Collection(BaseCollection):
         ``user`` is the name of the logged in user or empty.
 
         """
+        if not user:
+            return
+
         with cls._lock:
             cls.user = user
 
