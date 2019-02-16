@@ -144,7 +144,7 @@ class EteSync:
         changed = self._journal_list_dirty_get()
 
         for journal in changed:
-            crypto_manager = CryptoManager(journal.version, self.cipher_key, journal.uid.encode())
+            crypto_manager = self._get_journal_cryptomanager(journal)
             raw_journal = service.RawJournal(crypto_manager, uid=journal.uid)
             raw_journal.update(journal.content)
 
@@ -216,7 +216,7 @@ class EteSync:
         manager = EntryManager(self.remote, self.auth_token, journal_uid)
 
         journal = cache.JournalEntity.get(local_user=self.user, uid=journal_uid)
-        crypto_manager = CryptoManager(journal.version, self.cipher_key, journal_uid.encode())
+        crypto_manager = self._get_journal_cryptomanager(journal)
         changed_set = self._journal_dirty_get(journal)
         changed = list(changed_set)
 
