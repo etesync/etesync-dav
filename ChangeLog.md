@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.8.1
+* Fix pushing entries to shared journals.
+
 ## Version 0.8.0
 * Add support for read only journals
 * Fix issue with having the same journals in the db for different users.
