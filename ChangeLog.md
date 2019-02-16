@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.5.1
+* Rights management: better handle 404s
+
 ## Version 0.5.0
 * Add a rights module to handle read only journals.
 * Bump pyetesync version
