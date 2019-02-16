@@ -2,6 +2,7 @@ from radicale.rights import BaseRights
 
 from .etesync_cache import EteSyncCache
 
+import etesync as api
 
 CONFIG_SECTION = "storage"
 
@@ -36,6 +37,9 @@ class Rights(BaseRights):
         journal_uid = attributes[1]
 
         etesync, _ = self._etesync_cache.etesync_for_user(user)
-        journal = etesync.get(journal_uid)
+        try:
+            journal = etesync.get(journal_uid)
+        except api.exceptions.DoesNotExist:
+            return False
 
         return not journal.read_only
