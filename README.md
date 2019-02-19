@@ -182,7 +182,7 @@ add-on.
       * Password: generated etesync-dav password
       * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
 
-# macOS Mojave
+## macOS Mojave
 
 macOS Mojave enforces the use of SSL, *regardless* of whether you enable the
 checkbox for SSL or not. So to use EteSync, you have to enable SSL. You can
@@ -207,6 +207,12 @@ If you have already configured `etesync-dav` to use SSL,
 reconfigure `etesync-dav`. It also won't overwrite existing
 certificates. `--trust-cert` works on macOS 10.3 or newer only.
 See `etesync-dav-certgen --help` for details.
+
+## iOS
+
+By default, iOS only syncs events 30 days old and newer, which may look as if
+events are not showing. To fix this, got to: Settings -> Calendar -> Sync and
+change to the wanted time duration.
 
 # Known issues
 
