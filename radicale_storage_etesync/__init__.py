@@ -180,7 +180,8 @@ class Collection(BaseCollection):
 
     @classmethod
     def static_init(cls):
-        pass
+        cls._etesync_cache = None
+        cls._lock = threading.Lock()
 
     @classmethod
     def discover(cls, path, depth="0"):
@@ -472,8 +473,6 @@ class Collection(BaseCollection):
     def _mark_sync(cls):
         cls.etesync.last_sync = time.time()
 
-    _etesync_cache = None
-
     @classmethod
     def _get_etesync_for_user(cls, user):
         if cls._etesync_cache is None:
@@ -489,8 +488,6 @@ class Collection(BaseCollection):
             etesync.last_sync = 0
 
         return etesync
-
-    _lock = threading.Lock()
 
     @classmethod
     @contextmanager
