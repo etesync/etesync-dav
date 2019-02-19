@@ -1,6 +1,7 @@
 from .creds import Credentials
 import hashlib
 import threading
+import os
 
 from urllib.parse import quote
 
@@ -15,7 +16,7 @@ class EteSyncCache:
         self.creds = None
         self.creds_path = creds_path
         self.db_path = db_path
-        self.remote_url = remote_url
+        self.remote_url = os.environ.get('ETESYNC_URL', remote_url)
 
     def etesync_for_user(self, user):
         if self.creds:
