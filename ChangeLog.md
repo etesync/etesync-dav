@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.6.0
+* Allow overriding the API endpoint used, by setting ETESYNC_URL.
+* Fix a serious race condition in multi-threaded environments (default with Radicale!)
+  This could cause data leak when using the same etesync-dav instance with multiple EteSync credentials (not a common usecase).
+
 ## Version 0.5.1
 * Rights management: better handle 404s
 
