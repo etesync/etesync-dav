@@ -43,6 +43,8 @@ class EteSyncCache:
         etesync = api.EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
         etesync.cipher_key = cipher_key
 
-        self._etesync_cache[user] = etesync
+        if False:
+            # XXX: Remove the cache for now, it doesn't save us much and is racey. See commit message
+            self._etesync_cache[user] = etesync
 
         return etesync, True
