@@ -89,13 +89,13 @@ connect to.
 
 You need to first add an EteSync user using `etesync-dav-manage`, for example:
 
-`etesync-dav-manage add me@etesync.com`
+`etesync-dav-manage add user@example.com`
 
 *On Windows systems, you may have to navigate to the location of the python script etesync-dav-manage.py (e.g. C:\Python\Python36\Scripts) and run*
 
-`python etesync-dav-manage add me@etesync.com`
+`python etesync-dav-manage add user@example.com`
 
-*Substitute “`me@etesync.com`” with the username or email you use with your
+*Substitute “`user@example.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
@@ -111,12 +111,12 @@ and then run the server:
 
 After this, set up your CalDAV/CardDAV client to use the username and password
 you got from when adding your account to EteSync DAV before, or alternatively run
-`etesync-dav-manage get me@etesync.com` to get them again.
+`etesync-dav-manage get user@example.com` to get them again.
 
 Depending on the client you use, the server path should either be:
 
 * `http://localhost:37358/`
-* `http://localhost:37358/me@etesync.com/`
+* `http://localhost:37358/user@example.com/`
 
 On most clients this should automatically detect your collections (i.e.
 calendars and address books).
@@ -129,7 +129,7 @@ open [http://localhost:37358/](http://localhost:37358/) in your browser (or
 substitute “localhost” for the hostname or IP address of the etesync-dav
 instance). Then you will need to log in using the username and password
 given by the `etesync-dav-manage` tool as described above (run `etesync-dav-manage
-get me@etesync.com` to get them again). The Radicale web interface shows
+get user@example.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and
 paste the collection names as well, and select a color manually.
@@ -169,7 +169,7 @@ add-on.
     * CalDAV: Works. Setup instructions:
       * Internet Accounts->Add Other Account->CalDAV account
       * Account Type: Advanced
-      * Username: me@etesync.com
+      * Username: user@example.com
       * Password: generated etesync-dav password
       * Server Address: localhost
       * Server Path: /
@@ -178,7 +178,7 @@ add-on.
     * CardDAV: Works. Setup instructions:
       * Internet Accounts->Add Other Account->CardDAV account
       * Account Type: Manual
-      * Username: me@etesync.com
+      * Username: user@example.com
       * Password: generated etesync-dav password
       * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
 
