@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 import hashlib
 import posixpath
-import threading
 import time
 
 
@@ -181,7 +180,6 @@ class Collection(BaseCollection):
     @classmethod
     def static_init(cls):
         cls._etesync_cache = None
-        cls._lock = threading.Lock()
 
     @classmethod
     def discover(cls, path, depth="0"):
@@ -503,7 +501,7 @@ class Collection(BaseCollection):
         if not user:
             return
 
-        with cls._lock:
+        with EteSyncCache.lock:
             cls.user = user
 
             cls.etesync = cls._get_etesync_for_user(cls.user)

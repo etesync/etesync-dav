@@ -1,5 +1,6 @@
 from .creds import Credentials
 import hashlib
+import threading
 
 from urllib.parse import quote
 
@@ -7,6 +8,8 @@ import etesync as api
 
 
 class EteSyncCache:
+    lock = threading.RLock()
+
     def __init__(self, creds_path, db_path, remote_url=None):
         self._etesync_cache = {}
         self.creds = None

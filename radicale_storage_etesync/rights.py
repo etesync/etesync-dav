@@ -36,10 +36,11 @@ class Rights(BaseRights):
 
         journal_uid = attributes[1]
 
-        etesync, _ = self._etesync_cache.etesync_for_user(user)
-        try:
-            journal = etesync.get(journal_uid)
-        except api.exceptions.DoesNotExist:
-            return False
+        with EteSyncCache.lock:
+            etesync, _ = self._etesync_cache.etesync_for_user(user)
+            try:
+                journal = etesync.get(journal_uid)
+            except api.exceptions.DoesNotExist:
+                return False
 
         return not journal.read_only
