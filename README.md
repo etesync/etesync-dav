@@ -22,7 +22,7 @@ Installation is very easy when using Docker, the recommended installation method
 
 ## Docker
 
-Run one time initial setup to persist the required configuration into a docker volume. This is equivalent to running etesync-dav-manage, check out the configuration section below for more information.
+Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
 
     docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
 
@@ -73,7 +73,7 @@ Set up the virtual env:
 
 Run the etesync commands as explained in the [Configuration and running](#configuration-and-running) section:
 
-    ./venv/bin/etesync-dav-manage ...
+    ./venv/bin/etesync-dav manage ...
     ./venv/bin/etesync-dav ...
 
 Please note that you'll have to run `source venv/bin/activate` every time you'd like to run the EteSync commands.
@@ -87,13 +87,13 @@ uses the official EteSync server at `https://api.etesync.com`. The commands
 below all use this environment variable to determine which server to
 connect to.
 
-You need to first add an EteSync user using `etesync-dav-manage`, for example:
+You need to first add an EteSync user using `etesync-dav manage`, for example:
 
-`etesync-dav-manage add user@example.com`
+`etesync-dav manage add user@example.com`
 
-*On Windows systems, you may have to navigate to the location of the python script etesync-dav-manage.py (e.g. C:\Python\Python36\Scripts) and run*
+*On Windows systems, you may have to navigate to the location of the python script etesync-dav (e.g. C:\Python\Python36\Scripts) and run*
 
-`python etesync-dav-manage add user@example.com`
+`python etesync-dav manage add user@example.com`
 
 *Substitute “`user@example.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
@@ -111,7 +111,7 @@ and then run the server:
 
 After this, set up your CalDAV/CardDAV client to use the username and password
 you got from when adding your account to EteSync DAV before, or alternatively run
-`etesync-dav-manage get user@example.com` to get them again.
+`etesync-dav manage get user@example.com` to get them again.
 
 Depending on the client you use, the server path should either be:
 
@@ -128,7 +128,7 @@ log in to the web interface provided by the internal Radicale server. Just
 open [http://localhost:37358/](http://localhost:37358/) in your browser (or
 substitute “localhost” for the hostname or IP address of the etesync-dav
 instance). Then you will need to log in using the username and password
-given by the `etesync-dav-manage` tool as described above (run `etesync-dav-manage
+given by the `etesync-dav manage` tool as described above (run `etesync-dav manage
 get user@example.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and

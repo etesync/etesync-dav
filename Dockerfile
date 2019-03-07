@@ -16,5 +16,4 @@ EXPOSE 37358
 
 USER etesync
 
-COPY docker-entrypoint.sh /usr/local/bin/
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["etesync-dav"]
