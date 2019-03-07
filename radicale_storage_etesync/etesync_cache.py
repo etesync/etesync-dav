@@ -27,6 +27,8 @@ class EteSyncCache:
             if user in self._etesync_cache:
                 etesync = self._etesync_cache[user]
                 if (etesync.auth_token, etesync.cipher_key) == self.creds.get(user):
+                    # FIXME: Reinit the etesync db - should use the official reinit function once released
+                    etesync._set_db(etesync._database)
                     return etesync, False
                 else:
                     del self._etesync_cache[user]
@@ -47,8 +49,6 @@ class EteSyncCache:
         etesync = api.EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
         etesync.cipher_key = cipher_key
 
-        if False:
-            # XXX: Remove the cache for now, it doesn't save us much and is racey. See commit message
-            self._etesync_cache[user] = etesync
+        self._etesync_cache[user] = etesync
 
         return etesync, True
