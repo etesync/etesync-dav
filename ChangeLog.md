@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.5.0
+* Merge etesync-dav-manage and etesync-dav into a single entry point
+* Add support for PyInstaller (and thus building standalone binaries).
+
 ## Version 0.4.0
 * Include the new rights module (read only journals) in the default config
 * Upgrade radicale_etesync.
