@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.7.0
+* Bring back the EteSync cache - also fixes the request throttling
+
 ## Version 0.6.0
 * Allow overriding the API endpoint used, by setting ETESYNC_URL.
 * Fix a serious race condition in multi-threaded environments (default with Radicale!)
