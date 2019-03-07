@@ -3,6 +3,10 @@ Session.vim
 /.coverage
 /etesync.db
 
+/pyinstaller/etesync-dav.spec
+/pyinstaller/build
+/pyinstaller/dist
+
 __pycache__
 *.egg-info
 .*.swp
