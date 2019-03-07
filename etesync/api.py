@@ -24,6 +24,9 @@ class EteSync:
 
         self.user, created = cache.User.get_or_create(username=email)
 
+    def reinit(self):
+        self._set_db(self._database)
+
     def _set_db(self, database):
         self._database = database
 
