@@ -16,68 +16,13 @@ If all you want is to access your data from a computer, you are probably better 
 
 **Note:** This software is still in beta. It should work well and is used daily by many users, but there may be some rough edges.
 
-# Quick Setup
+# Installation
 
-Installation is very easy when using Docker, the recommended installation method. All you need to do is follow the instructions below.
+The easiest way to start using etesync-dav is by getting one of the pre-built binaries from the [releases page](https://github.com/etesync/etesync-dav/releases).
 
-## Docker
+These binaries are self-contained and can be run as-is, though they do not start automatically on boot. You'd need to either start them manually, or set up autostart based on your OS.
 
-Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
-
-    docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
-
-Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
-
-    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
-    
-After this, skip directly to the [Setting up clients](#setting-up-clients) section below and start using it!
-
-### Updating
-
-To update to the latest version of the docker image, run:
-
-    docker pull etesync/etesync-dav
-
-### Note for self-hosting:
-
-If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
-
-    --env "ETESYNC_URL=https://your-etesync-url.com"
-    
-# Alternative Installation Methods
-
-This methods are not as easy as the Docker method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section below.
-        
-## Arch Linux
-
-The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
-
-## Windows systems
-
-You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
-
-## Python virtual environment (Linux, BSD and Mac)
-
-Install virtual env (for **Python 3**) from your package manager, for example:
-
-- Arch Linux: pacman -S python-virtualenv
-- Debian/Ubuntu: apt-get install python3-virtualenv
-
-The bellow commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
-
-Set up the virtual env:
-
-    virtualenv -p python3 venv
-    source venv/bin/activate
-    pip install etesync-dav
-
-Run the etesync commands as explained in the [Configuration and running](#configuration-and-running) section:
-
-    ./venv/bin/etesync-dav manage ...
-    ./venv/bin/etesync-dav ...
-
-Please note that you'll have to run `source venv/bin/activate` every time you'd like to run the EteSync commands.
-
+**Note:** For Linux and Mac you may want to rename the binaries to `etesync-dav` for ease of use.
 
 # Configuration and running
 
@@ -91,19 +36,11 @@ You need to first add an EteSync user using `etesync-dav manage`, for example:
 
 `etesync-dav manage add user@example.com`
 
-*On Windows systems, you may have to navigate to the location of the python script etesync-dav (e.g. C:\Python\Python36\Scripts) and run*
-
-`python etesync-dav manage add user@example.com`
-
 *Substitute “`user@example.com`” with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
 `etesync-dav`
-
-*On Windows systems, you may have to navigate to the location of the etesync-dav.py script and run*
-
-`python etesync-dav`
 
 *Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
@@ -133,23 +70,6 @@ get user@example.com` to get them again). The Radicale web interface shows
 the collections with their names and URLs. You can just copy and paste the
 URLs into your client. You will most likely also need to manually copy and
 paste the collection names as well, and select a color manually.
-
-
-## Config files
-
-`etesync-dav` stores data in the directory specified by the `CONFIG_DIR`
-environment variable. This includes a database, credentials, and Radicale
-configuration file. This directory is not relocatable, so if you change
-`CONFIG_DIR` you will need to regenerate these files (which means
-reconfiguring clients). It may be possible to manually edit these files to
-the new path. Note that the database will just mirror the content of your
-main EteSync database so in most cases you should not lose anything if you
-delete it.
-
-`CONFIG_DIR` defaults to a subdirectory of the appropriate config directory
-for your platform (`~/.config/etesync-dav` on Unix/Linux, see
-[appdirs](http://pypi.python.org/pypi/appdirs) module docs for where it
-will be on other platforms).
 
 # Client support
 
@@ -214,11 +134,84 @@ By default, iOS only syncs events 30 days old and newer, which may look as if
 events are not showing. To fix this, got to: Settings -> Calendar -> Sync and
 change to the wanted time duration.
 
-# Known issues
 
-* This package is missing startups script for automatic execution on startup.
+# Alternative Installation Methods
 
+This methods are not as easy as the pre-built binaries method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section below.
 
-# Notes
+## Docker
+
+Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
+
+    docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
+
+Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
+
+    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
+    
+After this, refer to the [Setting up clients](#setting-up-clients) section below and start using it!
+
+### Updating
+
+To update to the latest version of the docker image, run:
+
+    docker pull etesync/etesync-dav
+
+### Note for self-hosting:
+
+If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
+
+    --env "ETESYNC_URL=https://your-etesync-url.com"
+    
+        
+## Arch Linux
+
+The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
+
+## Windows systems
+
+You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
+
+## Python virtual environment (Linux, BSD and Mac)
+
+Install virtual env (for **Python 3**) from your package manager, for example:
+
+- Arch Linux: pacman -S python-virtualenv
+- Debian/Ubuntu: apt-get install python3-virtualenv
+
+The bellow commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
+
+Set up the virtual env:
+
+    virtualenv -p python3 venv
+    source venv/bin/activate
+    pip install etesync-dav
+
+Run the etesync commands as explained in the [Configuration and running](#configuration-and-running) section:
+
+    ./venv/bin/etesync-dav manage ...
+    ./venv/bin/etesync-dav ...
+
+Please note that you'll have to run `source venv/bin/activate` every time you'd like to run the EteSync commands.
+
+# Advanced configuration
+
+## Config files
+
+`etesync-dav` stores data in the directory specified by the `CONFIG_DIR`
+environment variable. This includes a database, credentials, and Radicale
+configuration file. This directory is not relocatable, so if you change
+`CONFIG_DIR` you will need to regenerate these files (which means
+reconfiguring clients). It may be possible to manually edit these files to
+the new path. Note that the database will just mirror the content of your
+main EteSync database so in most cases you should not lose anything if you
+delete it.
+
+`CONFIG_DIR` defaults to a subdirectory of the appropriate config directory
+for your platform (`~/.config/etesync-dav` on Unix/Linux, see
+[appdirs](http://pypi.python.org/pypi/appdirs) module docs for where it
+will be on other platforms).
+
+# Credits
 
 This depends on the [radicale_storage_etesync](https://github.com/etesync/radicale_storage_etesync) module and the [Radicale server](http://radicale.org) for operation.
