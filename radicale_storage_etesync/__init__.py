@@ -318,6 +318,19 @@ class Collection(BaseCollection):
 
         return self
 
+    def sync(self, old_token=None):
+        """Get the current sync token and changed items for synchronization.
+
+        ``old_token`` an old sync token which is used as the base of the
+        delta update. If sync token is missing, all items are returned.
+        ValueError is raised for invalid or old tokens.
+        """
+        # FIXME: Actually implement
+        token = "http://radicale.org/ns/sync/%s" % self.etag.strip("\"")
+        if old_token:
+            raise ValueError("Sync token are not supported (you can ignore this warning)")
+        return token, self.list()
+
     def list(self):
         """List collection items."""
         if self.is_fake:
