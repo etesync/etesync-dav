@@ -105,12 +105,15 @@ add-on.
 ## macOS Mojave
 
 macOS Mojave enforces the use of SSL, *regardless* of whether you enable the
-checkbox for SSL or not. So to use EteSync, you have to enable SSL. You can
-do so by using the `etesync-dav-certgen` utility. It will generate a
-self-signed SSL certificate, configure etesync-dav to use that certificate,
-and -- if you request that -- will make your system trust it.
+checkbox for SSL or not. So to use EteSync, you have to enable SSL.
 
-You can do all of this by:
+You can do so by either using the `etesync-dav-certgen` utility, or follow
+the instructions below. Following these instructions will generate a self-signed SSL certificate,
+configure etesync-dav to use that certificate, and make your system trust it.
+
+### Automatic SSL setup
+
+You can automatically setup SSL by running the following command:
 
     etesync-dav-certgen --trust-cert
 
@@ -128,7 +131,7 @@ reconfigure `etesync-dav`. It also won't overwrite existing
 certificates. `--trust-cert` works on macOS 10.3 or newer only.
 See `etesync-dav-certgen --help` for details.
 
-### Manual
+### Manual SSL setup
 
 Alternatively you can generate and configure a self-signed certificate manually with the following steps:
 
