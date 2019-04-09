@@ -140,7 +140,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'manage':
 
 
 if not os.path.exists(CONFIG_DIR):
-    print("Configuration not found. Please run etesync-dav-manage first.")
+    print('Configuration not found. Please run "etesync-dav manage" first.')
     sys.exit(1)
 
 if not os.path.exists(RADICALE_CONFIG_FILE):
