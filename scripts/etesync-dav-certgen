@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/Users/odin/Applications/etesync-dav/bin/python3.7
 # pylint: disable = C0103,C0111
 """Sets up SSL for the etesync DAV client.
 
@@ -162,13 +162,13 @@ def main():
         help='write key to NAME (default: {})'.format(
             trimsubpath(args.config_dir, key_file)))
     cert_group.add_argument('--cipher', '-c', metavar='ALGO',
-        default=KEY_CIPHER,
+        dest='key_cipher', default=KEY_CIPHER,
         help='use public key cipher ALGO (default: {})'.format(KEY_CIPHER))
     cert_group.add_argument('--size', '-s', metavar='BITS', type=int,
-        default=KEY_SIZE,
+        dest='key_size', default=KEY_SIZE,
         help='make key BITS long (default: {})'.format(KEY_SIZE))
     cert_group.add_argument('--days', '-d', metavar='N', type=int,
-        default=KEY_DAYS,
+        dest='key_days', default=KEY_DAYS,
         help='key expires after N days (default: {})'.format(KEY_DAYS))
 
     if platform == 'darwin':
