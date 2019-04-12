@@ -150,12 +150,12 @@ open etesync.crt
     
 3. In the dialog confirm adding to "login" keychain.
 4. Open `Keychain Access` app, find and open `etesync.localhost` (under Keychains: login, Category: Certificates), expand "Trust" and pick "Always trust" for SSL. 
-5. Edit `~/Library/Application Support/etesync-dav/radicale.conf`, under `[server]` enter the following to make it use the certificate (please replace **USERNAME** for your actual username):
+5. Edit `~/Library/Application Support/etesync-dav/radicale.conf`, under `[server]` enter the following to make it use the certificate:
 
 ````ini
     ssl = yes
-    certificate = /Users/USERNAME/Library/Application Support/etesync-dav/etesync.crt
-    key = /Users/USERNAME/Library/Application Support/etesync-dav/etesync.key
+    certificate = ~/Library/Application Support/etesync-dav/etesync.crt
+    key = ~/Library/Application Support/etesync-dav/etesync.key
 ````
 
 6. Restart `etesync-dav`
