@@ -138,7 +138,7 @@ Alternatively you can generate and configure a self-signed certificate manually 
 1. Generate a self-signed certificate (valid for 10 years)
 
 ````bash
-cd ~/Library/Application\ Support/etesync-dav
+cd "~/Library/Application Support/etesync-dav"
 openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=etesync.localhost" -keyout etesync.key -out etesync.crt
 ````
     
@@ -150,12 +150,12 @@ open etesync.crt
     
 3. In the dialog confirm adding to "login" keychain.
 4. Open `Keychain Access` app, find and open `etesync.localhost` (under Keychains: login, Category: Certificates), expand "Trust" and pick "Always trust" for SSL. 
-5. Edit `~/Library/Application\ Support/etesync-dav/radicale.conf`, under `[server]` enter the following to make it use the certificate (please replace **USERNAME** for your actual username):
+5. Edit `~/Library/Application Support/etesync-dav/radicale.conf`, under `[server]` enter the following to make it use the certificate (please replace **USERNAME** for your actual username):
 
 ````ini
     ssl = yes
-    certificate = /Users/USERNAME/Library/Application\ Support/etesync-dav/etesync.crt
-    key = /Users/USERNAME/Library/Application\ Support/etesync-dav/etesync.key
+    certificate = /Users/USERNAME/Library/Application Support/etesync-dav/etesync.crt
+    key = /Users/USERNAME/Library/Application Support/etesync-dav/etesync.key
 ````
 
 6. Restart `etesync-dav`
