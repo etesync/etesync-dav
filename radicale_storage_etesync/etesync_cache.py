@@ -14,8 +14,8 @@ class EteSyncCache:
     def __init__(self, creds_path, db_path, remote_url=None):
         self._etesync_cache = {}
         self.creds = None
-        self.creds_path = creds_path
-        self.db_path = db_path
+        self.creds_path = os.path.expanduser(creds_path)
+        self.db_path = os.path.expanduser(db_path)
         self.remote_url = os.environ.get('ETESYNC_URL', remote_url)
 
     def etesync_for_user(self, user):
