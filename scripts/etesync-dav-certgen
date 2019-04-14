@@ -1,4 +1,4 @@
-#!/Users/odin/Applications/etesync-dav/bin/python3.7
+#!/usr/bin/env python3
 # pylint: disable = C0103,C0111
 """Sets up SSL for the etesync DAV client.
 
