@@ -160,6 +160,11 @@ open etesync.crt
 
 6. Restart `etesync-dav`
 
+### SSL in non-macOS applications
+
+Some applications, above all, web browers (Firefox, Chrome, ...) manage certificates themselves, rather than relying on the mechanisms the operating system provides. But `etesync-dav-certgen` and the instructions above only make the operating system trust the self-signed certificate. If you want to use SSL to connect to `etesync-dav` using such applications, you need to make them trust the self-signed certificate.
+
+
 ## iOS
 
 By default, iOS only syncs events 30 days old and newer, which may look as if
