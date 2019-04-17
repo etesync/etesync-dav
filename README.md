@@ -94,7 +94,9 @@ add-on.
       * Server Address: localhost
       * Server Path: /
       * Port: 37358
-      * Uncheck Use SSL (does nothing under macOS Mojave, SSL is always enabled)
+      * Prior to macOS Mojave: Uncheck "Use SSL".
+        From macOS Mojave onwards: Check "Use SSL."
+        (Mojave require SSL to be enabled.)
     * CardDAV: Works. Setup instructions:
       * Internet Accounts->Add Other Account->CardDAV account
       * Account Type: Manual
