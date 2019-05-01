@@ -375,7 +375,7 @@ class Collection(BaseCollection):
 
         etesync_item.save()
 
-        return self.get(href)
+        return self.get(etesync_item.uid)
 
     def delete(self, href=None):
         """Delete an item.
