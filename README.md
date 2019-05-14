@@ -140,7 +140,7 @@ Alternatively you can generate and configure a self-signed certificate manually 
 1. Generate a self-signed certificate (valid for 10 years)
 
 ````bash
-cd "~/Library/Application Support/etesync-dav"
+cd ~/Library/Application\ Support/etesync-dav
 openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=etesync.localhost" -keyout etesync.key -out etesync.crt
 ````
     
