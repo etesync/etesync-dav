@@ -44,6 +44,10 @@ and then run the server:
 
 *Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
+## Using a proxy
+
+EteSync-DAV should automatically use the system's proxy settings if set correctly. Alternatively, you can set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables to manually set the proxy settings.
+
 ## Setting up clients
 
 After this, set up your CalDAV/CardDAV client to use the username and password
