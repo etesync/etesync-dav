@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import hashlib
 import posixpath
 import time
-
+from uuid import uuid4
 
 from .etesync_cache import EteSyncCache
 
@@ -242,6 +242,16 @@ class Collection(BaseCollection):
             pass
 
         return entry.uid if entry is not None else hashlib.sha256(b"").hexdigest()
+
+    @staticmethod
+    def _find_available_file_name(exists_fn, suffix=""):
+        # Prevent infinite loop
+        for _ in range(1000):
+            file_name = uuid4() + suffix
+            if not exists_fn(file_name):
+                return file_name
+        # something is wrong with the PRNG
+        raise RuntimeError("No unique random sequence found")
 
     @classmethod
     def create_collection(cls, href, collection=None, props=None):
