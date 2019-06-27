@@ -4,6 +4,8 @@ import posixpath
 import time
 from uuid import uuid4
 
+from ._version import __version__  # noqa: F401
+
 from .etesync_cache import EteSyncCache
 
 import etesync as api

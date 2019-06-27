@@ -2,9 +2,11 @@
 
 from setuptools import find_packages, setup
 
+exec(open('radicale_storage_etesync/_version.py').read())
+
 setup(
     name='radicale_storage_etesync',
-    version='0.7.0',
+    version=__version__,
     author='EteSync',
     author_email='development@etesync.com',
     url='https://github.com/etesync/radicale_storage_etesync',
