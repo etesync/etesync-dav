@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.6.0
+* Upgrade radicale_etesync.
+* Print correct version when passed the --version flag.
+
 ## Version 0.5.0
 * Merge etesync-dav-manage and etesync-dav into a single entry point
 * Add support for PyInstaller (and thus building standalone binaries).
