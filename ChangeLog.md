@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.8.0
+* Fix support for paths/UIDs that contain front slashes (/)
+* Fix potential issues with making collections - although it's meant to be blocked in the rights module
+* Improve warning about sync-tokens (state that they can be ignored)
+* Make the module's version available in code
+* Configuration: add support for shell expansion for paths
+* Minor bug fixes
+
 ## Version 0.7.0
 * Bring back the EteSync cache - also fixes the request throttling
 
