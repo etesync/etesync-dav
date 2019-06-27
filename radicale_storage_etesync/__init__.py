@@ -16,6 +16,15 @@ import vobject
 CONFIG_SECTION = "storage"
 
 
+# comma can never appear in the uid per the rfc but is legal in urls so we can use that as a replacement for /
+def uid_escape(uid):
+    return uid.replace('/', ',')
+
+
+def uid_unescape(escaped_uid):
+    return escaped_uid.replace(',', '/')
+
+
 class MetaMapping:
     # Mappings between etesync meta and radicale
     _mappings = {
@@ -120,7 +129,7 @@ def _is_principal(path):
 
 def _get_attributes_from_path(path):
     sane_path = sanitize_path(path).strip("/")
-    attributes = sane_path.split("/")
+    attributes = sane_path.split("/", 2)
     if not attributes[0]:
         attributes.pop()
 
@@ -199,6 +208,15 @@ class Collection(BaseCollection):
 
         # Path should already be sanitized
         attributes = _get_attributes_from_path(path)
+        if len(attributes) == 3:
+            if path.endswith('/'):
+                # XXX Workaround UIDs with slashes in them - just continue as if path was one step above
+                path = posixpath.join("/", attributes[0], attributes[1], "")
+                attributes = _get_attributes_from_path(path)
+            else:
+                # Escape the uid
+                attributes[-1] = uid_escape(attributes[-1])
+                path = posixpath.join("/", *attributes)
 
         try:
             if len(attributes) == 3:
@@ -347,14 +365,14 @@ class Collection(BaseCollection):
             return
 
         for item in self.collection.list():
-            yield item.uid + self.content_suffix
+            yield uid_escape(item.uid) + self.content_suffix
 
     def get(self, href):
         """Fetch a single item."""
         if self.is_fake:
             return
 
-        uid = _trim_suffix(href, ('.ics', '.ical', '.vcf'))
+        uid = uid_unescape(_trim_suffix(href, ('.ics', '.ical', '.vcf')))
         etesync_item = self.collection.get(uid)
         if etesync_item is None:
             return None
