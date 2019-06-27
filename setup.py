@@ -2,9 +2,11 @@
 
 from setuptools import find_packages, setup
 
+exec(open('etesync_dav/_version.py').read())
+
 setup(
     name='etesync-dav',
-    version='0.5.0',
+    version=__version__,
     author='EteSync',
     author_email='development@etesync.com',
     url='https://github.com/etesync/etesync-dav',
