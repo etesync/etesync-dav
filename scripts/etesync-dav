@@ -139,6 +139,14 @@ if len(sys.argv) > 1 and sys.argv[1] == 'manage':
     sys.exit(0)
 
 
+if len(sys.argv) > 1 and sys.argv[1] == '--version':
+    import etesync_dav
+    import radicale_storage_etesync
+    print("EteSync DAV version: ", etesync_dav.__version__)
+    print("Radicale Storage EteSync version: ", radicale_storage_etesync.__version__)
+    print("Radicale version: ", radicale.VERSION)
+    sys.exit(0)
+
 if not os.path.exists(CONFIG_DIR):
     print('Configuration not found. Please run "etesync-dav manage" first.')
     sys.exit(1)
