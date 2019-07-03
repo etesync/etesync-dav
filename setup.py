@@ -31,6 +31,7 @@ setup(
        'pyparsing>=2.2',
        'pyscrypt>=1.6',
        'python-dateutil>=2.6',
+       'ptz>=2019.1',
        'requests>=2.21',
        'six>=1.10',
        'vobject>=0.9',
