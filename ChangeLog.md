@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.8.3
+* Fix typo with pytz dependency
+
 ## Version 0.8.2
 * Add missing pytz dependency
 * Upgrade urllib3 and requests
@@ -14,7 +17,7 @@
 
 ## Version 0.7.0
 * Fix user info to use the correct asymmetric key format
-* Sync user info on every protocl sync - needed for encryption password changes.
+* Sync user info on every protocol sync - needed for encryption password changes.
 
 ## Version 0.6.3
 * Sync: automatically create user info if doesn't exist
@@ -34,7 +37,7 @@
 
 ## Version 0.5.5
 * Automatically detect if scrypt is available. If so use it, otherwise revert to pyscript. Setup.py dep remains on pyscypt.
-  * This is to help distors that don't package pyscrypt
+  * This is to help distros that don't package pyscrypt
 * Update peewee to support version 3 and up
 
 ## Version 0.5.4
