@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8.2
+* Add missing pytz dependency
+* Upgrade urllib3 and requests
+
 ## Version 0.8.1
 * Fix pushing entries to shared journals.
 
