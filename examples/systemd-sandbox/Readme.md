@@ -6,7 +6,7 @@ To use etesync-dav via this unit you need to:
 * generate the credential files and configuration for Radicale
 * install the unit
 * start the unit
-* [connect your client to eyesync](https://github.com/etesync/etesync-dav])
+* [connect your client to etesync](https://github.com/etesync/etesync-dav)
 
 ## FAQ
 ### How should I generate the credential files and Radicale configuration?
