@@ -18,15 +18,6 @@ import vobject
 CONFIG_SECTION = "storage"
 
 
-# comma can never appear in the uid per the rfc but is legal in urls so we can use that as a replacement for /
-def uid_escape(uid):
-    return uid.replace('/', ',')
-
-
-def uid_unescape(escaped_uid):
-    return escaped_uid.replace(',', '/')
-
-
 class MetaMapping:
     # Mappings between etesync meta and radicale
     _mappings = {
@@ -216,8 +207,8 @@ class Collection(BaseCollection):
                 path = posixpath.join("/", attributes[0], attributes[1], "")
                 attributes = _get_attributes_from_path(path)
             else:
-                # Escape the uid
-                attributes[-1] = uid_escape(attributes[-1])
+                # XXX We would rather not rewrite urls, but we do it if urls contain /
+                attributes[-1] = attributes[-1].replace('/', ',')
                 path = posixpath.join("/", *attributes)
 
         try:
@@ -367,14 +358,14 @@ class Collection(BaseCollection):
             return
 
         for item in self.collection.list():
-            yield uid_escape(item.uid) + self.content_suffix
+            yield item.uid + self.content_suffix
 
     def get(self, href):
         """Fetch a single item."""
         if self.is_fake:
             return
 
-        uid = uid_unescape(_trim_suffix(href, ('.ics', '.ical', '.vcf')))
+        uid = _trim_suffix(href, ('.ics', '.ical', '.vcf'))
         etesync_item = self.collection.get(uid)
         if etesync_item is None:
             return None
