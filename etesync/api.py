@@ -49,9 +49,11 @@ class EteSync:
 
         self._set_db(database)
 
-    def _init_db_tables(self, database):
+    def _init_db_tables(self, database, additional_tables=None):
         database.create_tables([cache.Config, pim.Content, cache.User, cache.JournalEntity,
                                 cache.EntryEntity, cache.UserInfo], safe=True)
+        if additional_tables:
+            database.create_tables(additional_tables, safe=True)
 
         db_version = cache.Config.get_or_none()
         if db_version is None:
