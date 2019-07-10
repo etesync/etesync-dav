@@ -6,6 +6,12 @@ import os
 from urllib.parse import quote
 
 import etesync as api
+from .href_mapper import HrefMapper
+
+
+class EteSync(api.EteSync):
+    def _init_db_tables(self, database, additional_tables=[]):
+        super()._init_db_tables(database, additional_tables + [HrefMapper])
 
 
 class EteSyncCache:
@@ -46,7 +52,7 @@ class EteSyncCache:
         if auth_token is None:
             raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
 
-        etesync = api.EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
+        etesync = EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
         etesync.cipher_key = cipher_key
 
         self._etesync_cache[user] = etesync

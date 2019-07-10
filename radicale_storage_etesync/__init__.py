@@ -7,6 +7,7 @@ from uuid import uuid4
 from ._version import __version__  # noqa: F401
 
 from .etesync_cache import EteSyncCache
+from .href_mapper import HrefMapper
 
 import etesync as api
 from radicale.storage import (
@@ -358,17 +359,30 @@ class Collection(BaseCollection):
             return
 
         for item in self.collection.list():
-            yield item.uid + self.content_suffix
+            try:
+                href_mapper = item._cache_obj.href.get()
+            except HrefMapper.DoesNotExist:
+                # Generate a new mapper
+                href = hashlib.sha256(item.uid.encode()).hexdigest() + self.content_suffix
+                href_mapper = HrefMapper(content=item._cache_obj, href=href)
+                href_mapper.save(force_insert=True)
+
+            href = href_mapper.href
+
+            yield href
 
     def get(self, href):
         """Fetch a single item."""
         if self.is_fake:
             return
 
-        uid = _trim_suffix(href, ('.ics', '.ical', '.vcf'))
-        etesync_item = self.collection.get(uid)
-        if etesync_item is None:
+        try:
+            href_mapper = HrefMapper.get(HrefMapper.href == href)
+            uid = href_mapper.content.uid
+        except HrefMapper.DoesNotExist:
             return None
+
+        etesync_item = self.collection.get(uid)
 
         try:
             item = vobject.readOne(etesync_item.content)
@@ -387,16 +401,19 @@ class Collection(BaseCollection):
             return
 
         content = vobject_item.serialize()
-        try:
-            item = self.get(href)
+
+        item = self.get(href)
+        if item is not None:
             etesync_item = item.etesync_item
             etesync_item.content = content
-        except api.exceptions.DoesNotExist:
+            etesync_item.save()
+        else:
             etesync_item = self.collection.get_content_class().create(self.collection, content)
+            etesync_item.save()
+            href_mapper = HrefMapper(content=etesync_item._cache_obj, href=href)
+            href_mapper.save(force_insert=True)
 
-        etesync_item.save()
-
-        return self.get(etesync_item.uid)
+        return self.get(href)
 
     def delete(self, href=None):
         """Delete an item.
