@@ -1,2 +1,2 @@
-etesync==0.7.0
+etesync==0.8.4
 Radicale==2.1.10
