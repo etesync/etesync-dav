@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.9.1
+* Increase required pyetesync version to 0.8.4
+
 ## Version 0.9.0
 * Stop rewriting URLs to use the UID as the path and just use whatever the DAV clients choose (instead of rewriting).
   * This fixes KAddressBook and probably some other clients.
