@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.9.0
+* Stop rewriting URLs to use the UID as the path and just use whatever the DAV clients choose (instead of rewriting).
+  * This fixes KAddressBook and probably some other clients.
+
 ## Version 0.8.0
 * Fix support for paths/UIDs that contain front slashes (/)
 * Fix potential issues with making collections - although it's meant to be blocked in the rights module
