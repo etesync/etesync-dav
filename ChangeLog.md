@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8.4
+* Allow users of this library to add tables to the cache database.
+* Make the sqlite database more strict (enforce foreign key relations).
+
 ## Version 0.8.3
 * Fix typo with pytz dependency
 
