@@ -1,8 +1,0 @@
-Session.vim
-/.venv
-/.coverage
-/etesync.db
-
-__pycache__
-*.egg-info
-.*.swp
