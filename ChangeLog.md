@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.7.0
+* Merge radicale-storage-etesync into this package
+
 ## Version 0.6.0
 * Upgrade radicale_etesync.
 * Print correct version when passed the --version flag.
