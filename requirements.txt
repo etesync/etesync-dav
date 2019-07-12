@@ -18,7 +18,6 @@ pyparsing==2.2.0
 pyscrypt==1.6.2
 python-dateutil==2.7.3
 Radicale==2.1.10
-radicale-storage-etesync==0.4.0
 requests==2.20.0
 six==1.11.0
 urllib3==1.23
