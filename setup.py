@@ -22,5 +22,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'appdirs>=1.4.3',
+        'etesync>=0.9.0',
+        'Radicale>=2.1.10',
     ]
 )
