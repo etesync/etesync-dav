@@ -141,9 +141,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'manage':
 
 if len(sys.argv) > 1 and sys.argv[1] == '--version':
     import etesync_dav
-    import radicale_storage_etesync
     print("EteSync DAV version: ", etesync_dav.__version__)
-    print("Radicale Storage EteSync version: ", radicale_storage_etesync.__version__)
     print("Radicale version: ", radicale.VERSION)
     sys.exit(0)
 
