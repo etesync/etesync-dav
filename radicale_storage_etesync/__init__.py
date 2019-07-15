@@ -257,7 +257,7 @@ class Collection(BaseCollection):
     def _find_available_file_name(exists_fn, suffix=""):
         # Prevent infinite loop
         for _ in range(1000):
-            file_name = uuid4() + suffix
+            file_name = str(uuid4()) + suffix
             if not exists_fn(file_name):
                 return file_name
         # something is wrong with the PRNG
