@@ -327,14 +327,14 @@ class Collection(BaseCollection):
                     href = self._find_available_file_name(
                         vobject_items.get)
                     vobject_items[href] = new_collection
-                self.upload_all_nonatomic(vobject_items)
+                self._upload_all_nonatomic(vobject_items)
             elif props.get("tag") == "VADDRESSBOOK":
                 vobject_items = {}
                 for card in collection:
                     href = self._find_available_file_name(
                         vobject_items.get)
                     vobject_items[href] = card
-                self.upload_all_nonatomic(vobject_items)
+                self._upload_all_nonatomic(vobject_items)
 
         return self
 
@@ -392,6 +392,10 @@ class Collection(BaseCollection):
             "%a, %d %b %Y %H:%M:%S GMT",
             time.gmtime(time.time()))
         return EteSyncItem(self, item, href, last_modified=last_modified, etesync_item=etesync_item)
+
+    def _upload_all_nonatomic(self, items):
+        for href in items:
+            self.upload(href, items[href])
 
     def upload(self, href, vobject_item):
         """Upload a new or replace an existing item."""
