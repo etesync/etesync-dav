@@ -384,6 +384,9 @@ class Collection(BaseCollection):
 
         try:
             item = vobject.readOne(etesync_item.content)
+            # XXX Hack to remove photo until we fix its handling
+            if 'photo' in item.contents:
+                del item.contents['photo']
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" %
                                (href, self.path)) from e
