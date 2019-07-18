@@ -8,7 +8,7 @@ cryptography==2.7
 etesync==0.9.0
 furl==2.0.0
 idna==2.8
-orderedmultidict==1.0.1
+orderedmultidict==1.0
 packaging==19.0
 peewee==3.9.6
 py==1.8.0
