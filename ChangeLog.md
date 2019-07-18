@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.7.1
+* Filter out the PHOTO field from contacts to fix sync (see #65 for details).
+* Fixed bulk item uploading for newly created collections.
+* Fixed filename generation when creating items.
+
 ## Version 0.7.0
 * Merge radicale-storage-etesync into this package
 
