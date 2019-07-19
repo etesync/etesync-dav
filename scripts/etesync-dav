@@ -5,6 +5,7 @@ import sys
 
 import radicale.__main__
 
+from etesync_dav import qtapp
 from etesync_dav.manage import Manager
 from etesync_dav.config import CONFIG_DIR, RADICALE_CONFIG, RADICALE_CONFIG_FILE
 
@@ -78,7 +79,26 @@ if not os.path.exists(RADICALE_CONFIG_FILE):
     with open(RADICALE_CONFIG_FILE, "w") as f:
         f.write(RADICALE_CONFIG)
 
-os.chdir(CONFIG_DIR)
-os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
 
-radicale.__main__.run()
+run_service = False
+
+
+def set_run_service():
+    global run_service
+    run_service = True
+
+
+if qtapp.HAS_GUI:
+    qt_exit_status = qtapp.run(set_run_service)
+else:
+    set_run_service()
+    qt_exit_status = 0
+
+
+if run_service:
+    os.chdir(CONFIG_DIR)
+    os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
+
+    radicale.__main__.run()
+
+sys.exit(qt_exit_status)
