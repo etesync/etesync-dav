@@ -92,7 +92,7 @@ radicale_args = [
 
     '--storage-type', 'radicale_storage_etesync',
 
-    '--web-type', 'none',
+    '--web-type', 'radicale_storage_etesync.web',
 
     '--rights-type', 'radicale_storage_etesync.rights',
 ] + sys.argv[1:]
