@@ -26,33 +26,17 @@ These binaries are self-contained and can be run as-is, though they do not start
 
 # Configuration and running
 
-If you are self-hosting the EteSync server, you will need to set the
-`ETESYNC_URL` environment variable to the URL of your server. By default it
-uses the official EteSync server at `https://api.etesync.com`. The commands
-below all use this environment variable to determine which server to
-connect to.
+Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
 
-You need to first add an EteSync user using `etesync-dav manage`, for example:
+Add your EteSync user through the web UI. You will then be able to copy the password you will be entering your DAV clients.
 
-`etesync-dav manage add user@example.com`
-
-*Substitute “`user@example.com`” with the username or email you use with your
-EteSync account or self-hosted server.*
-
-and then run the server:
-`etesync-dav`
+For advanced usage and CLI instructions please refer to [the advanced usage section](#advanced-usage).
 
 *Please note that some antivirus/internet security software may block the CalDAV/CardDAV service from running - make sure that etesync-dav is whitelisted.*
 
-## Using a proxy
-
-EteSync-DAV should automatically use the system's proxy settings if set correctly. Alternatively, you can set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables to manually set the proxy settings.
-
 ## Setting up clients
 
-After this, set up your CalDAV/CardDAV client to use the username and password
-you got from when adding your account to EteSync DAV before, or alternatively run
-`etesync-dav manage get user@example.com` to get them again.
+You now need to set up your CalDAV/CardDAV client using your username and the password you got in the previous step.
 
 Depending on the client you use, the server path should either be:
 
@@ -63,17 +47,16 @@ On most clients this should automatically detect your collections (i.e.
 calendars and address books).
 
 If your client does not automatically detect your collections, you will
-need to manually add them. You need to find the “collection URL” for each
-collection you want to add. Currently, the simplest way to do this is to
-log in to the web interface provided by the internal Radicale server. Just
-open [http://localhost:37358/](http://localhost:37358/) in your browser (or
-substitute “localhost” for the hostname or IP address of the etesync-dav
-instance). Then you will need to log in using the username and password
-given by the `etesync-dav manage` tool as described above (run `etesync-dav manage
-get user@example.com` to get them again). The Radicale web interface shows
-the collections with their names and URLs. You can just copy and paste the
-URLs into your client. You will most likely also need to manually copy and
-paste the collection names as well, and select a color manually.
+need to manually add them. You can find the links in the management UI
+when you click on your username.
+
+
+## Running
+
+That's it!
+
+EteSync-DAV should already be running from the previous steps, but unfortunately it doesn't automatically start on startup. This is not yet implemented and you should set it up manually depending on your operating system.
+
 
 # Client support
 
@@ -237,13 +220,38 @@ Run the etesync commands as explained in the [Configuration and running](#config
 
 Please note that you'll have to run `source venv/bin/activate` every time you'd like to run the EteSync commands.
 
-# Advanced configuration
+# Advanced usage
+
+## CLI
+
+You need to first add an EteSync user using `etesync-dav manage`, for example:
+
+`etesync-dav manage add user@example.com`
+
+*Substitute `user@example.com` with the username or email you use with your
+EteSync account or self-hosted server.*
+
+and then run the server:
+`etesync-dav`
+
+
+## Self-hosting
+
+If you are self-hosting the EteSync server, you will need to set the
+`ETESYNC_URL` environment variable to the URL of your server every time
+you run etesync-dav.
+By default it uses the official EteSync server at `https://api.etesync.com`.
+
+## Using a proxy
+
+EteSync-DAV should automatically use the system's proxy settings if set correctly. Alternatively, you can set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables to manually set the proxy settings.
+
 
 ## Config files
 
 `etesync-dav` stores data in the directory specified by the `CONFIG_DIR`
-environment variable. This includes a database, credentials, and Radicale
-configuration file. This directory is not relocatable, so if you change
+environment variable. This includes a database and the credentials cache.
+This directory is not relocatable, so if you change
 `CONFIG_DIR` you will need to regenerate these files (which means
 reconfiguring clients). It may be possible to manually edit these files to
 the new path. Note that the database will just mirror the content of your
@@ -257,4 +265,4 @@ will be on other platforms).
 
 # Credits
 
-This depends on the [radicale_storage_etesync](https://github.com/etesync/radicale_storage_etesync) module and the [Radicale server](http://radicale.org) for operation.
+This depends on the [Radicale server](http://radicale.org) for operation.
