@@ -25,6 +25,9 @@ database_filename = {}
 remote_url = {}
 credentials_filename = {}
 
+[web]
+type = none
+
 [rights]
 type = radicale_storage_etesync.rights
 """.format(LISTEN_ADDRESS,
