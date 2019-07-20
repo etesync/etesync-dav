@@ -9,7 +9,7 @@ from etesync_dav import radicale_main
 
 from etesync_dav import webui
 from etesync_dav.manage import Manager
-from etesync_dav.config import CONFIG_DIR, RADICALE_CONFIG, RADICALE_CONFIG_FILE
+from etesync_dav.config import CONFIG_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE
 
 
 def manage(args):
@@ -77,18 +77,25 @@ if not os.path.exists(CONFIG_DIR):
     print('Configuration not found. Please run "etesync-dav manage" first.')
     sys.exit(1)
 
-if not os.path.exists(RADICALE_CONFIG_FILE):
-    with open(RADICALE_CONFIG_FILE, "w") as f:
-        f.write(RADICALE_CONFIG)
-
 
 if not os.getenv('ETESYNC_NO_WEBUI', False):
     thread = Thread(target=webui.run)
     thread.setDaemon(True)
     thread.start()
 
-os.chdir(CONFIG_DIR)
-os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
-radicale_main.run()
+radicale_args = [
+    '--hosts', '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT),
+
+    '--auth-type', 'htpasswd',
+    '--auth-htpasswd-filename', HTPASSWD_FILE,
+    '--auth-htpasswd-encryption', 'plain',
+
+    '--storage-type', 'radicale_storage_etesync',
+
+    '--web-type', 'none',
+
+    '--rights-type', 'radicale_storage_etesync.rights',
+] + sys.argv[1:]
+radicale_main.run(radicale_args)
 
 sys.exit(0)

@@ -9,30 +9,3 @@ CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
 RADICALE_CONFIG_FILE = os.path.join(CONFIG_DIR, 'radicale.conf')
 ETESYNC_URL = os.environ.get('ETESYNC_URL', 'https://api.etesync.com/')
 DATABASE_FILE = os.path.join(CONFIG_DIR, 'etesync_data.db')
-
-RADICALE_CONFIG = """
-[server]
-hosts = {}:{}
-
-[auth]
-type = htpasswd
-htpasswd_filename = {}
-htpasswd_encryption = plain
-
-[storage]
-type = radicale_storage_etesync
-database_filename = {}
-remote_url = {}
-credentials_filename = {}
-
-[web]
-type = none
-
-[rights]
-type = radicale_storage_etesync.rights
-""".format(LISTEN_ADDRESS,
-           LISTEN_PORT,
-           HTPASSWD_FILE,
-           DATABASE_FILE,
-           ETESYNC_URL,
-           CREDS_FILE)

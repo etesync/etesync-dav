@@ -4,16 +4,16 @@ from .etesync_cache import EteSyncCache
 
 import etesync as api
 
-CONFIG_SECTION = "storage"
+import etesync_dav.config as config
 
 
 class Rights(BaseRights):
     def __init__(self, configuration, logger):
         super().__init__(configuration, logger)
         self._etesync_cache = EteSyncCache(
-            creds_path=configuration.get(CONFIG_SECTION, "credentials_filename"),
-            db_path=configuration.get(CONFIG_SECTION, "database_filename"),
-            remote_url=configuration.get(CONFIG_SECTION, "remote_url"),
+            creds_path=config.CREDS_FILE,
+            db_path=config.DATABASE_FILE,
+            remote_url=config.ETESYNC_URL,
         )
 
     def authorized(self, user, path, permission):

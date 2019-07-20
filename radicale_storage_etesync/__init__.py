@@ -7,6 +7,8 @@ from uuid import uuid4
 from .etesync_cache import EteSyncCache
 from .href_mapper import HrefMapper
 
+import etesync_dav.config as config
+
 import etesync as api
 from radicale.storage import (
         BaseCollection, sanitize_path, Item, ComponentNotFoundError, get_etag, UnsafePathError, groupby, get_uid
@@ -531,9 +533,9 @@ class Collection(BaseCollection):
     def _get_etesync_for_user(cls, user):
         if cls._etesync_cache is None:
             cls._etesync_cache = EteSyncCache(
-                creds_path=cls.configuration.get(CONFIG_SECTION, "credentials_filename"),
-                db_path=cls.configuration.get(CONFIG_SECTION, "database_filename"),
-                remote_url=cls.configuration.get(CONFIG_SECTION, "remote_url"),
+                creds_path=config.CREDS_FILE,
+                db_path=config.DATABASE_FILE,
+                remote_url=config.ETESYNC_URL,
             )
 
         etesync, created = cls._etesync_cache.etesync_for_user(user)
