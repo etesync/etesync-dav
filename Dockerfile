@@ -19,6 +19,7 @@ RUN set -ex ;\
 
 VOLUME /data
 EXPOSE 37358
+EXPOSE 37359
 
 USER etesync
 
