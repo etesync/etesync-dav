@@ -15,7 +15,7 @@
   </li>
   {% for username, password in users %}
   <li class="d-flex" style="margin-bottom: 1.5rem;">
-    <span style="min-width: 400px">{{ username }}</span>
+    <a style="min-width: 400px" href="{{ url_for('user_index', user=username) }}">{{ username }}</a>
     <div class="d-inline">
       <button class="btn btn-sm btn-success" onclick="copyPassword('{{ password }}')">Copy Password</button>
       <form class="d-inline" method="post" action="{{ url_for('remove_user') }}">

@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
+from radicale_storage_etesync.etesync_cache import EteSyncCache, etesync_for_user
 
 manager = Manager()
 
@@ -59,6 +60,22 @@ def account_list():
     remove_user_form = UsernameForm(request.form)
     users = map(lambda x: (x, manager.get(x)), manager.list())
     return render_template('index.html', users=users, remove_user_form=remove_user_form)
+
+
+@app.route('/user/<string:user>')
+@login_required
+def user_index(user):
+    with EteSyncCache.lock:
+        etesync, _ = etesync_for_user(user)
+        journals = etesync.list()
+    collections = {}
+    for journal in journals:
+        collection = journal.collection
+        collections[collection.TYPE] = collections.get(collection.TYPE, [])
+        collections[collection.TYPE].append(collection)
+
+    return render_template(
+            'user_index.html', BASE_URL="http://localhost:37358/{}/".format(user), collections=collections)
 
 
 @app.route('/login/', methods=['GET', 'POST'])
