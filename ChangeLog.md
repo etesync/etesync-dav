@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.8.0
+* UI: add a web UI to manage etesync-dav
+* Get rid of the need for radicale.conf (pass the needed settings directly)
+* Move the radicale_storage_etesync module into the etesync_dav module
+
 ## Version 0.7.1
 * Filter out the PHOTO field from contacts to fix sync (see #65 for details).
 * Fixed bulk item uploading for newly created collections.
