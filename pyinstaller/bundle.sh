@@ -1,8 +1,7 @@
 #!/bin/sh
 
 pyinstaller \
-    --hidden-import radicale_storage_etesync \
-    --hidden-import radicale_storage_etesync.rights \
+    --hidden-import etesync_dav.radicale \
     --additional-hooks-dir ./hooks \
     --onefile \
     ../scripts/etesync-dav

@@ -11,7 +11,7 @@ from wtforms.validators import DataRequired
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
-from radicale_storage_etesync.etesync_cache import EteSyncCache, etesync_for_user
+from .radicale.etesync_cache import EteSyncCache, etesync_for_user
 
 manager = Manager()
 

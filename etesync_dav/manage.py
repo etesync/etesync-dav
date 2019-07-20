@@ -3,7 +3,7 @@ import random
 import string
 
 import etesync as api
-from radicale_storage_etesync.creds import Credentials
+from .radicale.creds import Credentials
 from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, ETESYNC_URL, CONFIG_DIR
 
 

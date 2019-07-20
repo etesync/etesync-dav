@@ -90,11 +90,11 @@ radicale_args = [
     '--auth-htpasswd-filename', HTPASSWD_FILE,
     '--auth-htpasswd-encryption', 'plain',
 
-    '--storage-type', 'radicale_storage_etesync',
+    '--storage-type', 'etesync_dav.radicale.storage',
 
-    '--web-type', 'radicale_storage_etesync.web',
+    '--web-type', 'etesync_dav.radicale.web',
 
-    '--rights-type', 'radicale_storage_etesync.rights',
+    '--rights-type', 'etesync_dav.radicale.rights',
 ] + sys.argv[1:]
 radicale_main.run(radicale_args)
 
