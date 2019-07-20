@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+  {{ form.csrf_token }}
+  <div class="form-group">
+    <div>
+      {{ form.username.label }}
+    </div>
+    {{ form.username }}
+  </div>
+  <div class="form-group">
+    <div>
+      {{ form.login_password.label }}
+    </div>
+    {{ form.login_password }}
+  </div>
+  {% if errors %}
+    <div class="alert alert-danger">
+      {{ errors }}
+    </div>
+  {% endif %}
+  <button id="send_button" class="btn btn-success">Login</button>
+</form>
+{% endblock content %}

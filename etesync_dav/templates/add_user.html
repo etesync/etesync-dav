@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Add User{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script>
+  function formSubmitted() {
+    document.getElementById('send_button').classList.add('hidden');
+    document.getElementById('loading_indicator').classList.remove('hidden');
+  }
+</script>
+
+<style>
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 51px;
+  height: 51px;
+  margin: 6px;
+  border: 6px solid #fff;
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #777 transparent transparent transparent;
+}
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<form action="" method="post" onsubmit="formSubmitted()">
+  {{ form.csrf_token }}
+  <div class="form-group">
+    <div>
+      {{ form.username.label }}
+    </div>
+    {{ form.username }}
+  </div>
+  <div class="form-group">
+    <div>
+      {{ form.login_password.label }}
+    </div>
+    {{ form.login_password }}
+  </div>
+  <div class="form-group">
+    <div>
+      {{ form.encryption_password.label }}
+    </div>
+    {{ form.encryption_password }}
+  </div>
+  {{ form.csrf_token }}
+  {% if errors %}
+    <div class="alert alert-danger">
+      {{ errors }}
+    </div>
+  {% endif %}
+  <button id="send_button" class="btn btn-success">Add</button>
+</form>
+<div id="loading_indicator" class="hidden">
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <p>Deriving encryption keys, please wait&hellip;</p>
+</p>
+{% endblock content %}

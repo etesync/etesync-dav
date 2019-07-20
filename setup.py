@@ -24,5 +24,7 @@ setup(
         'appdirs>=1.4.3',
         'etesync>=0.9.0',
         'Radicale>=2.1.10',
+        'Flask>=1.1.1',
+        'Flask-WTF>=0.14.2',
     ]
 )

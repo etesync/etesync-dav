@@ -2,10 +2,11 @@
 
 import os
 import sys
+from threading import Thread
 
 import radicale.__main__
 
-from etesync_dav import qtapp
+from etesync_dav import webui
 from etesync_dav.manage import Manager
 from etesync_dav.config import CONFIG_DIR, RADICALE_CONFIG, RADICALE_CONFIG_FILE
 
@@ -80,25 +81,13 @@ if not os.path.exists(RADICALE_CONFIG_FILE):
         f.write(RADICALE_CONFIG)
 
 
-run_service = False
+if not os.getenv('ETESYNC_NO_WEBUI', False):
+    thread = Thread(target=webui.run)
+    thread.setDaemon(True)
+    thread.start()
 
+os.chdir(CONFIG_DIR)
+os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
+radicale.__main__.run()
 
-def set_run_service():
-    global run_service
-    run_service = True
-
-
-if qtapp.HAS_GUI:
-    qt_exit_status = qtapp.run(set_run_service)
-else:
-    set_run_service()
-    qt_exit_status = 0
-
-
-if run_service:
-    os.chdir(CONFIG_DIR)
-    os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
-
-    radicale.__main__.run()
-
-sys.exit(qt_exit_status)
+sys.exit(0)
