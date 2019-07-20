@@ -6,6 +6,8 @@ import os
 from urllib.parse import quote
 
 import etesync as api
+from etesync_dav import config
+
 from .href_mapper import HrefMapper
 
 
@@ -58,3 +60,14 @@ class EteSyncCache:
         self._etesync_cache[user] = etesync
 
         return etesync, True
+
+
+_etesync_cache = EteSyncCache(
+    creds_path=config.CREDS_FILE,
+    db_path=config.DATABASE_FILE,
+    remote_url=config.ETESYNC_URL,
+)
+
+
+def etesync_for_user(user):
+    return _etesync_cache.etesync_for_user(user)

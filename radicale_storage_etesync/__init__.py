@@ -4,7 +4,7 @@ import posixpath
 import time
 from uuid import uuid4
 
-from .etesync_cache import EteSyncCache
+from .etesync_cache import EteSyncCache, etesync_for_user
 from .href_mapper import HrefMapper
 
 import etesync_dav.config as config
@@ -538,9 +538,9 @@ class Collection(BaseCollection):
                 remote_url=config.ETESYNC_URL,
             )
 
-        etesync, created = cls._etesync_cache.etesync_for_user(user)
+        etesync, _ = etesync_for_user(user)
 
-        if created:
+        if not hasattr(etesync, 'last_sync'):
             etesync.last_sync = 0
 
         return etesync
