@@ -4,7 +4,8 @@ import os
 import sys
 from threading import Thread
 
-import radicale.__main__
+import radicale
+from etesync_dav import radicale_main
 
 from etesync_dav import webui
 from etesync_dav.manage import Manager
@@ -88,6 +89,6 @@ if not os.getenv('ETESYNC_NO_WEBUI', False):
 
 os.chdir(CONFIG_DIR)
 os.environ['RADICALE_CONFIG'] = RADICALE_CONFIG_FILE
-radicale.__main__.run()
+radicale_main.run()
 
 sys.exit(0)
