@@ -17,7 +17,13 @@ manager = Manager()
 
 PORT = 37359
 
-app = Flask(__name__)
+# Special handling from frozen apps
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys._MEIPASS, 'etesync_dav', 'templates')
+    app = Flask(__name__, template_folder=template_folder)
+else:
+    app = Flask(__name__)
+
 app.secret_key = os.urandom(32)
 CSRFProtect(app)
 
