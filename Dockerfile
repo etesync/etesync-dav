@@ -5,12 +5,11 @@ ENV ETESYNC_LISTEN_ADDRESS "0.0.0.0"
 ENV ETESYNC_LISTEN_PORT "37358"
 
 # Make this file a build dep for the next steps
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt scrypt
+COPY requirements.txt /app/
+RUN pip install -r /app/requirements.txt scrypt
 
-# Make this file a build dep for the next steps
-COPY etesync_dav/_version.py /tmp/
-RUN pip install etesync-dav
+COPY . /app
+RUN pip install /app
 
 RUN set -ex ;\
         useradd etesync ;\
