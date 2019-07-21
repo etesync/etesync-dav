@@ -3,9 +3,14 @@ Session.vim
 /.coverage
 /etesync.db
 
+/dist
+
 /pyinstaller/etesync-dav.spec
 /pyinstaller/build
 /pyinstaller/dist
+/pyinstaller/.venv
+
+/old
 
 __pycache__
 *.egg-info
