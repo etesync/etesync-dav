@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.8.1
+* Make it possible to override the etesync database filename from the env.
+* Docker: expose web management port
+
 ## Version 0.8.0
 * UI: add a web UI to manage etesync-dav
 * Get rid of the need for radicale.conf (pass the needed settings directly)
