@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.9.0
+* Move certgen into the main script (and generated binaries)
+* Simplify and fixed issues with certgen
+* Automatically use SSL if certificate and key exist.
+* macOS: add a warning in the webui when missing SSL and add a button to set it up.
+
 ## Version 0.8.1
 * Make it possible to override the etesync database filename from the env.
 * Docker: expose web management port
