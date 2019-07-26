@@ -13,6 +13,14 @@ class Error(Exception):
     pass
 
 
+def has_ssl():
+    return os.path.exists(SSL_KEY_FILE) and os.path.exists(SSL_CERT_FILE)
+
+
+def needs_ssl():
+    return sys.platform == 'darwin' and not has_ssl()
+
+
 def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
                   key_cipher: str = KEY_CIPHER, key_size: int = KEY_SIZE,
                   key_days: int = KEY_DAYS):

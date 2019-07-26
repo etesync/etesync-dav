@@ -11,6 +11,7 @@ from wtforms.validators import DataRequired
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
+from etesync_dav.mac_helpers import generate_cert, macos_trust_cert, needs_ssl
 from .radicale.etesync_cache import EteSyncCache, etesync_for_user
 
 manager = Manager()
@@ -59,7 +60,7 @@ def login_required(func):
 def account_list():
     remove_user_form = UsernameForm(request.form)
     users = map(lambda x: (x, manager.get(x)), manager.list())
-    return render_template('index.html', users=users, remove_user_form=remove_user_form)
+    return render_template('index.html', users=users, remove_user_form=remove_user_form, osx_ssl_warning=needs_ssl())
 
 
 @app.route('/user/<string:user>')
@@ -106,6 +107,31 @@ def logout():
         logout_user()
 
     return redirect(url_for('login'))
+
+
+@app.route('/certgen/', methods=['GET', 'POST'])
+@login_required
+def certgen():
+    if request.method == 'GET':
+        return redirect(url_for('account_list'))
+
+    form = FlaskForm(request.form)
+    if form.validate_on_submit():
+        generate_cert()
+        macos_trust_cert()
+
+        # FIXME: hack to kill server after generation.
+        from threading import Timer
+
+        def shutdown():
+            os._exit(0)
+
+        thread = Timer(0.5, shutdown)
+        thread.start()
+
+        return render_template('shutdown_success.html')
+
+    return redirect(url_for('account_list'))
 
 
 @app.route('/add/', methods=['GET', 'POST'])

@@ -9,6 +9,23 @@
 {% endblock %}
 
 {% block content %}
+{% if osx_ssl_warning %}
+<div class="alert alert-danger" style="text-align: center;">
+  <p>
+  Due to macOS bugs etesync-dav has to run with SSL enabled. For more inormation please refer to the <a href="https://github.com/etesync/etesync-dav/blob/master/macos-instructions.md">macOS instructions</a>.
+  </p>
+  <p style="font-weight: bold;">
+  IMPORTANT: this operation will shutdown etesync-dav and require you to restart it.
+  </p>
+  <div>
+    <form method="post" action="{{ url_for('certgen') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button class="btn btn-success">Setup SSL</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
 <ul>
   <li class="d-flex" style="margin-bottom: 2.5rem;">
     <a class="btn btn-success btn-lg" href="{{ url_for('add_user') }}">Add user</a>
