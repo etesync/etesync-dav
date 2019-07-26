@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.9.1
+* Fix pip setup.
+
 ## Version 0.9.0
 * Move certgen into the main script (and generated binaries)
 * Simplify and fixed issues with certgen
