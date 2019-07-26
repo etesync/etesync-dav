@@ -9,7 +9,7 @@ from etesync_dav import radicale_main
 
 from etesync_dav import webui
 from etesync_dav.manage import Manager
-from etesync_dav.config import CONFIG_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE
+from etesync_dav.config import CONFIG_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
 
 
 def manage(args):
@@ -95,7 +95,15 @@ radicale_args = [
     '--web-type', 'etesync_dav.radicale.web',
 
     '--rights-type', 'etesync_dav.radicale.rights',
-] + sys.argv[1:]
-radicale_main.run(radicale_args)
+]
+
+if os.path.exists(SSL_KEY_FILE) and os.path.exists(SSL_CERT_FILE):
+    radicale_args += [
+        '--ssl',
+        '--server-key', SSL_KEY_FILE,
+        '--server-certificate', SSL_CERT_FILE,
+    ]
+
+radicale_main.run(radicale_args + sys.argv[1:])
 
 sys.exit(0)

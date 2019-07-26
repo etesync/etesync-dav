@@ -11,3 +11,6 @@ ETESYNC_MANAGEMENT_URL = os.environ.get('ETESYNC_MANAGEMENT_URL', 'http://localh
 
 HTPASSWD_FILE = os.path.join(CONFIG_DIR, 'htpaswd')
 CREDS_FILE = os.path.join(CONFIG_DIR, 'etesync_creds')
+
+SSL_KEY_FILE = os.path.join(CONFIG_DIR, 'etesync.key')
+SSL_CERT_FILE = os.path.join(CONFIG_DIR, 'etesync.crt')
