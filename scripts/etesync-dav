@@ -62,8 +62,19 @@ def manage(args):
             print(user)
 
 
+def certgen(args):
+    from etesync_dav.mac_helpers import generate_cert, macos_trust_cert
+    generate_cert()
+    macos_trust_cert()
+
+
 if len(sys.argv) > 1 and sys.argv[1] == 'manage':
     manage(sys.argv[2:])
+    sys.exit(0)
+
+
+if len(sys.argv) > 1 and sys.argv[1] == 'certgen':
+    certgen(sys.argv[2:])
     sys.exit(0)
 
 
