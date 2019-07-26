@@ -9,46 +9,37 @@
       * Server Address: localhost
       * Server Path: /
       * Port: 37358
-      * Prior to macOS Mojave: Uncheck "Use SSL".
-        From macOS Mojave onwards: Check "Use SSL."
-        (Mojave require SSL to be enabled.)
+      * Check "Use SSL".
     * CardDAV: Works. Setup instructions:
       * Internet Accounts->Add Other Account->CardDAV account
       * Account Type: Manual
       * Username: user@example.com
       * Password: generated etesync-dav password
-      * Server Address: `http://localhost:37358/` (under macOS Mojave: `https://localhost:37358/`)
+      * Server Address: `https://localhost:37358/` (please note it's https, not http!)
 
-## macOS Mojave
+## macOS Mojave bugs
 
-macOS Mojave enforces the use of SSL, *regardless* of whether you enable the
-checkbox for SSL or not. So to use EteSync, you have to enable SSL.
+macOS Mojave suffers from a bug that enforces the use of SSL, *regardless* of whether you enable the checkbox for SSL or not. So to use EteSync, you have to enable SSL.
 
-You can do so by either using the `etesync-dav-certgen` utility, or follow
-the instructions below. Following these instructions will generate a self-signed SSL certificate,
-configure etesync-dav to use that certificate, and make your system trust it.
+## Setup SSL
 
-### Automatic SSL setup
+Instructions differ depending on how you run `etesync-dav`. Most people will just need the first.
 
-You can automatically setup SSL by running the following command:
+### Webui
 
-    etesync-dav-certgen --trust-cert
+1. Login
+2. Click on the "Setup SSL" button at the top and wait.
+3. Enter your password once prompted by the system.
+4. Restart `etesync-dav`
 
-You will be prompted for your login password. This is because `--trust-cert`
-imports the certificate into your login keychain and then instructs the
-system to trust it for SSL connections.
+### Command line tool
 
-Once you have run `etesync-dav-certgen`, you need to restart `etesync-dav`
-for the changes to take effect. Then proceed to configure CalDAV and CardDAV
-as described above.
+1. Login
+2. Run `etesync-dav certgen`
+3. Enter your password once prompted by the system.
+4. Restart `etesync-dav`
 
-If you have already configured `etesync-dav` to use SSL, 
-`etesync-dav-certgen` will use your existing settings; in won't
-reconfigure `etesync-dav`. It also won't overwrite existing
-certificates. `--trust-cert` works on macOS 10.3 or newer only.
-See `etesync-dav-certgen --help` for details.
-
-### Manual SSL setup
+### Manual setup
 
 Alternatively you can generate and configure a self-signed certificate manually with the following steps:
 
@@ -56,28 +47,16 @@ Alternatively you can generate and configure a self-signed certificate manually 
 
 ````bash
 cd ~/Library/Application\ Support/etesync-dav
-openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=etesync.localhost" -keyout etesync.key -out etesync.crt
+openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/CN=localhost" -keyout etesync.key -out etesync.crt
 ````
-    
+
 2. Using `open` command triggers macOS "add to keychain" dialog (equivelent of double-clicking that file in Finder):
 
 ````bash
 open etesync.crt
 ````
-    
+
 3. In the dialog confirm adding to "login" keychain.
-4. Open `Keychain Access` app, find and open `etesync.localhost` (under Keychains: login, Category: Certificates), expand "Trust" and pick "Always trust" for SSL. 
-5. Edit `~/Library/Application Support/etesync-dav/radicale.conf`, under `[server]` enter the following to make it use the certificate:
+4. Open `Keychain Access` app, find and open `localhost` (under Keychains: login, Category: Certificates), expand "Trust" and pick "Always trust" for SSL.
 
-````ini
-    ssl = yes
-    certificate = ~/Library/Application Support/etesync-dav/etesync.crt
-    key = ~/Library/Application Support/etesync-dav/etesync.key
-````
-
-6. Restart `etesync-dav`
-
-### SSL in non-macOS applications
-
-Some applications, above all, web browers (Firefox, Chrome, ...) manage certificates themselves, rather than relying on the mechanisms the operating system provides. But `etesync-dav-certgen` and the instructions above only make the operating system trust the self-signed certificate. If you want to use SSL to connect to `etesync-dav` using such applications, you need to make them trust the self-signed certificate.
-
+5. Restart `etesync-dav`
