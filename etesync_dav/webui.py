@@ -98,7 +98,7 @@ def login():
     return render_template('login.html', form=form, errors=errors)
 
 
-@app.route('/logout/', methods=['GET', 'POST'])
+@app.route('/logout/', methods=['POST'])
 @login_required
 def logout():
     form = FlaskForm(request.form)
