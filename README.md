@@ -24,6 +24,12 @@ These binaries are self-contained and can be run as-is, though they do not start
 
 **Note:** For Linux and Mac you may want to rename the binaries to `etesync-dav` for ease of use.
 
+To run the binary on macOS or Linux:
+
+1. in your terminal, navigate to the binary's location by typing `cd /path/to/file`. The path to the file is most likely `~/Downloads`.
+1. make it executable by typing `chmod +x binary-name` in your terminal, replacing 'binary-name' with the name of the binary you downloaded.
+2. run the binary by typing `./binary-name` in your terminal.
+
 # Configuration and running
 
 Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
