@@ -22,14 +22,6 @@ The easiest way to start using etesync-dav is by getting one of the pre-built bi
 
 These binaries are self-contained and can be run as-is, though they do not start automatically on boot. You'd need to either start them manually, or set up autostart based on your OS.
 
-**Note:** For Linux and Mac you may want to rename the binaries to `etesync-dav` for ease of use.
-
-To run the binary on Linux:
-
-1. in your terminal, navigate to the binary's location by typing `cd /path/to/file`. The path to the file is most likely `~/Downloads`.
-1. make it executable by typing `chmod +x etesync-dav` in your terminal. This assumes you renamed the binary in the above note.
-1. run the binary by typing `./etesync-dav` in your terminal.
-
 # Configuration and running
 
 Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
@@ -141,15 +133,19 @@ Please note that you'll have to run `source venv/bin/activate` every time you'd 
 
 ## CLI
 
-You need to first add an EteSync user using `etesync-dav manage`, for example:
+1. Open a terminal and navigate to the binary's loctaion by typing `cd /path/to/file` (most likely `cd ~/Downloads`).
+2. Rename the binary to `etesync-dav` for ease of use, by e.g: `mv linux-etesync-dav etesync-dav`
+3. Make it executable: `chmod +x etesync-dav`
 
-`etesync-dav manage add user@example.com`
+You need to first add an EteSync user using `./etesync-dav manage`, for example:
+
+`./etesync-dav manage add user@example.com`
 
 *Substitute `user@example.com` with the username or email you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
-`etesync-dav`
+`./etesync-dav`
 
 
 ## Self-hosting
