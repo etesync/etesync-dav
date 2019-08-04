@@ -1,6 +1,7 @@
 import sys
 import os
 from functools import wraps
+from urllib.parse import urljoin
 
 from flask import Flask, render_template, redirect, url_for, request, session
 from flask_wtf import FlaskForm
@@ -18,6 +19,8 @@ manager = Manager()
 
 
 PORT = 37359
+BASE_URL = os.environ.get('ETESYNC_DAV_URL', 'http://localhost:37358/')
+
 
 # Special handling from frozen apps
 if getattr(sys, 'frozen', False):
@@ -76,7 +79,7 @@ def user_index(user):
         collections[collection.TYPE].append(collection)
 
     return render_template(
-            'user_index.html', BASE_URL="http://localhost:37358/{}/".format(user), collections=collections)
+            'user_index.html', BASE_URL=urljoin(BASE_URL, "{}/".format(user)), collections=collections)
 
 
 @app.route('/login/', methods=['GET', 'POST'])
