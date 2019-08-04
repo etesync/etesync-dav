@@ -34,6 +34,10 @@ For advanced usage and CLI instructions please refer to [the advanced usage sect
 
 Don't forget to set up EteSync to automatically start on startup. Instructions for this are unfortunately OS dependent and out of scope for this README.
 
+When running correctly, `etesync-dav` listens on two addrresses (and ports):
+* http://localhost:37358/
+* http://localhost:37359/
+
 # Setting up clients
 
 You now need to set up your CalDAV/CardDAV client using your username and the password you got in the previous step.
