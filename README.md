@@ -35,8 +35,8 @@ For advanced usage and CLI instructions please refer to [the advanced usage sect
 Don't forget to set up EteSync to automatically start on startup. Instructions for this are unfortunately OS dependent and out of scope for this README.
 
 When running correctly, `etesync-dav` listens on two addrresses (and ports):
-* http://localhost:37358/
-* http://localhost:37359/
+* http://localhost:37358/ - main service (redircts to management UI from the browser)
+* http://localhost:37359/ - management UI (for configuring `etesync-dav`)
 
 # Setting up clients
 
