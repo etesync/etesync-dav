@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.0
+* Webui: fix empty journal list when just adding an account.
+* Add ETESYNC_DAV_URL to be able to override the DAV url from the environment.
+
 ## Version 0.9.1
 * Fix pip setup.
 
