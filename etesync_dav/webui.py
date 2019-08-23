@@ -71,6 +71,7 @@ def account_list():
 def user_index(user):
     with EteSyncCache.lock:
         etesync, _ = etesync_for_user(user)
+        etesync.sync_journal_list()
         journals = etesync.list()
     collections = {}
     for journal in journals:
