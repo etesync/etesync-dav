@@ -12,14 +12,15 @@ from wtforms.validators import DataRequired
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
-from etesync_dav.mac_helpers import generate_cert, macos_trust_cert, needs_ssl
+from etesync_dav.mac_helpers import generate_cert, macos_trust_cert, needs_ssl, has_ssl
 from .radicale.etesync_cache import EteSyncCache, etesync_for_user
 
 manager = Manager()
 
 
 PORT = 37359
-BASE_URL = os.environ.get('ETESYNC_DAV_URL', 'http://localhost:37358/')
+scheme = 'https' if has_ssl() else 'http'
+BASE_URL = os.environ.get('ETESYNC_DAV_URL', scheme + '://localhost:37358/')
 
 
 # Special handling from frozen apps
