@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.11.0
+* Transparently transform vCard 4.0 to 3.0 which should fix sync on macOS (which doesn't support 4.0)
+* Webui: fix links to journals when SSL is enabled
+
 ## Version 0.10.0
 * Webui: fix empty journal list when just adding an account.
 * Add ETESYNC_DAV_URL to be able to override the DAV url from the environment.
