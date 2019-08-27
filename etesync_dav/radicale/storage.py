@@ -386,9 +386,15 @@ class Collection(BaseCollection):
 
         try:
             item = vobject.readOne(etesync_item.content)
-            # XXX Hack to remove photo until we fix its handling
-            if 'photo' in item.contents:
-                del item.contents['photo']
+            # XXX Hack: fake transform 4.0 vCards to 3.0 as 4.0 is not yet widely supported
+            if item.name == 'VCARD' and item.contents['version'][0].value == '4.0':
+                # Don't do anything for groups as transforming them won't help anyway.
+                if hasattr(item, 'kind') and item.kind.value.lower() == 'group':
+                    pass
+                else:
+                    item.contents['version'][0].value = '3.0'
+                    if 'photo' in item.contents:
+                        del item.contents['photo']
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" %
                                (href, self.path)) from e
