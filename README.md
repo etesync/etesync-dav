@@ -62,6 +62,18 @@ when you click on your username.
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` as the server and fill the rest of the fields as per the previous steps.
 
+### Evolution / GNOME Calendar / GNOME Contacts
+GNOME Calendar and Contacts do not support adding WebDAV calendars and address books directly, but you can add them in Evolution and they will appear correctly in all the apps.
+
+1. Open Evolution and click File -> New -> Calendar (or address book, depending on what you're adding).
+2. Set type to CalDAV (CardDAV for address books) - Do **not** set "One The Web"
+3. Use `http://localhost:37358/user@example.com/` as the server.
+4. User your username (user@example.com) in the user field.
+5. Click "Find Calendars" and choose your wanted calendar.
+6. Click OK
+
+Repeat this for every calendar and address book you would like to add.
+
 ### macOS
 While macOS works great, due to bugs in macOS Mojave the instructions require a few extra steps.
 
