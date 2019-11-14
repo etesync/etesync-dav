@@ -85,6 +85,7 @@ By default, iOS only syncs events 30 days old and newer, which may look as if
 events are not showing. To fix this, got to: Settings -> Calendar -> Sync and
 change to the wanted time duration.
 
+Or better yet, just use the [EteSync iOS client](https://github.com/etesync/ios).
 
 # Alternative Installation Methods
 
