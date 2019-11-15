@@ -20,6 +20,24 @@ import vobject
 CONFIG_SECTION = "storage"
 
 
+def _get_etesync_for_user(user):
+    etesync, _ = etesync_for_user(user)
+
+    if not hasattr(etesync, 'last_sync'):
+        etesync.last_sync = 0
+
+    return etesync
+
+
+def _delayed_sync(user):
+    with EteSyncCache.lock:
+        etesync = _get_etesync_for_user(user)
+
+        if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
+            etesync.last_sync = time.time()
+            etesync.sync()
+
+
 class MetaMapping:
     # Mappings between etesync meta and radicale
     _mappings = {
@@ -529,37 +547,6 @@ class Collection(BaseCollection):
         return ""
 
     @classmethod
-    def _should_sync(cls):
-        return time.time() - cls.etesync.last_sync >= 2 * 60  # In seconds
-
-    @classmethod
-    def _mark_sync(cls):
-        cls.etesync.last_sync = time.time()
-
-    @classmethod
-    def _get_etesync_for_user(cls, user):
-        etesync, _ = etesync_for_user(user)
-
-        if not hasattr(etesync, 'last_sync'):
-            etesync.last_sync = 0
-
-        return etesync
-
-    @classmethod
-    def _delayed_sync(cls, user):
-        with EteSyncCache.lock:
-            cls.user = user
-
-            cls.etesync = cls._get_etesync_for_user(cls.user)
-
-            if cls._should_sync():
-                cls._mark_sync()
-                cls.etesync.sync()
-
-            cls.etesync = None
-            cls.user = None
-
-    @classmethod
     @contextmanager
     def acquire_lock(cls, mode, user=None):
         """Set a context manager to lock the whole storage.
@@ -576,11 +563,11 @@ class Collection(BaseCollection):
         with EteSyncCache.lock:
             cls.user = user
 
-            cls.etesync = cls._get_etesync_for_user(cls.user)
+            cls.etesync = _get_etesync_for_user(cls.user)
 
             yield
 
-            thread = Thread(target=cls._delayed_sync, args=(user, ))
+            thread = Thread(target=_delayed_sync, args=(user, ))
             thread.start()
 
             cls.etesync = None
