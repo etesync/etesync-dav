@@ -20,6 +20,10 @@ import vobject
 CONFIG_SECTION = "storage"
 
 
+# How often we should sync, in seconds
+SYNC_INTERVAL = 15 * 60
+
+
 def _get_etesync_for_user(user):
     etesync, _ = etesync_for_user(user)
 
@@ -29,13 +33,16 @@ def _get_etesync_for_user(user):
     return etesync
 
 
-def _delayed_sync(user):
-    with EteSyncCache.lock:
-        etesync = _get_etesync_for_user(user)
+def _thread_sync_runner(user):
+    while True:
+        with EteSyncCache.lock:
+            etesync = _get_etesync_for_user(user)
 
-        if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
-            etesync.last_sync = time.time()
-            etesync.sync()
+            if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
+                etesync.last_sync = time.time()
+                etesync.sync()
+
+        time.sleep(SYNC_INTERVAL)
 
 
 class MetaMapping:
@@ -567,8 +574,10 @@ class Collection(BaseCollection):
 
             yield
 
-            thread = Thread(target=_delayed_sync, args=(user, ))
-            thread.start()
+            if not hasattr(cls.etesync, 'sync_thread'):
+                thread = Thread(target=_thread_sync_runner, args=(user, ), daemon=True)
+                cls.etesync.sync_thread = thread
+                thread.start()
 
             cls.etesync = None
             cls.user = None
