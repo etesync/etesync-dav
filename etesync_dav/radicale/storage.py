@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from threading import Thread
 import hashlib
 import posixpath
 import time
@@ -552,6 +553,20 @@ class Collection(BaseCollection):
         return etesync
 
     @classmethod
+    def _delayed_sync(cls, user):
+        with EteSyncCache.lock:
+            cls.user = user
+
+            cls.etesync = cls._get_etesync_for_user(cls.user)
+
+            if cls._should_sync():
+                cls._mark_sync()
+                cls.etesync.sync()
+
+            cls.etesync = None
+            cls.user = None
+
+    @classmethod
     @contextmanager
     def acquire_lock(cls, mode, user=None):
         """Set a context manager to lock the whole storage.
@@ -570,18 +585,10 @@ class Collection(BaseCollection):
 
             cls.etesync = cls._get_etesync_for_user(cls.user)
 
-            if cls._should_sync():
-                cls._mark_sync()
-                cls.etesync.get_or_create_user_info(force_fetch=True)
-                cls.etesync.sync_journal_list()
-                for journal in cls.etesync.list():
-                    cls.etesync.pull_journal(journal.uid)
             yield
-            if cls.etesync.journal_list_is_dirty():
-                cls.etesync.sync_journal_list()
-            for journal in cls.etesync.list():
-                if cls.etesync.journal_is_dirty(journal.uid):
-                    cls.etesync.sync_journal(journal.uid)
+
+            thread = Thread(target=cls._delayed_sync, args=(user, ))
+            thread.start()
 
             cls.etesync = None
             cls.user = None
