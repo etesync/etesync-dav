@@ -183,7 +183,7 @@ class Collection(BaseCollection):
 
     @classmethod
     def static_init(cls):
-        cls._etesync_cache = None
+        pass
 
     @classmethod
     def discover(cls, path, depth="0"):
@@ -538,13 +538,6 @@ class Collection(BaseCollection):
 
     @classmethod
     def _get_etesync_for_user(cls, user):
-        if cls._etesync_cache is None:
-            cls._etesync_cache = EteSyncCache(
-                creds_path=config.CREDS_FILE,
-                db_path=config.DATABASE_FILE,
-                remote_url=config.ETESYNC_URL,
-            )
-
         etesync, _ = etesync_for_user(user)
 
         if not hasattr(etesync, 'last_sync'):
