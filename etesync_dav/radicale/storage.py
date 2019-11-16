@@ -1,3 +1,4 @@
+import logging
 from contextlib import contextmanager
 from threading import Thread
 import hashlib
@@ -17,6 +18,8 @@ from radicale.storage import (
 import vobject
 
 
+logger = logging.getLogger('etesync-dav')
+
 CONFIG_SECTION = "storage"
 
 
@@ -35,14 +38,19 @@ def _get_etesync_for_user(user):
 
 def _thread_sync_runner(user):
     while True:
-        with EteSyncCache.lock:
-            etesync = _get_etesync_for_user(user)
+        try:
+            with EteSyncCache.lock:
+                etesync = _get_etesync_for_user(user)
 
-            if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
-                etesync.last_sync = time.time()
-                etesync.sync()
+                if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
+                    etesync.last_sync = time.time()
+                    etesync.sync()
+        except Exception as e:
+            # Print errors but keep on syncing in the background
+            logger.exception(e)
 
         time.sleep(SYNC_INTERVAL)
+
 
 
 class MetaMapping:
