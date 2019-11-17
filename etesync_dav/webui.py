@@ -21,6 +21,7 @@ manager = Manager()
 PORT = 37359
 scheme = 'https' if has_ssl() else 'http'
 BASE_URL = os.environ.get('ETESYNC_DAV_URL', scheme + '://localhost:37358/')
+ETESYNC_LISTEN_ADDRESS = os.environ.get('ETESYNC_LISTEN_ADDRESS', '127.0.0.1')
 
 
 # Special handling from frozen apps
@@ -181,4 +182,4 @@ class AddUserForm(LoginForm):
 
 
 def run(debug=False):
-    app.run(debug=debug, port=PORT)
+    app.run(debug=debug, host=ETESYNC_LISTEN_ADDRESS, port=PORT)
