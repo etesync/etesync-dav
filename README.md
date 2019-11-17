@@ -99,7 +99,7 @@ Run one time initial setup to persist the required configuration into a docker v
 
 Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
 
-    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
+    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 -p 37359:37359 --restart=always etesync/etesync-dav
     
 After this, refer to the [Setting up clients](#setting-up-clients) section below and start using it!
 
