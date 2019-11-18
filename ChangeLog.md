@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.12.0
+* Sync with etesync periodically: makes it much more responsive and fixes timeout issues
+* Webui: respect the ETESYNC_LISTEN_ADDRESS env var (fixes web ui access from docker)
+
 ## Version 0.11.0
 * Transparently transform vCard 4.0 to 3.0 which should fix sync on macOS (which doesn't support 4.0)
 * Webui: fix links to journals when SSL is enabled
