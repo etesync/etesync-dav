@@ -21,6 +21,8 @@
 
 macOS Mojave suffers from a bug that enforces the use of SSL, *regardless* of whether you enable the checkbox for SSL or not. So to use EteSync, you have to enable SSL.
 
+**NOTE:** [as reported by some users](https://github.com/etesync/etesync-dav/issues/96#issuecomment-555143171) it seems like adding the certificate to the keychain doesn't always make it immediately usable. You may need to first add a CardDAV account (has to be CardDAV), accept the certificate, and only then you will be able to add a CalDAV account.
+
 ## Setup SSL
 
 Instructions differ depending on how you run `etesync-dav`. Most people will just need the first.
