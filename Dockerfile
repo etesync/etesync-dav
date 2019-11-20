@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-stretch
 
 ENV ETESYNC_CONFIG_DIR "/data"
 ENV ETESYNC_LISTEN_ADDRESS "0.0.0.0"
