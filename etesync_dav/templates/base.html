@@ -298,7 +298,7 @@ a:hover {
   {% block body %}
   <div class="page-header">
     <div class="container d-flex flex-row">
-      <h1 class="d-inline">{% block title %}EteSync DAV Management{% endblock %}</h1>
+      <h1 class="d-inline">{% block title %}EteSync DAV Management <small>({{ version }})</small>{% endblock %}</h1>
       <form class="d-inline ml-auto my-auto" method="post" action="{{ url_for('logout') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <button class="btn btn-secondary">Logout</button>

@@ -35,6 +35,12 @@ app.secret_key = os.urandom(32)
 CSRFProtect(app)
 
 
+@app.context_processor
+def inject_user():
+    import etesync_dav
+    return dict(version=etesync_dav.__version__)
+
+
 def login_user(username):
     session['username'] = username
 
