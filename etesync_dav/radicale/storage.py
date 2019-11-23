@@ -1,6 +1,6 @@
 import logging
 from contextlib import contextmanager
-from threading import Thread
+import threading
 import hashlib
 import posixpath
 import time
@@ -25,31 +25,45 @@ CONFIG_SECTION = "storage"
 
 # How often we should sync, in seconds
 SYNC_INTERVAL = 15 * 60
+# Minimum time to wait between syncs
+SYNC_MINIMUM = 2 * 60
 
 
 def _get_etesync_for_user(user):
     etesync, _ = etesync_for_user(user)
-
-    if not hasattr(etesync, 'last_sync'):
-        etesync.last_sync = 0
-
     return etesync
 
 
-def _thread_sync_runner(user):
-    while True:
-        try:
-            with EteSyncCache.lock:
-                etesync = _get_etesync_for_user(user)
+class SyncThread(threading.Thread):
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._force_sync = threading.Event()
+        self.user = user
+        self.last_sync = None
 
-                if time.time() - etesync.last_sync >= 2 * 60:  # In seconds
-                    etesync.last_sync = time.time()
+    def request_sync(self):
+        if self.last_sync and time.time() - self.last_sync >= SYNC_MINIMUM:
+            self._force_sync.set()
+
+    @property
+    def forced_sync(self):
+        return self._force_sync.is_set()
+
+    def run(self):
+        while True:
+            try:
+                with EteSyncCache.lock:
+                    etesync = _get_etesync_for_user(self.user)
+
                     etesync.sync()
-        except Exception as e:
-            # Print errors but keep on syncing in the background
-            logger.exception(e)
 
-        time.sleep(SYNC_INTERVAL)
+                    self.last_sync = time.time()
+                    self._force_sync.clear()
+            except Exception as e:
+                # Print errors but keep on syncing in the background
+                logger.exception(e)
+
+            self._force_sync.wait(SYNC_INTERVAL)
 
 
 
@@ -583,9 +597,10 @@ class Collection(BaseCollection):
             yield
 
             if not hasattr(cls.etesync, 'sync_thread'):
-                thread = Thread(target=_thread_sync_runner, args=(user, ), daemon=True)
-                cls.etesync.sync_thread = thread
-                thread.start()
+                cls.etesync.sync_thread = SyncThread(user, daemon=True)
+                cls.etesync.sync_thread.start()
+            else:
+                cls.etesync.sync_thread.request_sync()
 
             cls.etesync = None
             cls.user = None
