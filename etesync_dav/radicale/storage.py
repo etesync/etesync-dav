@@ -1,4 +1,5 @@
 import logging
+import re
 from contextlib import contextmanager
 import threading
 import hashlib
@@ -176,6 +177,10 @@ def _get_attributes_from_path(path):
         attributes.pop()
 
     return attributes
+
+
+VCARD_4_TO_3_PHOTO_URI_REGEX = re.compile(r'^(PHOTO|LOGO):http', re.MULTILINE)
+VCARD_4_TO_3_PHOTO_INLINE_REGEX = re.compile(r'^(PHOTO|LOGO):data:image/([^;]*);base64,', re.MULTILINE)
 
 
 class PrincipalNotAllowedError(UnsafePathError):
@@ -440,9 +445,17 @@ class Collection(BaseCollection):
                 if hasattr(item, 'kind') and item.kind.value.lower() == 'group':
                     pass
                 else:
-                    item.contents['version'][0].value = '3.0'
+                    # XXX must be first because we are editing the content and reparsing
                     if 'photo' in item.contents:
-                        del item.contents['photo']
+                        content = etesync_item.content
+                        content = VCARD_4_TO_3_PHOTO_URI_REGEX.sub(r'\1;VALUE=uri:', content)
+                        content = VCARD_4_TO_3_PHOTO_INLINE_REGEX.sub(r'\1;ENCODING=b;TYPE=\2:', content)
+                        item = vobject.readOne(content)
+                        if content == etesync_item.content:
+                            # Delete the PHOTO if we haven't managed to convert it
+                            del item.contents['photo']
+
+                    item.contents['version'][0].value = '3.0'
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" %
                                (href, self.path)) from e
