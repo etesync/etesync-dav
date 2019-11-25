@@ -1,6 +1,7 @@
 from .creds import Credentials
 import hashlib
 import threading
+import collections
 import os
 
 from urllib.parse import quote
@@ -15,6 +16,73 @@ class EteSync(api.EteSync):
     def _init_db_tables(self, database, additional_tables=[]):
         super()._init_db_tables(database, additional_tables + [HrefMapper])
 
+
+class NamedReverseSemaphore:
+    _data_lock = threading.RLock()
+    _named_cond = collections.OrderedDict()
+
+    def __init__(self, name):
+        self.name = name
+
+    def __enter__(self):
+        self.acquire()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.release()
+
+    def _unref_name_self(self):
+        cls = NamedReverseSemaphore
+        with cls._data_lock:
+            cls._named_cond[self.name][1] -= 1
+            if cls._named_cond[self.name][1] == 0:
+                del cls._named_cond[self.name]
+
+                return True
+        return False
+
+    def acquire(self, timeout=None):
+        cls = NamedReverseSemaphore
+        cond = None
+        with cls._data_lock:
+            if not cls._named_cond:
+                cls._named_cond[self.name] = [None, 1]
+                return True
+            elif next(iter(cls._named_cond)) == self.name:
+                cls._named_cond[self.name][1] += 1
+                return True
+            else:
+                if self.name not in cls._named_cond:
+                    cond = threading.Condition()
+                    cls._named_cond[self.name] = [cond, 1]
+                else:
+                    cond = cls._named_cond[self.name][0]
+                    cls._named_cond[self.name][1] += 1
+                cond.acquire()
+        if cond is not None:
+            ret = cond.wait(timeout=timeout)
+
+            cond.release()
+            if not ret:
+                self._unref_name_self()
+            return ret
+        else:
+            raise RuntimeError('Condition is None, should never happen!')
+
+    def release(self):
+        cls = NamedReverseSemaphore
+        cond = None
+        with cls._data_lock:
+            owner = next(iter(cls._named_cond))
+            if owner == self.name:
+                if self._unref_name_self():
+                    if cls._named_cond:
+                        cond, refcount = next(iter(cls._named_cond.values()))
+                        cond.acquire()
+            else:
+                raise RuntimeError('NamedReverseSemaphore: did not own lock at exit. Owner: ' + str(owner))
+        if cond is not None:
+            cond.notify_all()
+            cond.release()
 
 class EteSyncCache:
     lock = threading.RLock()
