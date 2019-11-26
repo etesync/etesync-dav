@@ -102,8 +102,7 @@ class EteSyncCache:
             if user in self._etesync_cache:
                 etesync = self._etesync_cache[user]
                 if (etesync.auth_token, etesync.cipher_key) == self.creds.get(user):
-                    # FIXME: Reinit the etesync db - should use the official reinit function once released
-                    etesync._set_db(etesync._database)
+                    etesync.reinit()
                     return etesync, False
                 else:
                     del self._etesync_cache[user]
