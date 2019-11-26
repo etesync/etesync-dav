@@ -302,7 +302,7 @@ class Collection(BaseCollection):
         for entry in self.journal.list():
             pass
 
-        return entry.uid if entry is not None else hashlib.sha256(b"").hexdigest()
+        return entry.uid if entry is not None else self.journal.uid
 
     @staticmethod
     def _find_available_file_name(exists_fn, suffix=""):
