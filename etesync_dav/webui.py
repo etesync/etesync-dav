@@ -77,8 +77,7 @@ def account_list():
 @app.route('/user/<string:user>')
 @login_required
 def user_index(user):
-    with EteSyncCache.lock:
-        etesync, _ = etesync_for_user(user)
+    with etesync_for_user(user) as (etesync, _):
         etesync.sync_journal_list()
         journals = etesync.list()
     collections = {}

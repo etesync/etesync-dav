@@ -26,8 +26,7 @@ class Rights(BaseRights):
 
         journal_uid = attributes[1]
 
-        with EteSyncCache.lock:
-            etesync, _ = etesync_for_user(user)
+        with etesync_for_user(user) as (etesync, _):
             try:
                 journal = etesync.get(journal_uid)
             except api.exceptions.DoesNotExist:

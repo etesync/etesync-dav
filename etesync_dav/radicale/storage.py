@@ -30,11 +30,6 @@ SYNC_INTERVAL = 15 * 60
 SYNC_MINIMUM = 2 * 60
 
 
-def _get_etesync_for_user(user):
-    etesync, _ = etesync_for_user(user)
-    return etesync
-
-
 class SyncThread(threading.Thread):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,8 +48,7 @@ class SyncThread(threading.Thread):
     def run(self):
         while True:
             try:
-                with EteSyncCache.lock:
-                    etesync = _get_etesync_for_user(self.user)
+                with etesync_for_user(self.user) as (etesync, _):
 
                     etesync.sync()
 
@@ -202,6 +196,8 @@ class EteSyncItem(Item):
 
 class Collection(BaseCollection):
     """Collection stored in several files per calendar."""
+
+    _lock = threading.RLock()
 
     def __init__(self, path, principal=False, folder=None, tag=None):
         attributes = _get_attributes_from_path(path)
@@ -602,18 +598,18 @@ class Collection(BaseCollection):
         if not user:
             return
 
-        with EteSyncCache.lock:
-            cls.user = user
+        with etesync_for_user(user) as (etesync, _):
+            with cls._lock:
+                cls.user = user
+                cls.etesync = etesync
 
-            cls.etesync = _get_etesync_for_user(cls.user)
+                yield
 
-            yield
+                cls.etesync = None
+                cls.user = None
 
-            if not hasattr(cls.etesync, 'sync_thread'):
-                cls.etesync.sync_thread = SyncThread(user, daemon=True)
-                cls.etesync.sync_thread.start()
+            if not hasattr(etesync, 'sync_thread'):
+                etesync.sync_thread = SyncThread(user, daemon=True)
+                etesync.sync_thread.start()
             else:
-                cls.etesync.sync_thread.request_sync()
-
-            cls.etesync = None
-            cls.user = None
+                etesync.sync_thread.request_sync()

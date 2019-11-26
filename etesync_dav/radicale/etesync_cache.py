@@ -3,6 +3,7 @@ import hashlib
 import threading
 import collections
 import os
+from contextlib import contextmanager
 
 from urllib.parse import quote
 
@@ -85,8 +86,6 @@ class NamedReverseSemaphore:
             cond.release()
 
 class EteSyncCache:
-    lock = threading.RLock()
-
     def __init__(self, creds_path, db_path, remote_url=None):
         self._etesync_cache = {}
         self.creds = None
@@ -137,5 +136,7 @@ _etesync_cache = EteSyncCache(
 )
 
 
+@contextmanager
 def etesync_for_user(user):
-    return _etesync_cache.etesync_for_user(user)
+    with NamedReverseSemaphore(user):
+        yield _etesync_cache.etesync_for_user(user)
