@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.13.0
+* Significantly improve sync speed by changing the transaction locking mechanism
+* Sync on client requests even if sync period hasn't passed (but only if two minutes have passed)
+* Add support for contact PHOTOS
+* Webui: add a version string to the UI so it's easier for people to know what version they are running.
+
 ## Version 0.12.0
 * Sync with etesync periodically: makes it much more responsive and fixes timeout issues
 * Webui: respect the ETESYNC_LISTEN_ADDRESS env var (fixes web ui access from docker)
