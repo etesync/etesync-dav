@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.14.0
+* Initialise new accounts and verify encryption keys when adding users
+
 ## Version 0.13.0
 * Significantly improve sync speed by changing the transaction locking mechanism
 * Sync on client requests even if sync period hasn't passed (but only if two minutes have passed)
