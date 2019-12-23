@@ -1,9 +1,12 @@
 import os
 import random
 import string
+import time
+import hashlib
 
 import etesync as api
 from .radicale.creds import Credentials
+from .radicale.etesync_cache import etesync_for_user
 from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, ETESYNC_URL, CONFIG_DIR
 
 
@@ -79,6 +82,35 @@ class Manager:
         self.creds.set(username, auth_token, cipher_key)
         self.htpasswd.save()
         self.creds.save()
+
+        print("Initializing account")
+        try:
+            with etesync_for_user(username) as (etesync, _):
+                etesync.get_or_create_user_info(force_fetch=True)
+                etesync.sync_journal_list()
+                if not list(etesync.list()):
+                    collection_info = {"displayName": "Default", "description": ""}
+
+                    collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
+                    inst = api.Calendar.create(etesync, collection_name, collection_info)
+                    inst.save()
+
+                    collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
+                    inst = api.TaskList.create(etesync, collection_name, collection_info)
+                    inst.save()
+
+                    collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
+                    inst = api.AddressBook.create(etesync, collection_name, collection_info)
+                    inst.save()
+
+                    etesync.sync_journal_list()
+        except Exception as e:
+            # Remove the username on error
+            self.htpasswd.delete(username)
+            self.creds.delete(username)
+            self.htpasswd.save()
+            self.creds.save()
+            raise e
 
         return self.get(username)
 
