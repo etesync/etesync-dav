@@ -24,9 +24,9 @@ These binaries are self-contained and can be run as-is, though they do not start
 
 # Configuration and running
 
-Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
-
-Add your EteSync user through the web UI. You will then be able to copy the password you will be entering your DAV clients.
+1. Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
+2. Add your EteSync user through the web UI.
+3. Copy the DAV specific password by click the "Copy Password" button next to your newly added username.
 
 For advanced usage and CLI instructions please refer to [the advanced usage section](#advanced-usage).
 
@@ -60,7 +60,7 @@ when you click on your username.
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
-4. Use `http://localhost:37358/user@example.com/` as the server and fill the rest of the fields as per the previous steps.
+4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
 ### Evolution / GNOME Calendar / GNOME Contacts
 GNOME Calendar and Contacts do not support adding WebDAV calendars and address books directly, but you can add them in Evolution and they will appear correctly in all the apps.
@@ -68,7 +68,7 @@ GNOME Calendar and Contacts do not support adding WebDAV calendars and address b
 1. Open Evolution and click File -> New -> Calendar (or address book, depending on what you're adding).
 2. Set type to CalDAV (CardDAV for address books) - Do **not** set "One The Web"
 3. Use `http://localhost:37358/user@example.com/` as the server.
-4. Put your username (user@example.com) in the user field.
+4. Put your username (user@example.com) in the user field, and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
 5. Click "Find Calendars" and choose your wanted calendar.
 6. Click OK
 
