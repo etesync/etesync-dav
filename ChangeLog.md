@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.14.1
+* Fix issue with high CPU usage when there's no connection.
+
 ## Version 0.14.0
 * Initialise new accounts and verify encryption keys when adding users
 
