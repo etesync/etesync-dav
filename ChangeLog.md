@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.14.2
+* Fix "database is locked" errors
+
 ## Version 0.14.1
 * Fix issue with high CPU usage when there's no connection.
 
