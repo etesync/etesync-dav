@@ -50,12 +50,13 @@ class SyncThread(threading.Thread):
             try:
                 with etesync_for_user(self.user) as (etesync, _):
                     self.last_sync = time.time()
-                    self._force_sync.clear()
 
                     etesync.sync()
             except Exception as e:
                 # Print errors but keep on syncing in the background
                 logger.exception(e)
+            finally:
+                self._force_sync.clear()
 
             self._force_sync.wait(SYNC_INTERVAL)
 
