@@ -97,7 +97,7 @@ Run one time initial setup to persist the required configuration into a docker v
 
     docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
 
-Run etesync-dav in a background docker container with configuration from previous step (this is the command you'd run every time)
+Run etesync-dav in a background docker container with configuration from previous step. This wil (re)start the container on boot and after crashes.
 
     docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 -p 37359:37359 --restart=always etesync/etesync-dav
     
