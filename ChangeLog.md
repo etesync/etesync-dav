@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.14.3
+* Provide more explicit copyright and licensing information.
+
 ## Version 0.14.2
 * Fix "database is locked" errors
 
