@@ -12,7 +12,7 @@ chardet==3.0.4            # via requests
 click==7.0                # via flask
 coverage==4.5.3           # via etesync
 cryptography==2.7         # via etesync
-etesync==0.9.1
+etesync==0.9.3
 flask-wtf==0.14.2
 flask==1.1.1
 furl==2.0.0               # via etesync
