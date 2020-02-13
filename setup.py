@@ -7,12 +7,12 @@ exec(open('etesync_dav/_version.py').read())
 setup(
     name='etesync-dav',
     version=__version__,
-    author='EteSync',
-    author_email='development@etesync.com',
+    author='Tom Hacohen',
+    author_email='tom@stosb.com',
     url='https://github.com/etesync/etesync-dav',
     description='A CalDAV and CardDAV frontend for EteSync',
     keywords=['etesync', 'encryption', 'sync', 'pim', 'caldav', 'carddav'],
-    license='GPL',
+    license='GPL-3.0-only',
     long_description=open('DESCRIPTION.rst').read(),
     packages=find_packages(),
     scripts=[
