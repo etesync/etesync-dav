@@ -60,7 +60,7 @@ class Manager:
                  config_dir=CONFIG_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE, remote_url=ETESYNC_URL):
 
         if not os.path.exists(config_dir):
-            os.makedirs(config_dir)
+            os.makedirs(config_dir, mode=0o700)
 
         self.htpasswd = Htpasswd(htpasswd_file)
         self.creds = Credentials(creds_file)
