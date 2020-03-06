@@ -65,6 +65,10 @@ class Manager:
         self.htpasswd = Htpasswd(htpasswd_file)
         self.creds = Credentials(creds_file)
 
+        if not os.path.exists(htpasswd_file):
+            # Create a missing htpasswd file if missing
+            self.htpasswd.save()
+
         self.remote_url = remote_url
 
     def _generate_pasword(self):

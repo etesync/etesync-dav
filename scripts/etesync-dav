@@ -80,10 +80,6 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
     print("Radicale version: ", radicale.VERSION)
     sys.exit(0)
 
-if not os.path.exists(CONFIG_DIR):
-    print('Configuration not found. Please run "etesync-dav manage" first.')
-    sys.exit(1)
-
 
 radicale_args = [
     '--hosts', '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT),
@@ -112,6 +108,10 @@ if has_ssl():
         '--server-key', SSL_KEY_FILE,
         '--server-certificate', SSL_CERT_FILE,
     ]
+
+# Init data if no data dir
+if not os.path.exists(CONFIG_DIR):
+    Manager()
 
 radicale_main.run(radicale_args + sys.argv[1:])
 
