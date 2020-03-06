@@ -36,6 +36,16 @@ from radicale import (VERSION, Application, RequestHandler, ThreadedHTTPServer,
                       ThreadedHTTPSServer, config, log, storage)
 
 
+class MyApplication(Application):
+    def do_POST(self, environ, base_prefix, path, user):
+        """Manage POST request."""
+        # Dispatch .web URL to web module
+        if path == "/.web" or path.startswith("/.web/"):
+            return self.Web.post(environ, base_prefix, path, user)
+
+        return super().do_POST(environ, base_prefix, path, user)
+
+
 def run(passed_args=None):
     """Run Radicale as a standalone server."""
     # Get command-line arguments
@@ -226,7 +236,7 @@ def serve(configuration, logger):
         except ValueError as e:
             raise RuntimeError(
                 "Failed to parse address %r: %s" % (host, e)) from e
-        application = Application(configuration, logger)
+        application = MyApplication(configuration, logger)
         try:
             server = make_server(
                 address, port, application, server_class, RequestHandler)

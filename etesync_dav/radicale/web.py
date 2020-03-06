@@ -17,7 +17,6 @@ from http import client
 import pkg_resources
 
 from radicale import web
-from etesync_dav.config import ETESYNC_MANAGEMENT_URL
 
 
 class Web(web.BaseWeb):
@@ -25,8 +24,20 @@ class Web(web.BaseWeb):
         super().__init__(configuration, logger)
         self.folder = pkg_resources.resource_filename(__name__, "web")
 
+    def _call(self, environ, base_prefix, path, user):
+        from etesync_dav.webui import app
+        ret_response = []
+
+        def start_response(status, headers):
+            ret_response.append(int(status.split()[0]))
+            ret_response.append(dict(headers))
+
+        body = list(app(environ, start_response))[0]
+        ret_response.append(body)
+        return tuple(ret_response)
+
     def get(self, environ, base_prefix, path, user):
-        location = ETESYNC_MANAGEMENT_URL
-        return (client.FOUND,
-                {"Location": location, "Content-Type": "text/plain"},
-                "Redirected to %s" % location)
+        return self._call(environ, base_prefix, path, user)
+
+    def post(self, environ, base_prefix, path, user):
+        return self._call(environ, base_prefix, path, user)

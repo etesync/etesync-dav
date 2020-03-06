@@ -17,7 +17,7 @@ import os
 from functools import wraps
 from urllib.parse import urljoin
 
-from flask import Flask, render_template, redirect, url_for, request, session
+from flask import Flask, render_template, redirect, url_for, request, session, Blueprint
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
@@ -33,9 +33,20 @@ manager = Manager()
 
 
 PORT = 37359
-scheme = 'https' if has_ssl() else 'http'
-BASE_URL = os.environ.get('ETESYNC_DAV_URL', scheme + '://localhost:37358/')
+BASE_URL = os.environ.get('ETESYNC_DAV_URL', '/')
 ETESYNC_LISTEN_ADDRESS = os.environ.get('ETESYNC_LISTEN_ADDRESS', '127.0.0.1')
+
+
+def prefix_route(route_function, prefix='', mask='{0}{1}'):
+    '''
+      Defines a new route function with a prefix.
+      The mask argument is a `format string` formatted with, in that order:
+        prefix, route
+    '''
+    def newroute(route, *args, **kwargs):
+        '''New function to prefix the route'''
+        return route_function(mask.format(prefix, route), *args, **kwargs)
+    return newroute
 
 
 # Special handling from frozen apps
@@ -44,6 +55,8 @@ if getattr(sys, 'frozen', False):
     app = Flask(__name__, template_folder=template_folder)
 else:
     app = Flask(__name__)
+
+app.route = prefix_route(app.route, '/.web')
 
 app.secret_key = os.urandom(32)
 CSRFProtect(app)
@@ -149,7 +162,7 @@ def certgen():
         from threading import Timer
 
         def shutdown():
-            os._exit(0)
+            sys.exit(0)
 
         thread = Timer(0.5, shutdown)
         thread.start()

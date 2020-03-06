@@ -2,12 +2,10 @@
 
 import os
 import sys
-from threading import Thread
 
 import radicale
 from etesync_dav import radicale_main
 
-from etesync_dav import webui
 from etesync_dav.manage import Manager
 from etesync_dav.config import CONFIG_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
 from etesync_dav.mac_helpers import has_ssl
@@ -90,11 +88,6 @@ if not os.path.exists(CONFIG_DIR):
     sys.exit(1)
 
 
-if not os.getenv('ETESYNC_NO_WEBUI', False):
-    thread = Thread(target=webui.run)
-    thread.setDaemon(True)
-    thread.start()
-
 radicale_args = [
     '--hosts', '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT),
 
@@ -104,10 +97,17 @@ radicale_args = [
 
     '--storage-type', 'etesync_dav.radicale.storage',
 
-    '--web-type', 'etesync_dav.radicale.web',
-
     '--rights-type', 'etesync_dav.radicale.rights',
 ]
+
+if not os.getenv('ETESYNC_NO_WEBUI', None):
+    radicale_args.extend([
+        '--web-type', 'etesync_dav.radicale.web'
+    ])
+else:
+    radicale_args.extend([
+        '--web-type', 'none'
+    ])
 
 if has_ssl():
     radicale_args += [
