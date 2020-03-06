@@ -34,10 +34,6 @@ For advanced usage and CLI instructions please refer to [the advanced usage sect
 
 Don't forget to set up EteSync to automatically start on startup. Instructions for this are unfortunately OS dependent and out of scope for this README.
 
-When running correctly, `etesync-dav` listens on two addrresses (and ports):
-* http://localhost:37358/ - main service (redircts to management UI from the browser)
-* http://localhost:37359/ - management UI (for configuring `etesync-dav`)
-
 # Setting up clients
 
 You now need to set up your CalDAV/CardDAV client using your username and the password you got in the previous step.
@@ -99,7 +95,7 @@ Run one time initial setup to persist the required configuration into a docker v
 
 Run etesync-dav in a background docker container with configuration from previous step. This wil (re)start the container on boot and after crashes.
 
-    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 -p 37359:37359 --restart=always etesync/etesync-dav
+    docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
     
 After this, refer to the [Setting up clients](#setting-up-clients) section below and start using it!
 
