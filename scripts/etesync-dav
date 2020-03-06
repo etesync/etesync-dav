@@ -34,9 +34,6 @@ def manage(args):
                         help="The encryption password")
     args = parser.parse_args(args=args)
 
-    if not os.path.exists(CONFIG_DIR):
-        os.makedirs(CONFIG_DIR)
-
     if args.command == 'add':
         exists = manager.validate_username(args.username)
         if exists:
