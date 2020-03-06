@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.15.0
+* Webui: move it under /.web instead of a separate thread + port.
+* Make permissions to config dir more restrictive.
+* Move the app's data to user_data_dir from user_config_dir
+
 ## Version 0.14.3
 * Provide more explicit copyright and licensing information.
 
