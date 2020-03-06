@@ -21,7 +21,7 @@ import hashlib
 import etesync as api
 from .radicale.creds import Credentials
 from .radicale.etesync_cache import etesync_for_user
-from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, ETESYNC_URL, CONFIG_DIR
+from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, ETESYNC_URL, DATA_DIR, LEGACY_CONFIG_DIR
 
 
 class Htpasswd:
@@ -57,10 +57,15 @@ class Htpasswd:
 
 class Manager:
     def __init__(self,
-                 config_dir=CONFIG_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE, remote_url=ETESYNC_URL):
+                 config_dir=DATA_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE, remote_url=ETESYNC_URL):
 
         if not os.path.exists(config_dir):
-            os.makedirs(config_dir, mode=0o700)
+            # If the old dir still exists and the new one doesn't, mv the location
+            if os.path.exists(LEGACY_CONFIG_DIR):
+                import shutil
+                shutil.move(LEGACY_CONFIG_DIR, DATA_DIR)
+            else:
+                os.makedirs(config_dir, mode=0o700)
 
         self.htpasswd = Htpasswd(htpasswd_file)
         self.creds = Credentials(creds_file)

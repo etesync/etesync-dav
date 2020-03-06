@@ -7,7 +7,7 @@ import radicale
 from etesync_dav import radicale_main
 
 from etesync_dav.manage import Manager
-from etesync_dav.config import CONFIG_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
+from etesync_dav.config import DATA_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
 from etesync_dav.mac_helpers import has_ssl
 
 
@@ -110,7 +110,7 @@ if has_ssl():
     ]
 
 # Init data if no data dir
-if not os.path.exists(CONFIG_DIR):
+if not os.path.exists(DATA_DIR):
     Manager()
 
 radicale_main.run(radicale_args + sys.argv[1:])
