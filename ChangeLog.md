@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.15.1
+* Update pyetesync version to fix database locking issue
+
 ## Version 0.15.0
 * Webui: move it under /.web instead of a separate thread + port.
 * Make permissions to config dir more restrictive.
