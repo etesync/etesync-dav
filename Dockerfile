@@ -6,7 +6,7 @@ ENV ETESYNC_LISTEN_PORT "37358"
 
 # Make this file a build dep for the next steps
 COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt scrypt
+RUN pip install -r /app/requirements.txt
 
 COPY . /app
 RUN pip install /app

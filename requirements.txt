@@ -4,17 +4,16 @@
 #
 #    pip-compile --output-file=requirements.txt setup.py
 #
-appdirs==1.4.3
+appdirs==1.4.3            # via etesync, etesync-dav (setup.py)
 asn1crypto==0.24.0        # via cryptography, etesync
 certifi==2019.6.16        # via requests
 cffi==1.12.3              # via cryptography, etesync
 chardet==3.0.4            # via requests
 click==7.0                # via flask
-coverage==4.5.3           # via etesync
 cryptography==2.7         # via etesync
-etesync==0.10.0
-flask-wtf==0.14.2
-flask==1.1.1
+etesync==0.11.1           # via etesync-dav (setup.py)
+flask-wtf==0.14.2         # via etesync-dav (setup.py)
+flask==1.1.1              # via etesync-dav (setup.py), flask-wtf
 furl==2.0.0               # via etesync
 idna==2.8                 # via etesync, requests
 itsdangerous==1.1.0       # via flask
@@ -27,10 +26,9 @@ py==1.8.0                 # via etesync
 pyasn1==0.4.5             # via etesync
 pycparser==2.19           # via cffi, etesync
 pyparsing==2.4.0          # via etesync, packaging
-pyscrypt==1.6.2           # via etesync
 python-dateutil==2.8.0    # via etesync, radicale, vobject
 pytz==2019.1              # via etesync
-radicale==2.1.11
+radicale==2.1.11          # via etesync-dav (setup.py)
 requests==2.22.0          # via etesync
 six==1.12.0               # via cryptography, etesync, furl, orderedmultidict, packaging, python-dateutil
 urllib3==1.25.3           # via requests
