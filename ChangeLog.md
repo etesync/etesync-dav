@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.16.0
+* Update pyetesync version to improve sync time and set the user agent when making requests.
+
 ## Version 0.15.1
 * Update pyetesync version to fix database locking issue
 
