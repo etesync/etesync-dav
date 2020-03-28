@@ -18,6 +18,7 @@ import pkg_resources
 
 from radicale import web
 
+from etesync_dav.mac_helpers import has_ssl
 
 class Web(web.BaseWeb):
     def __init__(self, configuration, logger):
@@ -32,6 +33,8 @@ class Web(web.BaseWeb):
             ret_response.append(int(status.split()[0]))
             ret_response.append(dict(headers))
 
+        if has_ssl():
+            environ['wsgi.url_scheme'] = 'https'
         body = list(app(environ, start_response))[0]
         ret_response.append(body)
         return tuple(ret_response)
