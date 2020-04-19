@@ -182,7 +182,7 @@ or
 
 `export SSL_CERT_FILE=/path/file.crt`
 
-Alternatively, if the security of certificate is not an issue (say the server is on a private network and not publicly accessible), you can ignore the certificate completely with the following commands prior to sarting the dav bridge
+Alternatively, if the security of certificate is not an issue (say the server is on a private network and not publicly accessible), you can ignore the certificate completely with the following commands prior to starting the DAV bridge.
 
 ```bash
 export CURL_CA_BUNDLE='';
