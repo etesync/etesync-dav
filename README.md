@@ -172,6 +172,22 @@ By default it uses the official EteSync server at `https://api.etesync.com`.
 
 EteSync-DAV should automatically use the system's proxy settings if set correctly. Alternatively, you can set the `HTTP_PROXY` and `HTTPS_PROXY` environment variables to manually set the proxy settings.
 
+## Self Signed Certs
+
+If the etesync backend server is using self signed certs, the DAV bridge may refuse to connect. To solve this, run the following commands prior to starting the DAV bridge.
+
+`export REQUESTS_CA_BUNDLE=/path/to/your/certificate.pem`
+
+or
+
+`export SSL_CERT_FILE=/path/file.crt`
+
+Alternatively, if the security of certificate is not an issue (say the server is on a private network and not publicly accessible), you can ignore the certificate completely with the following commands prior to starting the DAV bridge.
+
+```bash
+export CURL_CA_BUNDLE='';
+export REQUESTS_CA_BUNDLE='';
+```
 
 ## Config files
 
