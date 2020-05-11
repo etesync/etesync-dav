@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.17.0
+* Web UI: correctly redirect using https when ssl is on.
+* Add application icon to macOS and Windows binaries
+
 ## Version 0.16.0
 * Update pyetesync version to improve sync time and set the user agent when making requests.
 
