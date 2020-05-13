@@ -20,7 +20,7 @@ If all you want is to access your data from a computer, you are probably better 
 
 The easiest way to start using etesync-dav is by getting one of the pre-built binaries from the [releases page](https://github.com/etesync/etesync-dav/releases).
 
-These binaries are self-contained and can be run as-is, though they do not start automatically on boot. You'd need to either start them manually, or set up autostart based on your OS.
+These binaries are self-contained and can be run as-is, though they do not start automatically on boot. You'd need to either start them manually, or set up [autostart based on your OS](#autostart-on-system-boot).
 
 # Configuration and running
 
@@ -82,6 +82,26 @@ events are not showing. To fix this, got to: Settings -> Calendar -> Sync and
 change to the wanted time duration.
 
 Or better yet, just use the [EteSync iOS client](https://github.com/etesync/ios).
+
+## Autostart on system boot
+
+It's probably easiet to just follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) for setting up autostart. Alternatively, you can try following the instructions below.
+
+### Linux (systemd)
+
+Make sure you have `/usr/lib/systemd/user/etesync-dav.service` on your system (should be there when installing from your distro's package manager), and then, to start the service:
+`systemctl --user start etesync-dav`
+To enable auto-start on boot:
+`systemctl --user enable etesync-dav`
+
+### macOS
+
+Make sure you installed `etesync-dav.app` by dragging it to your `Applications` directory through finder.
+Enable autostart by for example following [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/).
+
+### Windows
+
+Follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/).
 
 # Alternative Installation Methods
 
