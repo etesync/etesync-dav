@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.17.1
+* Fix address book collections reporting they are also CalDAV collections
+
 ## Version 0.17.0
 * Web UI: correctly redirect using https when ssl is on.
 * Add application icon to macOS and Windows binaries
