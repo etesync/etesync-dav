@@ -65,7 +65,7 @@ GNOME Calendar and Contacts do not support adding WebDAV calendars and address b
 2. Click Add -> Collection account
 3. Put your username (user@example.com) in the user field.
 4. Click Advanced Options and use `http://localhost:37358/` as the server.
-5. Untick "Look up in SRV records" and "Look up configuration with e-mail domain".
+5. Make sure "Look up for a CalDAV/CardDAV server" is ticked, and untick all the rest.
 6. Click "Look Up" and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
 7. Click Next/Finish until done.
 
