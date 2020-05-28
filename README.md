@@ -61,13 +61,12 @@ when you click on your username.
 ### Evolution / GNOME Calendar / GNOME Contacts
 GNOME Calendar and Contacts do not support adding WebDAV calendars and address books directly, but you can add them in Evolution and they will appear correctly in all the apps.
 
-1. Open Evolution and click Edit -> Accounts
-2. Click Add -> Collection account
-3. Put your username (user@example.com) in the user field.
-4. Click Advanced Options and use `http://localhost:37358/` as the server.
-5. Make sure "Look up for a CalDAV/CardDAV server" is ticked, and untick all the rest.
-6. Click "Look Up" and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
-7. Click Next/Finish until done.
+1. Open Evolution and click File -> NEw -> Collection account
+2. Put your username (user@example.com) in the user field.
+3. Click Advanced Options and use `http://localhost:37358/` as the server.
+4. Make sure "Look up for a CalDAV/CardDAV server" is ticked, and untick all the rest.
+5. Click "Look Up" and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
+6. Click Next/Finish until done.
 
 ### macOS (Contacts.app and Calendar.app)
 While EteSync-DAV works great on macOS, due to bugs in macOS Mojave, the instructions require a few extra steps for syncigng with Contacts.app and Calendar.app. Other clients, such as Thunderbird, do no require these extra steps.
