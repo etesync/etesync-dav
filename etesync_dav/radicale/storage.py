@@ -96,7 +96,7 @@ class MetaMapping:
             value = get_transform(value)
 
         if key == 'C:supported-calendar-component-set':
-            return key, getattr(self, 'supported_calendar_component', None)
+            return key, getattr(self, 'supported_calendar_component', 'none')
 
         return key, value
 
