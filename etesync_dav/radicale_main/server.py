@@ -52,6 +52,16 @@ elif os.name == "nt":
     COMPAT_IPPROTO_IPV6 = 41
 
 
+class MyApplication(Application):
+    def do_POST(self, environ, base_prefix, path, user):
+        """Manage POST request."""
+        # Dispatch .web URL to web module
+        if path == "/.web" or path.startswith("/.web/"):
+            return self._web.post(environ, base_prefix, path, user)
+
+        return super().do_POST(environ, base_prefix, path, user)
+
+
 def format_address(address):
     return "[%s]:%d" % address[:2]
 
@@ -210,7 +220,7 @@ def serve(configuration, shutdown_socket):
 
     use_ssl = configuration.get("server", "ssl")
     server_class = ParallelHTTPSServer if use_ssl else ParallelHTTPServer
-    application = Application(configuration)
+    application = MyApplication(configuration)
     servers = {}
     try:
         for address in configuration.get("server", "hosts"):
