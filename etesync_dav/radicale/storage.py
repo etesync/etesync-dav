@@ -369,10 +369,7 @@ class Collection(BaseCollection):
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" %
                                (href, self.path)) from e
-        # FIXME: Make this sensible
-        last_modified = time.strftime(
-            "%a, %d %b %Y %H:%M:%S GMT",
-            time.gmtime(time.time()))
+        last_modified = ''
 
         return EteSyncItem(collection=self, vobject_item=item, href=href, last_modified=last_modified, etesync_item=etesync_item)
 
@@ -460,11 +457,7 @@ class Collection(BaseCollection):
     @property
     def last_modified(self):
         """Get the HTTP-datetime of when the collection was modified."""
-        # FIXME: Make this sensible
-        last_modified = time.strftime(
-            "%a, %d %b %Y %H:%M:%S GMT",
-            time.gmtime(time.time()))
-        return last_modified
+        return ''
 
 
 class Storage(BaseStorage):
