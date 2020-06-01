@@ -287,10 +287,12 @@ class Collection(BaseCollection):
         delta update. If sync token is missing, all items are returned.
         ValueError is raised for invalid or old tokens.
         """
-        # FIXME: Actually implement
-        token = "http://radicale.org/ns/sync/%s" % self.etag.strip("\"")
-        if old_token:
-            raise ValueError("Sync token are not supported (you can ignore this warning)")
+        token_prefix = 'http://radicale.org/ns/sync/'
+        token = "{}{}".format(token_prefix, self.etag.strip('"'))
+        if old_token is not None and old_token.startswith(token_prefix):
+            old_token = old_token[len(token_prefix):]
+
+        # FIXME: actually implement filtering by token
         return token, self._list()
 
     def _list(self):
