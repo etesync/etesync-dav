@@ -21,8 +21,8 @@ from radicale import web
 from etesync_dav.mac_helpers import has_ssl
 
 class Web(web.BaseWeb):
-    def __init__(self, configuration, logger):
-        super().__init__(configuration, logger)
+    def __init__(self, configuration):
+        super().__init__(configuration)
         self.folder = pkg_resources.resource_filename(__name__, "web")
 
     def _call(self, environ, base_prefix, path, user):

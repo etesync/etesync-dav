@@ -12,38 +12,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from radicale.rights import BaseRights
+from radicale import pathutils, rights
 
 from .etesync_cache import EteSyncCache, etesync_for_user
 
 import etesync as api
 
 
-class Rights(BaseRights):
-    def authorized(self, user, path, permission):
-        if not bool(user):
-            return False
+class Rights(rights.BaseRights):
+    def authorization(self, user, path):
+        if not user:
+            return ""
 
-        attributes = path.strip('/').split('/')
+        sane_path = pathutils.strip_path(path)
+        if not sane_path:
+            return "R"
 
-        if len(attributes) == 1:
-            if attributes[0] == '':
-                return permission == 'r'
-            else:
-                return attributes[0] == user
+        attributes = sane_path.split('/')
+        if user != attributes[0]:
+            return ""
 
-        if attributes[0] != user:
-            return False
+        if "/" not in sane_path:
+            return "RW"
 
-        if permission == 'r':
-            return True
+        if sane_path.count("/") == 1:
+            journal_uid = attributes[1]
 
-        journal_uid = attributes[1]
+            with etesync_for_user(user) as (etesync, _):
+                try:
+                    journal = etesync.get(journal_uid)
+                except api.exceptions.DoesNotExist:
+                    return ''
 
-        with etesync_for_user(user) as (etesync, _):
-            try:
-                journal = etesync.get(journal_uid)
-            except api.exceptions.DoesNotExist:
-                return False
+            return 'rw' if not journal.read_only else 'r'
 
-        return not journal.read_only
+        return ""
