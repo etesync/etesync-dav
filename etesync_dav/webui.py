@@ -183,6 +183,8 @@ def add_user():
         try:
             manager.add(form.username.data, form.login_password.data, form.encryption_password.data)
             return redirect(url_for('account_list'))
+        except api.exceptions.IntegrityException:
+            errors = 'Wrong encryption password (failed to decrypt data)'
         except Exception as e:
             errors = str(e)
     else:
