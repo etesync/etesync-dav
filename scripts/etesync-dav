@@ -84,6 +84,8 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
 radicale_args = [
     '--hosts', SERVER_HOSTS,
 
+    '--config', '',  # Prevent radicale from loading the default config
+
     '--auth-type', 'htpasswd',
     '--auth-htpasswd-filename', HTPASSWD_FILE,
     '--auth-htpasswd-encryption', 'plain',
