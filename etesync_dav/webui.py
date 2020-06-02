@@ -147,6 +147,35 @@ def logout():
     return redirect(url_for('login'))
 
 
+# FIXME: hack to kill server after generation.
+def shutdown_response():
+    from threading import Timer
+
+    def shutdown():
+        os._exit(0)
+
+    thread = Timer(0.5, shutdown)
+    thread.start()
+
+    return redirect(url_for('shutdown_success'))
+
+
+@app.route('/shutdown/', methods=['POST'])
+@login_required
+def shutdown():
+    form = FlaskForm(request.form)
+    if form.validate_on_submit():
+        return shutdown_response()
+
+    return redirect(url_for('login'))
+
+
+@app.route('/shutdown/success/', methods=['GET'])
+@login_required
+def shutdown_success():
+    return render_template('shutdown_success.html')
+
+
 @app.route('/certgen/', methods=['GET', 'POST'])
 @login_required
 def certgen():
@@ -158,16 +187,7 @@ def certgen():
         generate_cert()
         macos_trust_cert()
 
-        # FIXME: hack to kill server after generation.
-        from threading import Timer
-
-        def shutdown():
-            sys.exit(0)
-
-        thread = Timer(0.5, shutdown)
-        thread.start()
-
-        return render_template('shutdown_success.html')
+        return shutdown_response()
 
     return redirect(url_for('account_list'))
 
