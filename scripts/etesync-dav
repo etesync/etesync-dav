@@ -7,7 +7,7 @@ import radicale
 from etesync_dav import radicale_main
 
 from etesync_dav.manage import Manager
-from etesync_dav.config import DATA_DIR, LISTEN_ADDRESS, LISTEN_PORT, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
+from etesync_dav.config import DATA_DIR, SERVER_HOSTS, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
 from etesync_dav.mac_helpers import has_ssl
 
 
@@ -82,7 +82,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
 
 
 radicale_args = [
-    '--hosts', '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT),
+    '--hosts', SERVER_HOSTS,
 
     '--auth-type', 'htpasswd',
     '--auth-htpasswd-filename', HTPASSWD_FILE,

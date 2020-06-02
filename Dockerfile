@@ -1,8 +1,7 @@
 FROM python:3.7-stretch
 
 ENV ETESYNC_DATA_DIR "/data"
-ENV ETESYNC_LISTEN_ADDRESS "0.0.0.0"
-ENV ETESYNC_LISTEN_PORT "37358"
+ENV ETESYNC_SERVER_HOSTS "0.0.0.0:37358,[::]:37358"
 
 # Make this file a build dep for the next steps
 COPY requirements.txt /app/
