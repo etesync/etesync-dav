@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.18.0
+* Update Radicale to 3.0.0 and adjust the code accordingly
+* Add a way to shutdown etesync-dav from the web UI
+* Prevent Radicale from loading the default config (and confuse etesync-dav)
+* Fix error message for wrong encryption passwords
+* Make it possible to bind to multiple hosts + bind to both ipv4 and 6 by default
+
 ## Version 0.17.1
 * Fix address book collections reporting they are also CalDAV collections
 
