@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.18.1
+* Fix sync issues (regression in 0.18.0)
+* Fix database is locked errors that were showing in some cases
+* Open the default web browser to the web UI on first run
+
 ## Version 0.18.0
 * Update Radicale to 3.0.0 and adjust the code accordingly
 * Add a way to shutdown etesync-dav from the web UI
