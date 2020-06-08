@@ -2,6 +2,7 @@
 
 import os
 import sys
+import logging
 
 import radicale
 from etesync_dav import radicale_main
@@ -9,6 +10,8 @@ from etesync_dav import radicale_main
 from etesync_dav.manage import Manager
 from etesync_dav.config import DATA_DIR, SERVER_HOSTS, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
 from etesync_dav.mac_helpers import has_ssl
+
+logger = logging.getLogger('etesync-dav')
 
 
 def manage(args):
@@ -111,9 +114,19 @@ if has_ssl():
         '--server-certificate', SSL_CERT_FILE,
     ]
 
-# Init data if no data dir
+# If first run:
 if not os.path.exists(DATA_DIR):
+    # Init data if no data dir
     Manager()
+    # Attempt to run the default web browser
+    import webbrowser
+    scheme = 'https' if has_ssl() else 'http'
+    url = 'localhost:37358'  # Not good to have it hardcoded, but will work for most people
+    admin_interface = '{}://{}'.format(scheme, url)
+    try:
+        webbrowser.open(admin_interface)
+    except Exception as e:
+        logger.exception(e)
 
 radicale_main.run(radicale_args + sys.argv[1:])
 
