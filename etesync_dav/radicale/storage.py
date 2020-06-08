@@ -467,7 +467,7 @@ class Storage(BaseStorage):
 
     _collection_class = Collection
 
-    _lock = threading.RLock()
+    _sync_thread_lock = threading.RLock()
 
     def __init__(self, configuration):
         self.user = None
@@ -583,17 +583,17 @@ class Storage(BaseStorage):
             return
 
         with etesync_for_user(user) as (etesync, _):
-            with self._lock:
-                self.user = user
-                self.etesync = etesync
+            self.user = user
+            self.etesync = etesync
 
-                yield
+            yield
 
-                self.etesync = None
-                self.user = None
+            self.etesync = None
+            self.user = None
 
-            if not hasattr(etesync, 'sync_thread'):
-                etesync.sync_thread = SyncThread(user, daemon=True)
-                etesync.sync_thread.start()
-            else:
-                etesync.sync_thread.request_sync()
+            with self.__class__._sync_thread_lock:
+                if not hasattr(etesync, 'sync_thread'):
+                    etesync.sync_thread = SyncThread(user, daemon=True)
+                    etesync.sync_thread.start()
+                else:
+                    etesync.sync_thread.request_sync()

@@ -149,7 +149,13 @@ _etesync_cache = EteSyncCache(
 )
 
 
+_get_etesync_lock = threading.RLock()
+
+
 @contextmanager
 def etesync_for_user(user):
+    with _get_etesync_lock:
+        ret = _etesync_cache.etesync_for_user(user)
+
     with NamedReverseSemaphore(user):
-        yield _etesync_cache.etesync_for_user(user)
+        yield ret
