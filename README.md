@@ -69,7 +69,7 @@ GNOME Calendar and Contacts do not support adding WebDAV calendars and address b
 6. Click Next/Finish until done.
 
 ### macOS (Contacts.app and Calendar.app)
-While EteSync-DAV works great on macOS, due to bugs in macOS Mojave, the instructions require a few extra steps for syncigng with Contacts.app and Calendar.app. Other clients, such as Thunderbird, do no require these extra steps.
+While EteSync-DAV works great on macOS, due to bugs in macOS Mojave, the instructions require a few extra steps for syncing with Contacts.app and Calendar.app. Other clients, such as Thunderbird, do no require these extra steps.
 
 Please take a look at the [macOS instructions](macos-instructions.md) for more information.
 
