@@ -25,5 +25,6 @@ setup(
         'Radicale==3.0.3',
         'Flask>=1.1.1',
         'Flask-WTF>=0.14.2',
+        'requests[socks]>=2.21',
     ]
 )
