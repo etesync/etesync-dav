@@ -112,16 +112,17 @@ class Manager:
                 etesync.get_or_create_user_info(force_fetch=True)
                 etesync.sync_journal_list()
                 if not list(etesync.list()):
-                    collection_info = {"displayName": "Default", "description": ""}
-
+                    collection_info = {"displayName": "My Calendar", "description": ""}
                     collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
                     inst = api.Calendar.create(etesync, collection_name, collection_info)
                     inst.save()
 
+                    collection_info = {"displayName": "My Tasks", "description": ""}
                     collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
                     inst = api.TaskList.create(etesync, collection_name, collection_info)
                     inst.save()
 
+                    collection_info = {"displayName": "My Contacts", "description": ""}
                     collection_name = hashlib.sha256(str(time.time()).encode()).hexdigest()
                     inst = api.AddressBook.create(etesync, collection_name, collection_info)
                     inst.save()
