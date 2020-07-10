@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.19.0
+* Sync: change the sync back to being synchronous instead of async.
+* Change default collection names from Default to something descriptive
+* Add socks SOCKS proxy support
+
 ## Version 0.18.1
 * Fix sync issues (regression in 0.18.0)
 * Fix database is locked errors that were showing in some cases
