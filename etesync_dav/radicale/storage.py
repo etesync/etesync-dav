@@ -38,32 +38,39 @@ import vobject
 logger = logging.getLogger('etesync-dav')
 
 
-# How often we should sync, in seconds
+# How often we should sync automatically, in seconds
 SYNC_INTERVAL = 15 * 60
 # Minimum time to wait between syncs
-SYNC_MINIMUM = 2 * 60
+SYNC_MINIMUM = 30
 
 
 class SyncThread(threading.Thread):
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._force_sync = threading.Event()
+        self._done_syncing = threading.Event()
+        self._done_syncing.set()  # We are done before we start.
         self.user = user
         self.last_sync = None
 
     def request_sync(self):
         if self.last_sync and time.time() - self.last_sync >= SYNC_MINIMUM:
             self._force_sync.set()
+            self._done_syncing.clear()
 
     @property
     def forced_sync(self):
         return self._force_sync.is_set()
+
+    def wait_for_sync(self, timeout=None):
+        return self._done_syncing.wait(timeout)
 
     def run(self):
         while True:
             try:
                 with etesync_for_user(self.user) as (etesync, _):
                     self.last_sync = time.time()
+                    self._done_syncing.clear()
 
                     etesync.sync()
             except Exception as e:
@@ -71,6 +78,7 @@ class SyncThread(threading.Thread):
                 logger.exception(e)
             finally:
                 self._force_sync.clear()
+                self._done_syncing.set()
 
             self._force_sync.wait(SYNC_INTERVAL)
 
@@ -581,6 +589,17 @@ class Storage(BaseStorage):
             return
 
         with etesync_for_user(user) as (etesync, _):
+            with self.__class__._sync_thread_lock:
+                if not hasattr(etesync, 'sync_thread'):
+                    etesync.sync_thread = SyncThread(user, daemon=True)
+                    etesync.sync_thread.start()
+                else:
+                    etesync.sync_thread.request_sync()
+
+        # At most wait for 5 seconds before returning stale data
+        etesync.sync_thread.wait_for_sync(5)
+
+        with etesync_for_user(user) as (etesync, _):
             self.user = user
             self.etesync = etesync
 
@@ -588,10 +607,3 @@ class Storage(BaseStorage):
 
             self.etesync = None
             self.user = None
-
-            with self.__class__._sync_thread_lock:
-                if not hasattr(etesync, 'sync_thread'):
-                    etesync.sync_thread = SyncThread(user, daemon=True)
-                    etesync.sync_thread.start()
-                else:
-                    etesync.sync_thread.request_sync()
