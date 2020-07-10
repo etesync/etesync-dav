@@ -37,8 +37,6 @@ import vobject
 
 logger = logging.getLogger('etesync-dav')
 
-CONFIG_SECTION = "storage"
-
 
 # How often we should sync, in seconds
 SYNC_INTERVAL = 15 * 60
