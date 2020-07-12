@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.20.0
+* Windows: add an easy way to generate an SSL certificate (just like on the mac)
+
 ## Version 0.19.0
 * Sync: change the sync back to being synchronous instead of async.
 * Change default collection names from Default to something descriptive
