@@ -14,13 +14,24 @@
 
 import os
 import sys
+from datetime import datetime, timedelta
 from subprocess import check_call
+
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from etesync_dav.config import SSL_KEY_FILE, SSL_CERT_FILE
 
 KEY_CIPHER = 'rsa'
 KEY_SIZE = 4096
 KEY_DAYS = 3650  # That's 10 years.
+
+ON_MAC = sys.platform == 'darwin'
+ON_WINDOWS = sys.platform in ['win32', 'cygwin']
 
 
 class Error(Exception):
@@ -32,24 +43,62 @@ def has_ssl():
 
 
 def needs_ssl():
-    return sys.platform == 'darwin' and not has_ssl()
-
+    return (ON_MAC or ON_WINDOWS) and \
+        not has_ssl()
 
 def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
-                  key_cipher: str = KEY_CIPHER, key_size: int = KEY_SIZE,
-                  key_days: int = KEY_DAYS):
+                  key_size: int = KEY_SIZE, key_days: int = KEY_DAYS):
     if os.path.exists(key_path):
         print('Skipping key generation as already exists.')
         return
 
-    check_call(['openssl', 'req', '-x509', '-nodes',
-                '-newkey', key_cipher + ':' + str(key_size),
-                '-keyout', key_path, '-out', cert_path, '-days', str(key_days),
-                '-subj', '/CN=localhost'])
+    hostname = 'localhost'
+
+    key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=key_size,
+        backend=default_backend(),
+    )
+
+    name = x509.Name([
+        x509.NameAttribute(NameOID.COMMON_NAME, hostname)
+    ])
+
+    # best practice seem to be to include the hostname in the SAN, which *SHOULD* mean COMMON_NAME is ignored.
+    alt_names = [x509.DNSName(hostname)]
+
+    san = x509.SubjectAlternativeName(alt_names)
+
+    # path_len=0 means this cert can only sign itself, not other certs.
+    basic_contraints = x509.BasicConstraints(ca=True, path_length=0)
+    now = datetime.utcnow()
+    cert = (
+        x509.CertificateBuilder()
+        .subject_name(name)
+        .issuer_name(name)
+        .public_key(key.public_key())
+        .serial_number(1000)
+        .not_valid_before(now)
+        .not_valid_after(now + timedelta(days=key_days))
+        .add_extension(basic_contraints, False)
+        .add_extension(san, False)
+        .sign(key, hashes.SHA256(), default_backend())
+    )
+    cert_pem = cert.public_bytes(encoding=serialization.Encoding.PEM)
+    key_pem = key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    with open(key_path, 'wb') as f:
+        f.write(key_pem)
+    with open(cert_path, 'wb') as f:
+        f.write(cert_pem)
 
 
 def macos_trust_cert(cert_path: str = SSL_CERT_FILE, keychain: str = ''):
-    if sys.platform != 'darwin':
+    if not ON_MAC:
         raise Error('this is not macOS.')
     keychain_option = ['-k', keychain] if keychain else []
     check_call(['security', 'import', cert_path] + keychain_option)
