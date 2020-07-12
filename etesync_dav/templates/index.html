@@ -12,10 +12,12 @@
 {% if osx_ssl_warning %}
 <div class="alert alert-danger" style="text-align: center;">
   <p>
-  Due to macOS bugs etesync-dav has to run with SSL enabled. For more inormation please refer to the <a href="https://github.com/etesync/etesync-dav/blob/master/macos-instructions.md">macOS instructions</a>.
+  Both macOS and Windows 10 require SSL even when explicitly disabled. <br />
+  This is only needed for Contacts.app and Calendar.app on macOS and Outlook, Windows Calendar and Windows People on Windows. <br />
+  For more inormation please refer to the <a href="https://github.com/etesync/etesync-dav/blob/master/macos-instructions.md">macOS instructions</a>.
   </p>
   <p style="font-weight: bold;">
-  IMPORTANT: this operation will shutdown etesync-dav and require you to restart it.
+  IMPORTANT: this operation will shutdown etesync-dav and require you to start it again.
   </p>
   <div>
     <form method="post" action="{{ url_for('certgen') }}">
