@@ -97,9 +97,23 @@ def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
         f.write(cert_pem)
 
 
-def macos_trust_cert(cert_path: str = SSL_CERT_FILE, keychain: str = ''):
+def macos_trust_cert(cert_path: str = SSL_CERT_FILE):
     if not ON_MAC:
         raise Error('this is not macOS.')
-    keychain_option = ['-k', keychain] if keychain else []
-    check_call(['security', 'import', cert_path] + keychain_option)
-    check_call(['security', 'add-trusted-cert', '-p', 'ssl', cert_path] + keychain_option)
+    check_call(['security', 'import', cert_path])
+    check_call(['security', 'add-trusted-cert', '-p', 'ssl', cert_path])
+
+
+def windows_trust_cert(cert_path: str = SSL_CERT_FILE):
+    if not ON_WINDOWS:
+        raise Error('this is not Windows.')
+    check_call(['powershell.exe', 'Import-Certificate', '-FilePath', '"{}"'.format(cert_path), '-CertStoreLocation', 'Cert:\CurrentUser\Root'])
+
+
+def trust_cert(cert_path: str = SSL_CERT_FILE):
+    if ON_WINDOWS:
+        windows_trust_cert(cert_path)
+    elif ON_MAC:
+        macos_trust_cert(cert_path)
+    else:
+        raise Error('Only supported on windows/macOS')

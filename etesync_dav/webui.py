@@ -26,7 +26,7 @@ from wtforms.validators import DataRequired
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
-from etesync_dav.mac_helpers import generate_cert, macos_trust_cert, needs_ssl, has_ssl
+from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl, has_ssl
 from .radicale.etesync_cache import EteSyncCache, etesync_for_user
 
 manager = Manager()
@@ -185,7 +185,7 @@ def certgen():
     form = FlaskForm(request.form)
     if form.validate_on_submit():
         generate_cert()
-        macos_trust_cert()
+        trust_cert()
 
         return shutdown_response()
 
