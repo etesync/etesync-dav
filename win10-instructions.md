@@ -2,7 +2,7 @@ While EteSync-DAV works great on Windows 10, due to bugs in Windows itself, the 
 
 ## Setup SSL
 
-Windows 10 clients (e.g. Calendar and Outlook) fail without an error when the DAV server doesn't use SSL, so we need to enable SSL for etesync-dav.
+Windows 10 clients (e.g. Windows Calendar and People) fail without an error when the DAV server doesn't use SSL, so we need to enable SSL for etesync-dav.
 
 Instructions differ depending on how you run `etesync-dav`. Most people will just need the first.
 
@@ -23,6 +23,8 @@ Instructions differ depending on how you run `etesync-dav`. Most people will jus
 ## Configuration
 
 Windows 10 supports CalDAV and CardDAV account, though for whatever reason, they don't have an easy UI to enable them, so they need to be added in an awkward manner.
+
+This works for Windows Calendar and People, though apparently Outlook has a different way of adding caldav accounts.
 
 1. Open the windows settings app (search for "Settings" in the start menu's search box)
 2. Go to Email & accounts and click add account
