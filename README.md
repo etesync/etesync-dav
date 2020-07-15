@@ -68,7 +68,7 @@ GNOME Calendar and Contacts do not support adding WebDAV calendars and address b
 5. Click "Look Up" and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
 6. Click Next/Finish until done.
 
-### Windows 10
+### Windows 10 (Outlook, Windows Calendar and Windows People)
 While EteSync-DAV works great on Windows 10, due to bugs in Windows itself, the instructions require a few extra steps for syncing with Outlook, Windows Calendar and Windows people. Other clients, such as Thunderbird, do no require these extra steps.
 
 Please take a look at the [Windows 10 instructions](win10-instructions.md) for more information.
