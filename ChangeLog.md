@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.20.1
+* Added travis CI for CI/CD
+* Improve SSL messegae on windows
+* Update etesync dep
+
 ## Version 0.20.0
 * Windows: add an easy way to generate an SSL certificate (just like on the mac)
 
