@@ -2,7 +2,7 @@
 
 ## Version 0.20.1
 * Added travis CI for CI/CD
-* Improve SSL messegae on windows
+* Improve SSL message on Windows
 * Update etesync dep
 
 ## Version 0.20.0
