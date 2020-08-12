@@ -6,8 +6,8 @@
 <ul>
   {% for collection in collection_list %}
   <li class="d-flex" style="margin-bottom: 1.5rem;">
-    {% with dav_url = "{}{}/".format(BASE_URL, collection.journal.uid) %}
-    {{ collection.display_name }}&nbsp;
+    {% with dav_url = "{}{}/".format(BASE_URL, collection.uid) %}
+    {{ collection.name }}&nbsp;
     <a href="{{ dav_url }}">[link]</a>
     {% endwith %}
   </li>

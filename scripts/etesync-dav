@@ -31,10 +31,14 @@ def manage(args):
     parser.add_argument("username",
                         nargs='?',
                         help="The username used with EteSync")
+    parser.add_argument('--legacy', default=False, action='store_true',
+                        help="Use the legacy EteSync backend")
+    parser.add_argument("--password",
+                        help="Your EteSync account password")
     parser.add_argument("--login-password",
-                        help="The password to login to the EteSync server.")
+                        help="The password to login to the EteSync server (only valid in legacy mode)")
     parser.add_argument("--encryption-password",
-                        help="The encryption password")
+                        help="The encryption password (only valid in legacy mode)")
     args = parser.parse_args(args=args)
 
     if args.command == 'add':
@@ -42,12 +46,21 @@ def manage(args):
         if exists:
             raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
 
-        login_password = (getattr(args, 'login_password') or
-                          getpass.getpass(prompt="Please enter the EteSync login password: "))
-        encryption_password = (getattr(args, 'encryption_password') or
-                               getpass.getpass(prompt="Please enter your encryption password: "))
+        if args.legacy:
+            login_password = (getattr(args, 'login_password') or
+                              getpass.getpass(prompt="Please enter the EteSync login password: "))
+            encryption_password = (getattr(args, 'encryption_password') or
+                                   getpass.getpass(prompt="Please enter your encryption password: "))
 
-        print_credentials(args.username, manager.add(args.username, login_password, encryption_password))
+            print_credentials(args.username, manager.add(args.username, login_password, encryption_password))
+        else:
+            if getattr(args, 'login_password') or getattr(args, 'encryption_password'):
+                raise RuntimeError("--encryption-password and --login-password are only valid in legacy mode!")
+
+            password = (getattr(args, 'password') or
+                        getpass.getpass(prompt="Please enter the EteSync account password: "))
+
+            print_credentials(args.username, manager.add_etebase(args.username, password))
 
     elif args.command == 'del':
         print("Deleting user")

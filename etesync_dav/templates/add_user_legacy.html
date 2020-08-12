@@ -72,6 +72,12 @@
     </div>
     {{ form.login_password }}
   </div>
+  <div class="form-group">
+    <div>
+      {{ form.encryption_password.label }}
+    </div>
+    {{ form.encryption_password }}
+  </div>
   {{ form.csrf_token }}
   {% if errors %}
     <div class="alert alert-danger">
@@ -79,9 +85,6 @@
     </div>
   {% endif %}
   <button id="send_button" class="btn btn-success">Add</button>
-  <div style="padding-top: 1em;">
-    Still using legacy EteSync? Go to the <a href="{{ url_for('add_user_legacy') }}">legacy EteSync login</a>.
-  </div>
 </form>
 <div id="loading_indicator" class="hidden">
   <div class="lds-ring"><div></div><div></div><div></div><div></div></div>

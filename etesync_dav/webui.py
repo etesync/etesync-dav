@@ -17,17 +17,21 @@ import os
 from functools import wraps
 from urllib.parse import urljoin
 
-from flask import Flask, render_template, redirect, url_for, request, session, Blueprint
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
 
+from etebase import Account, Client
 import etesync as api
 from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
-from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl, has_ssl
-from .radicale.etesync_cache import EteSyncCache, etesync_for_user
+from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl
+from .radicale.etesync_cache import etesync_for_user
+from etesync_dav.radicale.creds import Credentials
+from etesync_dav import config
+from etesync_dav.local_cache import Etebase
 
 manager = Manager()
 
@@ -104,14 +108,27 @@ def account_list():
 @app.route('/user/<string:user>')
 @login_required
 def user_index(user):
-    with etesync_for_user(user) as (etesync, _):
-        etesync.sync_journal_list()
-        journals = etesync.list()
+    type_name_mapper = {
+        "etebase.vevent": "Calendars",
+        "etebase.vtodo": "Tasks",
+        "etebase.vcard": "Address Books",
+    }
     collections = {}
-    for journal in journals:
-        collection = journal.collection
-        collections[collection.TYPE] = collections.get(collection.TYPE, [])
-        collections[collection.TYPE].append(collection)
+    with etesync_for_user(user) as (etesync, _):
+        if isinstance(etesync, Etebase):
+            etesync.sync_collection_list()
+            for col in etesync.list():
+                col_type = type_name_mapper.get(col.col_type, None)
+                if col_type is not None:
+                    collections[col_type] = collections.get(col_type, [])
+                    collections[col_type].append({"name": col.meta["name"], "uid": col.uid})
+        else:
+            etesync.sync_journal_list()
+            journals = etesync.list()
+            for journal in journals:
+                collection = journal.collection
+                collections[collection.TYPE] = collections.get(collection.TYPE, [])
+                collections[collection.TYPE].append({"name": collection.display_name, "uid": journal.uid})
 
     return render_template(
             'user_index.html', BASE_URL=urljoin(BASE_URL, "{}/".format(user)), collections=collections)
@@ -201,6 +218,25 @@ def add_user():
     form = AddUserForm(request.form)
     if form.validate_on_submit():
         try:
+            manager.add_etebase(form.username.data, form.login_password.data)
+            return redirect(url_for('account_list'))
+        except Exception as e:
+            errors = str(e)
+    else:
+        errors = form.errors
+
+    return render_template('add_user.html', form=form, errors=errors)
+
+
+@app.route('/add_legacy/', methods=['GET', 'POST'])
+def add_user_legacy():
+    if not logged_in() and len(list(manager.list())) > 0:
+        return redirect(url_for('login'))
+
+    errors = None
+    form = AddUserLegacyForm(request.form)
+    if form.validate_on_submit():
+        try:
             manager.add(form.username.data, form.login_password.data, form.encryption_password.data)
             return redirect(url_for('account_list'))
         except api.exceptions.IntegrityException:
@@ -210,7 +246,7 @@ def add_user():
     else:
         errors = form.errors
 
-    return render_template('add_user.html', form=form, errors=errors)
+    return render_template('add_user_legacy.html', form=form, errors=errors)
 
 
 @app.route('/remove_user/', methods=['GET', 'POST'])
@@ -232,6 +268,10 @@ class LoginForm(UsernameForm):
 
 
 class AddUserForm(LoginForm):
+    pass
+
+
+class AddUserLegacyForm(LoginForm):
     encryption_password = PasswordField('Encryption Password', validators=[DataRequired()])
 
 

@@ -26,6 +26,8 @@ from etesync_dav import config
 
 from .href_mapper import HrefMapper
 
+from ..local_cache import Etebase
+
 
 class EteSync(api.EteSync):
     def _init_db_tables(self, database, additional_tables=[]):
@@ -99,6 +101,7 @@ class NamedReverseSemaphore:
             cond.notify_all()
             cond.release()
 
+
 class EteSyncCache:
     def __init__(self, creds_path, db_path, remote_url=None):
         self._etesync_cache = {}
@@ -115,7 +118,9 @@ class EteSyncCache:
             # Used the cached etesync for the user unless the cipher_key or auth_token have changed.
             if user in self._etesync_cache:
                 etesync = self._etesync_cache[user]
-                if (etesync.auth_token, etesync.cipher_key) == self.creds.get(user):
+                if isinstance(etesync, Etebase):
+                    return etesync, False
+                elif (etesync.auth_token, etesync.cipher_key) == self.creds.get(user):
                     etesync.reinit()
                     return etesync, False
                 else:
@@ -123,19 +128,24 @@ class EteSyncCache:
         else:
             self.creds = Credentials(self.creds_path)
 
-        auth_token, cipher_key = self.creds.get(user)
+        stored_session = self.creds.get_etebase(user)
+        if stored_session is not None:
+            etesync = Etebase(user, stored_session, self.remote_url)
+        else:
+            auth_token, cipher_key = self.creds.get(user)
 
-        # Create a unique filename for user and cipher_key combos. So we don't use old caches that are no longer valid.
-        unique_name_sha = hashlib.sha256(cipher_key)
-        db_name_unique = '{}-{}'.format(quote(user, safe=''), unique_name_sha.hexdigest())
+            # Create a unique filename for user and cipher_key combos. So we don't use old caches that are no longer
+            # valid.
+            unique_name_sha = hashlib.sha256(cipher_key)
+            db_name_unique = '{}-{}'.format(quote(user, safe=''), unique_name_sha.hexdigest())
 
-        db_path = self.db_path.format(db_name_unique)
+            db_path = self.db_path.format(db_name_unique)
 
-        if auth_token is None:
-            raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
+            if auth_token is None:
+                raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
 
-        etesync = EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
-        etesync.cipher_key = cipher_key
+            etesync = EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
+            etesync.cipher_key = cipher_key
 
         self._etesync_cache[user] = etesync
 
@@ -157,5 +167,6 @@ def etesync_for_user(user):
     with _get_etesync_lock:
         ret = _etesync_cache.etesync_for_user(user)
 
+    # FIXME: no longer neeeded with Etebase as we have just one db. Just need to make sure we only init it once
     with NamedReverseSemaphore(user):
         yield ret

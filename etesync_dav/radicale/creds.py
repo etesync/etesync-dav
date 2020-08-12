@@ -52,6 +52,21 @@ class Credentials:
             }
         users[username] = user
 
+    def get_etebase(self, username):
+        users = self.content['users']
+        if username not in users:
+            return None
+
+        user = users[username]
+        return user.get('storedSession', None)
+
+    def set_etebase(self, username, stored_session):
+        users = self.content['users']
+        user = {
+                'storedSession': stored_session,
+            }
+        users[username] = user
+
     def delete(self, username):
         users = self.content['users']
         users.pop(username, None)

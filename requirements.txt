@@ -12,6 +12,7 @@ chardet==3.0.4            # via requests
 click==7.0                # via flask
 cryptography==3.0         # via etesync
 defusedxml==0.6.0         # via radicale
+etebase==0.1.0            # via etesync-dav (setup.py)
 etesync==0.12.1           # via etesync-dav (setup.py)
 flask-wtf==0.14.2         # via etesync-dav (setup.py)
 flask==1.1.1              # via etesync-dav (setup.py), flask-wtf
@@ -20,6 +21,7 @@ idna==2.8                 # via etesync, requests
 itsdangerous==1.1.0       # via flask
 jinja2==2.10.1            # via flask
 markupsafe==1.1.1         # via jinja2
+msgpack==1.0.0            # via etebase, etesync-dav (setup.py)
 orderedmultidict==1.0     # via etesync, furl
 packaging==19.0           # via etesync
 passlib==1.7.2            # via radicale
