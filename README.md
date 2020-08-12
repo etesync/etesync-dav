@@ -15,8 +15,6 @@ It's meant for letting desktop CalDAV and CardDAV clients such as Thunderbird, O
 
 If all you want is to access your data from a computer, you are probably better off using [the web app](https://client.etesync.com).
 
-**Note:** This software is still in beta. It should work well and is used daily by many users, but there may be some rough edges.
-
 # Installation
 
 The easiest way to start using etesync-dav is by getting one of the pre-built binaries from the [releases page](https://github.com/etesync/etesync-dav/releases).
@@ -195,6 +193,7 @@ EteSync account or self-hosted server.*
 and then run the server:
 `./etesync-dav`
 
+**Note:** if you are using this with the legacy etesync server you should also pass `--legacy`
 
 ## Self-hosting
 
