@@ -53,10 +53,13 @@ class SyncThread(threading.Thread):
         self.user = user
         self.last_sync = None
 
+    def force_sync(self):
+        self._force_sync.set()
+        self._done_syncing.clear()
+
     def request_sync(self):
         if self.last_sync and time.time() - self.last_sync >= SYNC_MINIMUM:
-            self._force_sync.set()
-            self._done_syncing.clear()
+            self.force_sync()
 
     @property
     def forced_sync(self):
@@ -604,6 +607,10 @@ class Storage(BaseStorage):
             self.etesync = etesync
 
             yield
+
+            # Always push changes if we made changes
+            if mode == "w":
+                etesync.sync_thread.force_sync()
 
             self.etesync = None
             self.user = None
