@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.20.2
+* Fix issue with changes not being pushed immediately after they are made.
+
 ## Version 0.20.1
 * Added travis CI for CI/CD
 * Improve SSL message on Windows
