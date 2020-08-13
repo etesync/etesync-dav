@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'appdirs>=1.4.3',
-        'etesync>=0.12.0',
+        'etesync>=0.12.1',
         'Radicale==3.0.3',
         'Flask>=1.1.1',
         'Flask-WTF>=0.14.2',
