@@ -159,7 +159,7 @@ class Manager:
             raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
 
         print("Logging in")
-        client = Etebase.Client.new("etesync-dav", self.remote_url)
+        client = Etebase.Client("etesync-dav", self.remote_url)
         etebase = Etebase.Account.login(client, username, password)
 
         print("Saving config")
@@ -174,9 +174,9 @@ class Manager:
             existing = {}
             col_mgr = etebase.get_collection_manager()
             collections = col_mgr.list(None)
-            for col in collections.get_data():
-                meta = col.get_meta()
-                existing[meta.get_collection_type()] = True
+            for col in collections.data:
+                meta = col.meta
+                existing[meta["type"]] = True
 
             wanted = [
                 ["etebase.vcard", "My Contacts"],
@@ -185,7 +185,7 @@ class Manager:
             ]
             for [col_type, name] in wanted:
                 if col_type not in existing:
-                    meta = Etebase.CollectionMetadata(col_type, name)
+                    meta = {"type": col_type, "name": name}
                     col = col_mgr.create(meta, b"")
                     col_mgr.upload(col)
         except Exception as e:

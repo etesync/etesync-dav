@@ -2,7 +2,7 @@ import os
 
 import msgpack
 
-from etebase import Account, Client, FetchOptions, ItemMetadata
+from etebase import Account, Client, FetchOptions
 from etesync_dav import config
 
 from . import db, models
@@ -38,7 +38,7 @@ def get_millis():
 class Etebase:
     def __init__(self, username, stored_session, remote_url=None):
         db_path = config.ETEBASE_DATABASE_FILE
-        client = Client.new("etesync-dav", remote_url)
+        client = Client("etesync-dav", remote_url)
         self.etebase = Account.restore(client, stored_session, None)
         self.username = username
 
@@ -95,22 +95,21 @@ class Etebase:
         done = False
 
         while not done:
-            fetch_options = FetchOptions()
-            fetch_options.stoken(stoken)
+            fetch_options = FetchOptions().stoken(stoken)
             col_list = col_mgr.list(fetch_options)
-            for col in col_list.get_data():
-                collection = models.CollectionEntity.get_or_none(local_user=self.user, uid=col.get_uid())
+            for col in col_list.data:
+                collection = models.CollectionEntity.get_or_none(local_user=self.user, uid=col.uid)
                 if collection is None:
                     collection = models.CollectionEntity(
                         local_user=self.user,
-                        uid=col.get_uid(),
+                        uid=col.uid,
                     )
-                collection.eb_col = bytes(col_mgr.cache_save_with_content(col))
-                collection.stoken = col.get_stoken()
-                collection.deleted = col.is_deleted()
+                collection.eb_col = col_mgr.cache_save(col)
+                collection.stoken = col.stoken
+                collection.deleted = col.deleted
                 collection.save()
 
-            for col_uid in col_list.get_removed_memberships():
+            for col_uid in col_list.removed_memberships:
                 try:
                     collection = models.CollectionEntity.get(local_user=self.user, uid=col_uid)
                     collection.deleted = True
@@ -119,8 +118,8 @@ class Etebase:
                     # Already removed
                     pass
 
-            done = col_list.is_done()
-            stoken = col_list.get_stoken()
+            done = col_list.done
+            stoken = col_list.stoken
 
             self.user.stoken = stoken
             self.user.save()
@@ -139,7 +138,6 @@ class Etebase:
 
         for collection in changed:
             col = col_mgr.cache_load(changed.eb_col)
-            col.set_meta_raw(changed.meta)
 
             if collection.deleted:
                 col.delete()
@@ -164,24 +162,23 @@ class Etebase:
         done = False
 
         while not done:
-            fetch_options = FetchOptions()
-            fetch_options.stoken(stoken)
+            fetch_options = FetchOptions().stoken(stoken)
             item_list = item_mgr.list(fetch_options)
 
-            for item in item_list.get_data():
-                meta = msgpack_decode(bytes(item.get_meta_raw()))
+            for item in item_list.data:
+                meta = item.meta
                 cache_item = models.ItemEntity.get_or_none(collection=cache_col, uid=meta["name"])
                 if cache_item is None:
                     cache_item = models.ItemEntity(
                         collection=cache_col,
                         uid=meta["name"],
                     )
-                cache_item.eb_item = bytes(item_mgr.cache_save_with_content(item))
-                cache_item.deleted = item.is_deleted()
+                cache_item.eb_item = item_mgr.cache_save(item)
+                cache_item.deleted = item.deleted
                 cache_item.save()
 
-            done = item_list.is_done()
-            stoken = item_list.get_stoken()
+            done = item_list.done
+            stoken = item_list.stoken
 
             cache_col.local_stoken = stoken
             cache_col.save()
@@ -207,7 +204,7 @@ class Etebase:
             chunk_items = list(map(lambda x: item_mgr.cache_load(x.eb_item), chunk))
             item_mgr.batch(chunk_items, None, None)
             for cache_item, item in zip(chunk, chunk_items):
-                cache_item.eb_item = bytes(item_mgr.cache_save(item))
+                cache_item.eb_item = item_mgr.cache_save(item)
                 cache_item.dirty = False
                 cache_item.new = False
                 cache_item.save()
@@ -235,11 +232,11 @@ class Collection:
 
     @property
     def uid(self):
-        return self.col.get_uid()
+        return self.col.uid
 
     @property
     def read_only(self):
-        return self.col.get_access_level() == "ro"
+        return self.col.access_level == "ro"
 
     @property
     def stoken(self):
@@ -252,27 +249,25 @@ class Collection:
     # FIXME: cache
     @property
     def meta(self):
-        return msgpack_decode(bytes(self.col.get_meta_raw()))
+        return self.col.meta
 
     def update_meta(self, update_info):
         if update_info is None:
             raise RuntimeError("update_info can't be None.")
         meta = self.meta
         meta.update(update_info)
-        self.col.set_meta_raw(msgpack_encode(meta))
-        self.cache_col.eb_col = bytes(self.col_mgr.cache_save(self.col))
+        self.col.meta = meta
+        self.cache_col.eb_col = self.col_mgr.cache_save(self.col)
         self.cache_col.save()
 
     # CRUD
     def create(self, vobject_item):
         item_mgr = self.col_mgr.get_item_manager(self.col)
-        item_meta = ItemMetadata()
-        item_meta.set_name(vobject_item.uid)
-        item_meta.set_mtime(get_millis())
+        item_meta = {"name": vobject_item.uid, "mtime": get_millis()}
         item = item_mgr.create(item_meta, vobject_item.serialize().encode())
         cache_item = models.ItemEntity(collection=self.cache_col, uid=vobject_item.uid)
-        cache_item.eb_item = bytes(item_mgr.cache_save_with_content(item))
-        cache_item.deleted = item.is_deleted()
+        cache_item.eb_item = item_mgr.cache_save(item)
+        cache_item.deleted = item.deleted
         cache_item.new = True
         return Item(item_mgr, cache_item)
 
@@ -300,24 +295,24 @@ class Item:
     # FIXME: cache
     @property
     def meta(self):
-        return msgpack_decode(bytes(self.item.get_meta_raw()))
+        return self.item.meta
 
     @meta.setter
     def meta(self, meta):
-        self.item.set_meta_raw(msgpack_encode(meta))
+        self.item.meta = meta
 
     # FIXME: cache
     @property
     def content(self):
-        return bytes(self.item.get_content()).decode()
+        return self.item.content.decode()
 
     @property
     def etag(self):
-        return self.item.get_etag()
+        return self.item.etag
 
     @content.setter
     def content(self, content):
-        self.item.set_content(content.encode())
+        self.item.content = content.encode()
 
     def delete(self):
         self.item.delete()
@@ -328,6 +323,6 @@ class Item:
         item_meta = self.meta
         item_meta["mtime"] = get_millis()
         self.meta = item_meta
-        self.cache_item.eb_item = bytes(self.item_mgr.cache_save(self.item))
+        self.cache_item.eb_item = self.item_mgr.cache_save(self.item)
         self.cache_item.dirty = True
         self.cache_item.save()
