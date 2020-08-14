@@ -19,6 +19,7 @@ setup(
         'scripts/etesync-dav',
     ],
     include_package_data=True,
+    python_requires='>=3',
     install_requires=[
         'appdirs>=1.4.3',
         'etesync>=0.12.1',
