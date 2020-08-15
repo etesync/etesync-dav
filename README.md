@@ -54,7 +54,7 @@ when you click on your username.
 ## Specific client notes and instructions
 
 ### Thunderbird
-1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
+1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/). (If you don't want to install any extra plugins, you can use Thunderbird's built-in DAV support, but you'll have to subscribe to each of the items in your collection separately.  Log in at http://localhost:37358, and then click on your username to see a list of the items in the collection and their individual links.)
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
