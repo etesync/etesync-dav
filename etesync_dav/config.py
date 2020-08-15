@@ -18,10 +18,7 @@ import os
 LISTEN_ADDRESS = os.environ.get('ETESYNC_LISTEN_ADDRESS', 'localhost')
 LISTEN_PORT = os.environ.get('ETESYNC_LISTEN_PORT', '37358')
 
-if LISTEN_ADDRESS == 'localhost':  # If we bind localhost, bind both ipv4 and 6
-    DEFAULT_HOSTS = '127.0.0.1:{0},[::1]:{0}'.format(LISTEN_PORT)
-else:
-    DEFAULT_HOSTS = '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT)
+DEFAULT_HOSTS = '{}:{}'.format(LISTEN_ADDRESS, LISTEN_PORT)
 
 SERVER_HOSTS = os.environ.get('ETESYNC_SERVER_HOSTS', DEFAULT_HOSTS)
 LEGACY_CONFIG_DIR = os.environ.get('ETESYNC_CONFIG_DIR', user_config_dir("etesync-dav", "etesync"))
