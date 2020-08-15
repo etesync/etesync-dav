@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.20.3
+* Don't automatically bind to both ipv4 and ipv6 - fix detecting if ipv6 is available.
+
 ## Version 0.20.2
 * Fix issue with changes not being pushed immediately after they are made.
 
