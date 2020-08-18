@@ -12,7 +12,7 @@ chardet==3.0.4            # via requests
 click==7.0                # via flask
 cryptography==3.0         # via etesync
 defusedxml==0.6.0         # via radicale
-etebase==0.1.0            # via etesync-dav (setup.py)
+etebase==0.2.0            # via etesync-dav (setup.py)
 etesync==0.12.1           # via etesync-dav (setup.py)
 flask-wtf==0.14.2         # via etesync-dav (setup.py)
 flask==1.1.1              # via etesync-dav (setup.py), flask-wtf
