@@ -53,13 +53,14 @@ when you click on your username.
 
 ## Specific client notes and instructions
 
-### Thunderbird (using TbSync)
+###Thunderbird
+#### Thunderbird (using TbSync)
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/). 
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
-### Thunderbird (using Lightning)
+#### Thunderbird (using Lightning)
 Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general.  However, you *can* also do the following:
 
 1. Install a CardDAV add-on such as Cardbook if you want to sync your contacts
