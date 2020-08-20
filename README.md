@@ -53,15 +53,16 @@ when you click on your username.
 
 ## Specific client notes and instructions
 
-###Thunderbird
-#### Thunderbird (using TbSync)
-1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/). 
+### Thunderbird
+
+#### Thunderbird (using TbSync) - recommended
+1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
-#### Thunderbird (using Lightning)
-Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general.  However, you *can* also do the following:
+#### Thunderbird (no additional add-ons)
+Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general. However, you *can* also do the following:
 
 1. Install a CardDAV add-on such as Cardbook if you want to sync your contacts
 2. Open http://localhost:37358 in a browser, log in with your username and account password (not encryption password), and click on the link to your DAV colection to see a list of all the calendars, tasks lists, and address books in that collection
