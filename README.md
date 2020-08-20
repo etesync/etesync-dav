@@ -54,15 +54,24 @@ when you click on your username.
 ## Specific client notes and instructions
 
 ### Thunderbird
+
+#### Thunderbird (using TbSync) - recommended
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
+#### Thunderbird (no additional add-ons)
+Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general. However, you *can* also do the following:
+
+1. Install a CardDAV add-on such as Cardbook if you want to sync your contacts
+2. Open http://localhost:37358 in a browser, log in with your username and account password (not encryption password), and click on the link to your DAV colection to see a list of all the calendars, tasks lists, and address books in that collection
+3. For each item in the collection that you want to sync, copy the \[link] address and subscribe to that address in Thunderbird using `File > New Calendar > On the Network > CalDav` for calendars and tasks, or `New Address Book > Remote > CardDav` in Cardbook for address books
+
 ### Evolution / GNOME Calendar / GNOME Contacts
 GNOME Calendar and Contacts do not support adding WebDAV calendars and address books directly, but you can add them in Evolution and they will appear correctly in all the apps.
 
-1. Open Evolution and click File -> NEw -> Collection account
+1. Open Evolution and click File -> New -> Collection account
 2. Put your username (user@example.com) in the user field.
 3. Click Advanced Options and use `http://localhost:37358/` as the server.
 4. Make sure "Look up for a CalDAV/CardDAV server" is ticked, and untick all the rest.
