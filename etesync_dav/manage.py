@@ -87,6 +87,12 @@ class Manager:
             raise RuntimeError("Username can't include a colon.")
         return self.htpasswd.get(username) is not None
 
+    def refresh_token(self, username, login_password):
+        _, cipher_key = self.creds.get(username)
+        auth_token = api.Authenticator(self.remote_url).get_auth_token(username, login_password)
+        self.creds.set(username, auth_token, cipher_key)
+        self.creds.save()
+
     def add(self, username, login_password, encryption_password):
         exists = self.validate_username(username)
         if exists:
