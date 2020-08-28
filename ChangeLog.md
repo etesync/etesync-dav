@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.20.4
+* Refresh the auth token on every web ui login
+
 ## Version 0.20.3
 * Don't automatically bind to both ipv4 and ipv6 - fix detecting if ipv6 is available.
 
