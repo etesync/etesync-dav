@@ -377,6 +377,9 @@ class Collection(BaseCollection):
                             del item.contents['photo']
 
                     item.contents['version'][0].value = '3.0'
+            # XXX Hack: add missing FN
+            if item.name == 'VCARD' and not hasattr(item, 'fn'):
+                item.add('fn').value = str(item.n)
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" %
                                (href, self.path)) from e
