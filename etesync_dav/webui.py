@@ -21,17 +21,15 @@ from flask import Flask, render_template, redirect, url_for, request, session
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired
+from flask_wtf.html5 import URLField
+from wtforms.validators import Optional, DataRequired, url
 
-from etebase import Account, Client
 import etesync as api
-from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
 from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl
 from .radicale.etesync_cache import etesync_for_user
-from etesync_dav.radicale.creds import Credentials
-from etesync_dav import config
 from etesync_dav.local_cache import Etebase
+from etesync_dav.config import LEGACY_ETESYNC_URL, ETESYNC_URL
 
 manager = Manager()
 
@@ -218,7 +216,9 @@ def add_user():
     form = AddUserForm(request.form)
     if form.validate_on_submit():
         try:
-            manager.add_etebase(form.username.data, form.login_password.data)
+            server_url = form.server_url.data
+            server_url = ETESYNC_URL if server_url == "" else server_url
+            manager.add_etebase(form.username.data, form.login_password.data, server_url)
             return redirect(url_for('account_list'))
         except Exception as e:
             errors = str(e)
@@ -237,7 +237,9 @@ def add_user_legacy():
     form = AddUserLegacyForm(request.form)
     if form.validate_on_submit():
         try:
-            manager.add(form.username.data, form.login_password.data, form.encryption_password.data)
+            server_url = form.server_url.data
+            server_url = LEGACY_ETESYNC_URL if server_url == "" else server_url
+            manager.add(form.username.data, form.login_password.data, form.encryption_password.data, server_url)
             return redirect(url_for('account_list'))
         except api.exceptions.IntegrityException:
             errors = 'Wrong encryption password (failed to decrypt data)'
@@ -264,6 +266,7 @@ class UsernameForm(FlaskForm):
 
 
 class LoginForm(UsernameForm):
+    server_url = URLField('Server URL (Leave Empty for Default)', validators=[Optional(), url(require_tld=False)])
     login_password = PasswordField('Account Password', validators=[DataRequired()])
 
 

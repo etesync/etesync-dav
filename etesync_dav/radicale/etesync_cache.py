@@ -103,12 +103,11 @@ class NamedReverseSemaphore:
 
 
 class EteSyncCache:
-    def __init__(self, creds_path, db_path, remote_url=None):
+    def __init__(self, creds_path, db_path):
         self._etesync_cache = {}
         self.creds = None
         self.creds_path = os.path.expanduser(creds_path)
         self.db_path = os.path.expanduser(db_path)
-        self.remote_url = os.environ.get('ETESYNC_URL', remote_url)
 
     def etesync_for_user(self, user):
         if self.creds:
@@ -128,9 +127,10 @@ class EteSyncCache:
         else:
             self.creds = Credentials(self.creds_path)
 
+        remote_url = self.creds.get_server_url(user)
         stored_session = self.creds.get_etebase(user)
         if stored_session is not None:
-            etesync = Etebase(user, stored_session, self.remote_url)
+            etesync = Etebase(user, stored_session, remote_url)
         else:
             auth_token, cipher_key = self.creds.get(user)
 
@@ -144,7 +144,7 @@ class EteSyncCache:
             if auth_token is None:
                 raise Exception('Very bad! User "{}" not found in credentials file.'.format(user))
 
-            etesync = EteSync(user, auth_token, remote=self.remote_url, db_path=db_path)
+            etesync = EteSync(user, auth_token, remote=remote_url, db_path=db_path)
             etesync.cipher_key = cipher_key
 
         self._etesync_cache[user] = etesync
@@ -155,7 +155,6 @@ class EteSyncCache:
 _etesync_cache = EteSyncCache(
     creds_path=config.CREDS_FILE,
     db_path=config.DATABASE_FILE,
-    remote_url=config.ETESYNC_URL,
 )
 
 

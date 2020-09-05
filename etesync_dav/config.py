@@ -24,7 +24,8 @@ SERVER_HOSTS = os.environ.get('ETESYNC_SERVER_HOSTS', DEFAULT_HOSTS)
 LEGACY_CONFIG_DIR = os.environ.get('ETESYNC_CONFIG_DIR', user_config_dir("etesync-dav", "etesync"))
 DATA_DIR = os.environ.get('ETESYNC_DATA_DIR', user_data_dir("etesync-dav", "etesync"))
 
-ETESYNC_URL = os.environ.get('ETESYNC_URL', 'https://api.etesync.com/')
+ETESYNC_URL = os.environ.get('ETESYNC_URL', 'https://api.etebase.com/')
+LEGACY_ETESYNC_URL = os.environ.get('ETESYNC_URL', 'https://api.etesync.com/')
 DATABASE_FILE = os.environ.get('ETESYNC_DATABASE_FILE', os.path.join(DATA_DIR, 'etesync_data.db'))
 ETEBASE_DATABASE_FILE = os.environ.get('ETEBASE_DATABASE_FILE', os.path.join(DATA_DIR, 'etebase_data.db'))
 

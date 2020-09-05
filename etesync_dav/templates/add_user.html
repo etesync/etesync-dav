@@ -72,6 +72,12 @@
     </div>
     {{ form.login_password }}
   </div>
+  <div class="form-group">
+    <div>
+      {{ form.server_url.label }}
+    </div>
+    {{ form.server_url }}
+  </div>
   {{ form.csrf_token }}
   {% if errors %}
     <div class="alert alert-danger">
