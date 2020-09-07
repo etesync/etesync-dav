@@ -61,6 +61,8 @@ when you click on your username.
 3. Add new DAV account (choose manual configuration).
 4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
+**Note:** if you enabled SSL in etesync-dav, you should follow the [TbSync instructions for self-signed certificates](https://github.com/jobisoft/TbSync/wiki/How-to-use-TbSync-with-self-signed-or-otherwise-untrusted-certificates%3F).
+
 #### Thunderbird (no additional add-ons)
 Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general. However, you *can* also do the following:
 
