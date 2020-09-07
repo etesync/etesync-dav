@@ -194,7 +194,7 @@ class Collection(BaseCollection):
                 href_mapper = item.cache_item.href.get()
             except HrefMapper.DoesNotExist:
                 # Generate a new mapper
-                href = item.item.get_uid() + self.content_suffix
+                href = item.item.uid + self.content_suffix
                 href_mapper = HrefMapper(content=item.cache_item, href=href)
                 href_mapper.save(force_insert=True)
 

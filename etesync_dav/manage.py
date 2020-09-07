@@ -91,7 +91,7 @@ class Manager:
         server_url = self.creds.get_server_url(username)
         stored_session = self.creds.get_etebase(username)
         if stored_session is not None:
-            etebase = local_cache.Etebase(username, stored_session, server_url)
+            etebase = local_cache.Etebase(username, stored_session, server_url).etebase
             etebase.fetch_token()
             self.creds.set_etebase(username, etebase.save(None), server_url)
         else:

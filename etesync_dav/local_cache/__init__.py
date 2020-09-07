@@ -167,6 +167,10 @@ class Etebase:
 
             for item in item_list.data:
                 meta = item.meta
+                # Skip malformed entries
+                if "name" not in meta:
+                    continue
+
                 cache_item = models.ItemEntity.get_or_none(collection=cache_col, uid=meta["name"])
                 if cache_item is None:
                     cache_item = models.ItemEntity(
