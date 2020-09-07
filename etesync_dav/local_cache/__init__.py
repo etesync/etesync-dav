@@ -2,7 +2,7 @@ import os
 
 import msgpack
 
-from etebase import Account, Client, FetchOptions
+from etebase import Account, Client, FetchOptions, CollectionAccessLevel
 from etesync_dav import config
 
 from . import db, models
@@ -236,7 +236,7 @@ class Collection:
 
     @property
     def read_only(self):
-        return self.col.access_level == "ro"
+        return self.col.access_level == CollectionAccessLevel.ReadOnly
 
     @property
     def stoken(self):
