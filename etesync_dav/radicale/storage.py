@@ -52,6 +52,7 @@ class SyncThread(threading.Thread):
         self._done_syncing.set()  # We are done before we start.
         self.user = user
         self.last_sync = None
+        self._exception = None
 
     def force_sync(self):
         self._force_sync.set()
@@ -66,7 +67,12 @@ class SyncThread(threading.Thread):
         return self._force_sync.is_set()
 
     def wait_for_sync(self, timeout=None):
-        return self._done_syncing.wait(timeout)
+        ret = self._done_syncing.wait(timeout)
+        e = self._exception
+        self._exception = None
+        if e is not None:
+            raise e
+        return ret
 
     def run(self):
         while True:
@@ -79,6 +85,7 @@ class SyncThread(threading.Thread):
             except Exception as e:
                 # Print errors but keep on syncing in the background
                 logger.exception(e)
+                self._exception = e
             finally:
                 self._force_sync.clear()
                 self._done_syncing.set()
