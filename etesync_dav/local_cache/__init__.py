@@ -52,9 +52,10 @@ class Etebase:
 
         db.database_proxy.initialize(database)
 
-        self._init_db_tables(database)
+        with db.database_proxy:
+            self._init_db_tables(database)
 
-        self.user, created = models.User.get_or_create(username=self.username)
+            self.user, created = models.User.get_or_create(username=self.username)
 
     def _init_db(self, db_path):
         from playhouse.sqlite_ext import SqliteExtDatabase
@@ -67,7 +68,6 @@ class Etebase:
             'journal_mode': 'wal',
             'foreign_keys': 1,
             })
-        database.connect()
 
         self._set_db(database)
 
@@ -94,38 +94,40 @@ class Etebase:
         stoken = self.user.stoken
         done = False
 
-        while not done:
-            fetch_options = FetchOptions().stoken(stoken)
-            col_list = col_mgr.list(fetch_options)
-            for col in col_list.data:
-                collection = models.CollectionEntity.get_or_none(local_user=self.user, uid=col.uid)
-                if collection is None:
-                    collection = models.CollectionEntity(
-                        local_user=self.user,
-                        uid=col.uid,
-                    )
-                collection.eb_col = col_mgr.cache_save(col)
-                collection.stoken = col.stoken
-                collection.deleted = col.deleted
-                collection.save()
-
-            for col_uid in col_list.removed_memberships:
-                try:
-                    collection = models.CollectionEntity.get(local_user=self.user, uid=col_uid)
-                    collection.deleted = True
+        with db.database_proxy:
+            while not done:
+                fetch_options = FetchOptions().stoken(stoken)
+                col_list = col_mgr.list(fetch_options)
+                for col in col_list.data:
+                    collection = models.CollectionEntity.get_or_none(local_user=self.user, uid=col.uid)
+                    if collection is None:
+                        collection = models.CollectionEntity(
+                            local_user=self.user,
+                            uid=col.uid,
+                        )
+                    collection.eb_col = col_mgr.cache_save(col)
+                    collection.stoken = col.stoken
+                    collection.deleted = col.deleted
                     collection.save()
-                except models.CollectionEntity.DoesNotExist:
-                    # Already removed
-                    pass
 
-            done = col_list.done
-            stoken = col_list.stoken
+                for col_uid in col_list.removed_memberships:
+                    try:
+                        collection = models.CollectionEntity.get(local_user=self.user, uid=col_uid)
+                        collection.deleted = True
+                        collection.save()
+                    except models.CollectionEntity.DoesNotExist:
+                        # Already removed
+                        pass
 
-            self.user.stoken = stoken
-            self.user.save()
+                done = col_list.done
+                stoken = col_list.stoken
+
+                self.user.stoken = stoken
+                self.user.save()
 
     def _collection_list_dirty_get(self):
-        return self.user.collections.where(models.CollectionEntity.dirty | models.CollectionEntity.new)
+        with db.database_proxy:
+            return self.user.collections.where(models.CollectionEntity.dirty | models.CollectionEntity.new)
 
     def collection_list_is_dirty(self):
         changed = list(self._collection_list_dirty_get())
@@ -134,98 +136,105 @@ class Etebase:
     def push_collection_list(self):
         col_mgr = self.etebase.get_collection_manager()
 
-        changed = self._collection_list_dirty_get()
+        with db.database_proxy:
+            changed = self._collection_list_dirty_get()
 
-        for collection in changed:
-            col = col_mgr.cache_load(changed.eb_col)
+            for collection in changed:
+                col = col_mgr.cache_load(changed.eb_col)
 
-            if collection.deleted:
-                col.delete()
-            col_mgr.upload(col, None)
+                if collection.deleted:
+                    col.delete()
+                col_mgr.upload(col, None)
 
-            collection.dirty = False
-            collection.save()
+                collection.dirty = False
+                collection.save()
 
     def sync_collection(self, uid):
         self.push_collection(uid)
         self.pull_collection(uid)
 
     def pull_collection(self, uid):
-        col_mgr = self.etebase.get_collection_manager()
-        cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
-        if cache_col.stoken == cache_col.local_stoken:
-            return
+        with db.database_proxy:
+            col_mgr = self.etebase.get_collection_manager()
+            cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
+            if cache_col.stoken == cache_col.local_stoken:
+                return
 
-        col = col_mgr.cache_load(cache_col.eb_col)
-        item_mgr = col_mgr.get_item_manager(col)
-        stoken = cache_col.local_stoken
-        done = False
+            col = col_mgr.cache_load(cache_col.eb_col)
+            item_mgr = col_mgr.get_item_manager(col)
+            stoken = cache_col.local_stoken
+            done = False
 
-        while not done:
-            fetch_options = FetchOptions().stoken(stoken)
-            item_list = item_mgr.list(fetch_options)
+            while not done:
+                fetch_options = FetchOptions().stoken(stoken)
+                item_list = item_mgr.list(fetch_options)
 
-            for item in item_list.data:
-                meta = item.meta
-                # Skip malformed entries
-                if "name" not in meta:
-                    continue
+                for item in item_list.data:
+                    meta = item.meta
+                    # Skip malformed entries
+                    if "name" not in meta:
+                        continue
 
-                cache_item = models.ItemEntity.get_or_none(collection=cache_col, uid=meta["name"])
-                if cache_item is None:
-                    cache_item = models.ItemEntity(
-                        collection=cache_col,
-                        uid=meta["name"],
-                    )
-                cache_item.eb_item = item_mgr.cache_save(item)
-                cache_item.deleted = item.deleted
-                cache_item.save()
+                    cache_item = models.ItemEntity.get_or_none(collection=cache_col, uid=meta["name"])
+                    if cache_item is None:
+                        cache_item = models.ItemEntity(
+                            collection=cache_col,
+                            uid=meta["name"],
+                        )
+                    cache_item.eb_item = item_mgr.cache_save(item)
+                    cache_item.deleted = item.deleted
+                    cache_item.save()
 
-            done = item_list.done
-            stoken = item_list.stoken
+                done = item_list.done
+                stoken = item_list.stoken
 
-            cache_col.local_stoken = stoken
-            cache_col.save()
+                cache_col.local_stoken = stoken
+                cache_col.save()
 
     def _collection_dirty_get(self, collection):
-        return collection.items.where(models.ItemEntity.dirty | models.ItemEntity.new)
+        with db.database_proxy:
+            return collection.items.where(models.ItemEntity.dirty | models.ItemEntity.new)
 
     def collection_is_dirty(self, uid):
-        cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
-        changed = list(self._collection_dirty_get(cache_col))
-        return len(changed) > 0
+        with db.database_proxy:
+            cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
+            changed = list(self._collection_dirty_get(cache_col))
+            return len(changed) > 0
 
     def push_collection(self, uid):
-        CHUNK_PUSH = 30
-        col_mgr = self.etebase.get_collection_manager()
-        cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
-        col = col_mgr.cache_load(cache_col.eb_col)
-        item_mgr = col_mgr.get_item_manager(col)
+        with db.database_proxy:
+            CHUNK_PUSH = 30
+            col_mgr = self.etebase.get_collection_manager()
+            cache_col = models.CollectionEntity.get(local_user=self.user, uid=uid)
+            col = col_mgr.cache_load(cache_col.eb_col)
+            item_mgr = col_mgr.get_item_manager(col)
 
-        changed = self._collection_dirty_get(cache_col)
+            changed = self._collection_dirty_get(cache_col)
 
-        for chunk in batch(changed, CHUNK_PUSH):
-            chunk_items = list(map(lambda x: item_mgr.cache_load(x.eb_item), chunk))
-            item_mgr.batch(chunk_items, None, None)
-            for cache_item, item in zip(chunk, chunk_items):
-                cache_item.eb_item = item_mgr.cache_save(item)
-                cache_item.dirty = False
-                cache_item.new = False
-                cache_item.save()
+            for chunk in batch(changed, CHUNK_PUSH):
+                chunk_items = list(map(lambda x: item_mgr.cache_load(x.eb_item), chunk))
+                item_mgr.batch(chunk_items, None, None)
+                for cache_item, item in zip(chunk, chunk_items):
+                    cache_item.eb_item = item_mgr.cache_save(item)
+                    cache_item.dirty = False
+                    cache_item.new = False
+                    cache_item.save()
 
     # CRUD operations
     def list(self):
-        col_mgr = self.etebase.get_collection_manager()
-        for cache_obj in self.user.collections.where(~models.CollectionEntity.deleted):
-            yield Collection(col_mgr, cache_obj)
+        with db.database_proxy:
+            col_mgr = self.etebase.get_collection_manager()
+            for cache_obj in self.user.collections.where(~models.CollectionEntity.deleted):
+                yield Collection(col_mgr, cache_obj)
 
     def get(self, uid):
-        col_mgr = self.etebase.get_collection_manager()
-        try:
-            return Collection(col_mgr, self.user.collections.where(
-                (models.CollectionEntity.uid == uid) & ~models.CollectionEntity.deleted).get())
-        except models.CollectionEntity.DoesNotExist as e:
-            raise DoesNotExist(e)
+        with db.database_proxy:
+            col_mgr = self.etebase.get_collection_manager()
+            try:
+                return Collection(col_mgr, self.user.collections.where(
+                    (models.CollectionEntity.uid == uid) & ~models.CollectionEntity.deleted).get())
+            except models.CollectionEntity.DoesNotExist as e:
+                raise DoesNotExist(e)
 
 
 class Collection:
@@ -266,24 +275,27 @@ class Collection:
 
     # CRUD
     def create(self, vobject_item):
-        item_mgr = self.col_mgr.get_item_manager(self.col)
-        item_meta = {"name": vobject_item.uid, "mtime": get_millis()}
-        item = item_mgr.create(item_meta, vobject_item.serialize().encode())
-        cache_item = models.ItemEntity(collection=self.cache_col, uid=vobject_item.uid)
-        cache_item.eb_item = item_mgr.cache_save(item)
-        cache_item.deleted = item.deleted
-        cache_item.new = True
-        return Item(item_mgr, cache_item)
+        with db.database_proxy:
+            item_mgr = self.col_mgr.get_item_manager(self.col)
+            item_meta = {"name": vobject_item.uid, "mtime": get_millis()}
+            item = item_mgr.create(item_meta, vobject_item.serialize().encode())
+            cache_item = models.ItemEntity(collection=self.cache_col, uid=vobject_item.uid)
+            cache_item.eb_item = item_mgr.cache_save(item)
+            cache_item.deleted = item.deleted
+            cache_item.new = True
+            return Item(item_mgr, cache_item)
 
     def get(self, uid):
-        item_mgr = self.col_mgr.get_item_manager(self.col)
-        return Item(item_mgr,
-                    self.cache_col.items.where((models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted).get())
+        with db.database_proxy:
+            item_mgr = self.col_mgr.get_item_manager(self.col)
+            return Item(item_mgr,
+                        self.cache_col.items.where((models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted).get())
 
     def list(self):
-        item_mgr = self.col_mgr.get_item_manager(self.col)
-        for cache_item in self.cache_col.items.where(~models.ItemEntity.deleted):
-            yield Item(item_mgr, cache_item)
+        with db.database_proxy:
+            item_mgr = self.col_mgr.get_item_manager(self.col)
+            for cache_item in self.cache_col.items.where(~models.ItemEntity.deleted):
+                yield Item(item_mgr, cache_item)
 
 
 class Item:
@@ -327,6 +339,7 @@ class Item:
         item_meta = self.meta
         item_meta["mtime"] = get_millis()
         self.meta = item_meta
-        self.cache_item.eb_item = self.item_mgr.cache_save(self.item)
-        self.cache_item.dirty = True
-        self.cache_item.save()
+        with db.database_proxy:
+            self.cache_item.eb_item = self.item_mgr.cache_save(self.item)
+            self.cache_item.dirty = True
+            self.cache_item.save()
