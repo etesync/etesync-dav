@@ -138,13 +138,6 @@ To update to the latest version of the docker image, run:
 
     docker pull etesync/etesync-dav
 
-### Note for self-hosting:
-
-If you're self-hosting the EteSync server, you will need to add the following before the `-v` in the above commands:
-
-    --env "ETESYNC_URL=https://your-etesync-url.com"
-    
-        
 ## Arch Linux
 
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
@@ -197,10 +190,10 @@ and then run the server:
 
 ## Self-hosting
 
-If you are self-hosting the EteSync server, you will need to set the
-`ETESYNC_URL` environment variable to the URL of your server every time
-you run etesync-dav.
-By default it uses the official EteSync server at `https://api.etesync.com`.
+If you are self-hosting the EteSync server, just enter your server URL when adding your account.
+Alternatively, you can set the default URL to be used by setting the `ETESYNC_URL` environment
+variable to the URL of your server when running etesync-dav.
+By default it uses the official EteSync server at `etesync.com`.
 
 ## Using a proxy
 
