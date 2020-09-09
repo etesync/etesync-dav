@@ -21,7 +21,7 @@ from flask import Flask, render_template, redirect, url_for, request, session
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
-from flask_wtf.html5 import URLField
+from wtforms.fields.html5 import URLField
 from wtforms.validators import Optional, DataRequired, url
 
 import etesync as api
