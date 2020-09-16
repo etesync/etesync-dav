@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'appdirs>=1.4.3',
         'etesync>=0.12.1',
-        'etebase>=0.20.0',
+        'etebase>=0.20.2',
         'msgpack>=1.0.0',
         'Radicale>=3.0.3,<=3.1.0',
         'Flask>=1.1.1',
