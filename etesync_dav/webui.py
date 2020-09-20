@@ -99,13 +99,17 @@ def login_required(func):
 @login_required
 def account_list():
     remove_user_form = UsernameForm(request.form)
-    users = map(lambda x: (x, manager.get(x)), manager.list())
-    return render_template('index.html', users=users, remove_user_form=remove_user_form, osx_ssl_warning=needs_ssl())
+    username = session['username']
+    password = manager.get(username)
+    return render_template('index.html', username=username, password=password, remove_user_form=remove_user_form,
+                           osx_ssl_warning=needs_ssl())
 
 
 @app.route('/user/<string:user>')
 @login_required
 def user_index(user):
+    if session['username'] != user:
+        return redirect(url_for('user_index', user=session['username']))
     type_name_mapper = {
         "etebase.vevent": "Calendars",
         "etebase.vtodo": "Tasks",
@@ -209,9 +213,6 @@ def certgen():
 
 @app.route('/add/', methods=['GET', 'POST'])
 def add_user():
-    if not logged_in() and len(list(manager.list())) > 0:
-        return redirect(url_for('login'))
-
     errors = None
     form = AddUserForm(request.form)
     if form.validate_on_submit():
@@ -230,9 +231,6 @@ def add_user():
 
 @app.route('/add_legacy/', methods=['GET', 'POST'])
 def add_user_legacy():
-    if not logged_in() and len(list(manager.list())) > 0:
-        return redirect(url_for('login'))
-
     errors = None
     form = AddUserLegacyForm(request.form)
     if form.validate_on_submit():

@@ -27,22 +27,16 @@
 </div>
 {% endif %}
 
-<ul>
-  <li class="d-flex" style="margin-bottom: 2.5rem;">
-    <a class="btn btn-success btn-lg" href="{{ url_for('add_user') }}">Add user</a>
-  </li>
-  {% for username, password in users %}
-  <li class="d-flex" style="margin-bottom: 1.5rem;">
-    <a style="min-width: 400px" href="{{ url_for('user_index', user=username) }}">{{ username }}</a>
-    <div class="d-inline">
+<div>
+  <h2>Welcome {{ username }}!</h2>
+  <p>
+  To see the available collections please view the <a style="min-width: 400px" href="{{ url_for('user_index', user=username) }}">collection list</a>.
+  </p>
+  <div>
+    To start using the DAV bridge please copy your DAV-specific password:
+    <div style="margin-top: 1em">
       <button class="btn btn-sm btn-success" onclick="copyPassword('{{ password }}')">Copy Password</button>
-      <form class="d-inline" method="post" action="{{ url_for('remove_user') }}">
-        <input name="username" type="hidden" value="{{ username }}"/>
-        {{ remove_user_form.csrf_token }}
-        <button class="btn btn-sm btn-danger">Remove</button>
-      </form>
     </div>
-  </li>
-  {% endfor %}
-</ul>
+  </div>
+</div>
 {% endblock content %}
