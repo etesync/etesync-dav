@@ -216,19 +216,13 @@ export CURL_CA_BUNDLE='';
 export REQUESTS_CA_BUNDLE='';
 ```
 
-## Config files
+## Data files
 
-`etesync-dav` stores data in the directory specified by the `ETESYNC_CONFIG_DIR`
+`etesync-dav` stores data in the directory specified by the `ETESYNC_DATA_DIR`
 environment variable. This includes a database and the credentials cache.
-This directory is not relocatable, so if you change
-`ETESYNC_CONFIG_DIR` you will need to regenerate these files (which means
-reconfiguring clients). It may be possible to manually edit these files to
-the new path. Note that the database will just mirror the content of your
-main EteSync database so in most cases you should not lose anything if you
-delete it.
 
-`ETESYNC_CONFIG_DIR` defaults to a subdirectory of the appropriate config directory
-for your platform (`~/.config/etesync-dav` on Unix/Linux, see
+`ETESYNC_DATA_DIR` defaults to a subdirectory of the appropriate config directory
+for your platform (`~/.local/share/etesync-dav` on Unix/Linux, see
 [appdirs](http://pypi.python.org/pypi/appdirs) module docs for where it
 will be on other platforms).
 
