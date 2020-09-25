@@ -96,7 +96,8 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
     print("Radicale version: ", radicale.VERSION)
     sys.exit(0)
 
-if logfilename := os.getenv('ETESYNC_LOGFILE', None):
+logfilename = os.getenv('ETESYNC_LOGFILE', None)
+if logfilename:
     logfile = open(logfilename, 'a', encoding='utf-8')
     sys.stdout = logfile
     sys.stderr = logfile
