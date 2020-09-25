@@ -216,6 +216,23 @@ export CURL_CA_BUNDLE='';
 export REQUESTS_CA_BUNDLE='';
 ```
 
+## Debugging
+
+In order to put `etesync-dav` in debug mode so it print extra debug information please pass it the `-D` flag like so:
+
+```bash
+./etesync-dav -D
+```
+
+While this works on Linux, BSD and macOS, the Windows pre-compiled binary is compiled in "no console" mode, which means
+it can't print to the terminal. In order to get the debug information on Windows, please redirect the output log to
+file, like so:
+
+```bash
+set ETESYNC_LOGFILE=output.log
+etesync-dav.exe -D
+```
+
 ## Data files
 
 `etesync-dav` stores data in the directory specified by the `ETESYNC_DATA_DIR`
