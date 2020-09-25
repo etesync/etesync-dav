@@ -19,12 +19,9 @@ import threading
 import hashlib
 import posixpath
 import time
-from uuid import uuid4
 
-from .etesync_cache import EteSyncCache, etesync_for_user
+from .etesync_cache import etesync_for_user
 from .href_mapper import HrefMapper
-
-import etesync_dav.config as config
 
 import etesync as api
 from radicale import pathutils
@@ -33,6 +30,9 @@ from radicale.storage import (
         BaseCollection, BaseStorage, ComponentNotFoundError,
     )
 import vobject
+
+from ..local_cache import Etebase
+from .storage_etebase_collection import Collection as EtebaseCollection
 
 
 logger = logging.getLogger('etesync-dav')
@@ -52,6 +52,7 @@ class SyncThread(threading.Thread):
         self._done_syncing.set()  # We are done before we start.
         self.user = user
         self.last_sync = None
+        self._exception = None
 
     def force_sync(self):
         self._force_sync.set()
@@ -66,7 +67,12 @@ class SyncThread(threading.Thread):
         return self._force_sync.is_set()
 
     def wait_for_sync(self, timeout=None):
-        return self._done_syncing.wait(timeout)
+        ret = self._done_syncing.wait(timeout)
+        e = self._exception
+        self._exception = None
+        if e is not None:
+            raise e
+        return ret
 
     def run(self):
         while True:
@@ -79,12 +85,12 @@ class SyncThread(threading.Thread):
             except Exception as e:
                 # Print errors but keep on syncing in the background
                 logger.exception(e)
+                self._exception = e
             finally:
                 self._force_sync.clear()
                 self._done_syncing.set()
 
             self._force_sync.wait(SYNC_INTERVAL)
-
 
 
 class MetaMapping:
@@ -385,7 +391,8 @@ class Collection(BaseCollection):
                                (href, self.path)) from e
         last_modified = ''
 
-        return EteSyncItem(collection=self, vobject_item=item, href=href, last_modified=last_modified, etesync_item=etesync_item)
+        return EteSyncItem(collection=self, vobject_item=item, href=href, last_modified=last_modified,
+                           etesync_item=etesync_item)
 
     def upload(self, href, vobject_item):
         """Upload a new or replace an existing item."""
@@ -477,8 +484,6 @@ class Collection(BaseCollection):
 class Storage(BaseStorage):
     """Collection stored in several files per calendar."""
 
-    _collection_class = Collection
-
     _sync_thread_lock = threading.RLock()
 
     def __init__(self, configuration):
@@ -501,7 +506,10 @@ class Storage(BaseStorage):
 
         """
 
-        cls = self._collection_class
+        if isinstance(self.etesync, Etebase):
+            cls = EtebaseCollection
+        else:
+            cls = Collection
 
         # Path should already be sanitized
         attributes = _get_attributes_from_path(path)
@@ -536,9 +544,14 @@ class Storage(BaseStorage):
         if len(attributes) == 0:
             yield cls(self, posixpath.join(path, cls.user))
         elif len(attributes) == 1:
-            for journal in self.etesync.list():
-                if journal.collection.TYPE in (api.AddressBook.TYPE, api.Calendar.TYPE, api.TaskList.TYPE):
-                    yield cls(self, posixpath.join(path, journal.uid))
+            if isinstance(self.etesync, Etebase):
+                for journal in self.etesync.list():
+                    if journal.col_type in ["etebase.vcard", "etebase.vevent", "etebase.vtodo"]:
+                        yield cls(self, posixpath.join(path, journal.uid))
+            else:
+                for journal in self.etesync.list():
+                    if journal.collection.TYPE in (api.AddressBook.TYPE, api.Calendar.TYPE, api.TaskList.TYPE):
+                        yield cls(self, posixpath.join(path, journal.uid))
         elif len(attributes) == 2:
             for href in collection._list():
                 yield collection._get(href)

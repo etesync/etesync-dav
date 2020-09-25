@@ -14,7 +14,7 @@
 
 from radicale import pathutils, rights
 
-from .etesync_cache import EteSyncCache, etesync_for_user
+from .etesync_cache import etesync_for_user
 
 import etesync as api
 

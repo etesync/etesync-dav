@@ -19,9 +19,11 @@ import time
 import hashlib
 
 import etesync as api
+import etebase as Etebase
 from .radicale.creds import Credentials
 from .radicale.etesync_cache import etesync_for_user
-from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, ETESYNC_URL, DATA_DIR, LEGACY_CONFIG_DIR
+from . import local_cache
+from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, LEGACY_ETESYNC_URL, ETESYNC_URL, DATA_DIR, LEGACY_CONFIG_DIR
 
 
 class Htpasswd:
@@ -57,7 +59,7 @@ class Htpasswd:
 
 class Manager:
     def __init__(self,
-                 config_dir=DATA_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE, remote_url=ETESYNC_URL):
+                 config_dir=DATA_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE):
 
         if not os.path.exists(config_dir):
             # If the old dir still exists and the new one doesn't, mv the location
@@ -74,8 +76,6 @@ class Manager:
             # Create a missing htpasswd file if missing
             self.htpasswd.save()
 
-        self.remote_url = remote_url
-
     def _generate_pasword(self):
         return ''.join(
                 [random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16)])
@@ -88,27 +88,37 @@ class Manager:
         return self.htpasswd.get(username) is not None
 
     def refresh_token(self, username, login_password):
-        _, cipher_key = self.creds.get(username)
-        auth_token = api.Authenticator(self.remote_url).get_auth_token(username, login_password)
-        self.creds.set(username, auth_token, cipher_key)
+        server_url = self.creds.get_server_url(username)
+        stored_session = self.creds.get_etebase(username)
+        if stored_session is not None:
+            etebase = local_cache.Etebase(username, stored_session, server_url).etebase
+            etebase.fetch_token()
+            self.creds.set_etebase(username, etebase.save(None), server_url)
+        else:
+            _, cipher_key = self.creds.get(username)
+            if cipher_key is None:
+                raise RuntimeError("User not found in etesync-dav")
+            auth_token = api.Authenticator(server_url).get_auth_token(username, login_password)
+            self.creds.set(username, auth_token, cipher_key, server_url)
+
         self.creds.save()
 
-    def add(self, username, login_password, encryption_password):
+    def add(self, username, login_password, encryption_password, remote_url=LEGACY_ETESYNC_URL):
         exists = self.validate_username(username)
         if exists:
             raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
 
         print("Fetching auth token")
-        auth_token = api.Authenticator(self.remote_url).get_auth_token(username, login_password)
+        auth_token = api.Authenticator(remote_url).get_auth_token(username, login_password)
 
         print("Deriving password")
-        etesync = api.EteSync(username, auth_token, remote=self.remote_url, db_path=':memory:')
+        etesync = api.EteSync(username, auth_token, remote=remote_url, db_path=':memory:')
         cipher_key = etesync.derive_key(encryption_password)
 
         print("Saving config")
         generated_password = self._generate_pasword()
         self.htpasswd.set(username, generated_password)
-        self.creds.set(username, auth_token, cipher_key)
+        self.creds.set(username, auth_token, cipher_key, remote_url)
         self.htpasswd.save()
         self.creds.save()
 
@@ -134,6 +144,51 @@ class Manager:
                     inst.save()
 
                     etesync.sync_journal_list()
+        except Exception as e:
+            # Remove the username on error
+            self.htpasswd.delete(username)
+            self.creds.delete(username)
+            self.htpasswd.save()
+            self.creds.save()
+            raise e
+
+        return self.get(username)
+
+    def add_etebase(self, username, password, remote_url=ETESYNC_URL):
+        exists = self.validate_username(username)
+        if exists:
+            raise RuntimeError("User already exists. Delete first if you'd like to override settings.")
+
+        print("Logging in")
+        client = Etebase.Client("etesync-dav", remote_url)
+        etebase = Etebase.Account.login(client, username, password)
+
+        print("Saving config")
+        generated_password = self._generate_pasword()
+        self.htpasswd.set(username, generated_password)
+        self.creds.set_etebase(username, etebase.save(None), remote_url)
+        self.htpasswd.save()
+        self.creds.save()
+
+        print("Initializing account")
+        try:
+            existing = {}
+            col_mgr = etebase.get_collection_manager()
+            collections = col_mgr.list(None)
+            for col in collections.data:
+                meta = col.meta
+                existing[meta["type"]] = True
+
+            wanted = [
+                ["etebase.vcard", "My Contacts"],
+                ["etebase.vevent", "My Calendar"],
+                ["etebase.vtodo", "My Tasks"],
+            ]
+            for [col_type, name] in wanted:
+                if col_type not in existing:
+                    meta = {"type": col_type, "name": name}
+                    col = col_mgr.create(meta, b"")
+                    col_mgr.upload(col)
         except Exception as e:
             # Remove the username on error
             self.htpasswd.delete(username)

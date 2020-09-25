@@ -23,5 +23,8 @@
     </div>
   {% endif %}
   <button id="send_button" class="btn btn-success">Login</button>
+  <div style="padding-top: 1em;">
+    Or alternatively, <a href="{{ url_for('add_user') }}">add a new account</a>.
+  </div>
 </form>
 {% endblock content %}

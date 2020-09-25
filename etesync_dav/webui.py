@@ -17,17 +17,19 @@ import os
 from functools import wraps
 from urllib.parse import urljoin
 
-from flask import Flask, render_template, redirect, url_for, request, session, Blueprint
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.fields.html5 import URLField
+from wtforms.validators import Optional, DataRequired, url
 
 import etesync as api
-from etesync_dav.config import ETESYNC_URL
 from etesync_dav.manage import Manager
-from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl, has_ssl
-from .radicale.etesync_cache import EteSyncCache, etesync_for_user
+from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl
+from .radicale.etesync_cache import etesync_for_user
+from etesync_dav.local_cache import Etebase
+from etesync_dav.config import LEGACY_ETESYNC_URL, ETESYNC_URL
 
 manager = Manager()
 
@@ -97,21 +99,38 @@ def login_required(func):
 @login_required
 def account_list():
     remove_user_form = UsernameForm(request.form)
-    users = map(lambda x: (x, manager.get(x)), manager.list())
-    return render_template('index.html', users=users, remove_user_form=remove_user_form, osx_ssl_warning=needs_ssl())
+    username = session['username']
+    password = manager.get(username)
+    return render_template('index.html', username=username, password=password, remove_user_form=remove_user_form,
+                           osx_ssl_warning=needs_ssl())
 
 
 @app.route('/user/<string:user>')
 @login_required
 def user_index(user):
-    with etesync_for_user(user) as (etesync, _):
-        etesync.sync_journal_list()
-        journals = etesync.list()
+    if session['username'] != user:
+        return redirect(url_for('user_index', user=session['username']))
+    type_name_mapper = {
+        "etebase.vevent": "Calendars",
+        "etebase.vtodo": "Tasks",
+        "etebase.vcard": "Address Books",
+    }
     collections = {}
-    for journal in journals:
-        collection = journal.collection
-        collections[collection.TYPE] = collections.get(collection.TYPE, [])
-        collections[collection.TYPE].append(collection)
+    with etesync_for_user(user) as (etesync, _):
+        if isinstance(etesync, Etebase):
+            etesync.sync_collection_list()
+            for col in etesync.list():
+                col_type = type_name_mapper.get(col.col_type, None)
+                if col_type is not None:
+                    collections[col_type] = collections.get(col_type, [])
+                    collections[col_type].append({"name": col.meta["name"], "uid": col.uid})
+        else:
+            etesync.sync_journal_list()
+            journals = etesync.list()
+            for journal in journals:
+                collection = journal.collection
+                collections[collection.TYPE] = collections.get(collection.TYPE, [])
+                collections[collection.TYPE].append({"name": collection.display_name, "uid": journal.uid})
 
     return render_template(
             'user_index.html', BASE_URL=urljoin(BASE_URL, "{}/".format(user)), collections=collections)
@@ -194,14 +213,31 @@ def certgen():
 
 @app.route('/add/', methods=['GET', 'POST'])
 def add_user():
-    if not logged_in() and len(list(manager.list())) > 0:
-        return redirect(url_for('login'))
-
     errors = None
     form = AddUserForm(request.form)
     if form.validate_on_submit():
         try:
-            manager.add(form.username.data, form.login_password.data, form.encryption_password.data)
+            server_url = form.server_url.data
+            server_url = ETESYNC_URL if server_url == "" else server_url
+            manager.add_etebase(form.username.data, form.login_password.data, server_url)
+            return redirect(url_for('account_list'))
+        except Exception as e:
+            errors = str(e)
+    else:
+        errors = form.errors
+
+    return render_template('add_user.html', form=form, errors=errors)
+
+
+@app.route('/add_legacy/', methods=['GET', 'POST'])
+def add_user_legacy():
+    errors = None
+    form = AddUserLegacyForm(request.form)
+    if form.validate_on_submit():
+        try:
+            server_url = form.server_url.data
+            server_url = LEGACY_ETESYNC_URL if server_url == "" else server_url
+            manager.add(form.username.data, form.login_password.data, form.encryption_password.data, server_url)
             return redirect(url_for('account_list'))
         except api.exceptions.IntegrityException:
             errors = 'Wrong encryption password (failed to decrypt data)'
@@ -210,7 +246,7 @@ def add_user():
     else:
         errors = form.errors
 
-    return render_template('add_user.html', form=form, errors=errors)
+    return render_template('add_user_legacy.html', form=form, errors=errors)
 
 
 @app.route('/remove_user/', methods=['GET', 'POST'])
@@ -228,10 +264,15 @@ class UsernameForm(FlaskForm):
 
 
 class LoginForm(UsernameForm):
+    server_url = URLField('Server URL (Leave Empty for Default)', validators=[Optional(), url(require_tld=False)])
     login_password = PasswordField('Account Password', validators=[DataRequired()])
 
 
 class AddUserForm(LoginForm):
+    pass
+
+
+class AddUserLegacyForm(LoginForm):
     encryption_password = PasswordField('Encryption Password', validators=[DataRequired()])
 
 
