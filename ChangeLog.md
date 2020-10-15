@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.30.0
+* More efficient fetching
+* Update etebase dep
+
 ## Version 0.20.4
 * Refresh the auth token on every web ui login
 
