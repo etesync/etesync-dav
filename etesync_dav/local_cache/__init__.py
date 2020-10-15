@@ -8,6 +8,9 @@ from etesync_dav import config
 from . import db, models
 
 
+COL_TYPES = ["etebase.vcard", "etebase.vevent", "etebase.vtodo"]
+
+
 class StorageException(Exception):
     pass
 
@@ -97,7 +100,7 @@ class Etebase:
         with db.database_proxy:
             while not done:
                 fetch_options = FetchOptions().stoken(stoken)
-                col_list = col_mgr.list(fetch_options)
+                col_list = col_mgr.list(COL_TYPES, fetch_options)
                 for col in col_list.data:
                     collection = models.CollectionEntity.get_or_none(local_user=self.user, uid=col.uid)
                     if collection is None:
@@ -257,9 +260,8 @@ class Collection:
 
     @property
     def col_type(self):
-        return self.meta['type']
+        return self.col.collection_type
 
-    # FIXME: cache
     @property
     def meta(self):
         return self.col.meta

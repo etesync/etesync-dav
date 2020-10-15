@@ -31,7 +31,7 @@ from radicale.storage import (
     )
 import vobject
 
-from ..local_cache import Etebase
+from ..local_cache import Etebase, COL_TYPES
 from .storage_etebase_collection import Collection as EtebaseCollection
 
 
@@ -546,7 +546,7 @@ class Storage(BaseStorage):
         elif len(attributes) == 1:
             if isinstance(self.etesync, Etebase):
                 for journal in self.etesync.list():
-                    if journal.col_type in ["etebase.vcard", "etebase.vevent", "etebase.vtodo"]:
+                    if journal.col_type in COL_TYPES:
                         yield cls(self, posixpath.join(path, journal.uid))
             else:
                 for journal in self.etesync.list():
