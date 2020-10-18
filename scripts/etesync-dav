@@ -147,6 +147,19 @@ if not os.path.exists(DATA_DIR):
     except Exception as e:
         logger.exception(e)
 
+if sys.platform == 'darwin':
+    from threading import Thread
+    def machack():
+        try:
+            from PyObjCTools import AppHelper
+            AppHelper.runConsoleEventLoop()
+        except ImportError:
+            pass
+
+    thread = Thread(target=machack)
+    thread.setDaemon(True)
+    thread.start()
+
 radicale_main.run(radicale_args + sys.argv[1:])
 
 sys.exit(0)

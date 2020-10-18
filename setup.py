@@ -29,5 +29,6 @@ setup(
         'Flask>=1.1.1',
         'Flask-WTF>=0.14.2',
         'requests[socks]>=2.21',
+        'pyobjc-framework-Cocoa>=6.2.2 ; sys_platform=="darwin"',
     ]
 )
