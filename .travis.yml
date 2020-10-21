@@ -7,6 +7,8 @@ jobs:
     - name: "Python 3.7.4 on macOS"
       os: osx
       language: shell       # 'language: python' is an error on Travis CI macOS
+      before_install:
+          - pip3 install --upgrade 'git+https://github.com/ronaldoussoren/pyobjc@4f77802f2a71a2e7660ce5e53fe608d42aae0e26#egg=pkg&subdirectory=pyobjc-framework-Cocoa'  # FIXME: remove this hack one there's a newer version than 6.2.2
     - name: "Python 3.8.0 on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
