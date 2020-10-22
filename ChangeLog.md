@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.30.1
+* Fixed race condition when there are many connections in parallel.
+
 ## Version 0.30.0
 * More efficient fetching
 * Update etebase dep
