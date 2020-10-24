@@ -1,4 +1,4 @@
-FROM python:3.7-stretch
+FROM python:3.9
 
 ENV ETESYNC_DATA_DIR "/data"
 ENV ETESYNC_SERVER_HOSTS "0.0.0.0:37358,[::]:37358"
