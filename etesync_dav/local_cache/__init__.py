@@ -239,6 +239,15 @@ class Etebase:
             except models.CollectionEntity.DoesNotExist as e:
                 raise DoesNotExist(e)
 
+    def clear_user(self):
+        with db.database_proxy:
+            for col in self.user.collections:
+                for item in col.items:
+                    item.delete_instance()
+                col.delete_instance()
+            self.user.delete_instance()
+            self.user = None
+
 
 class Collection:
     def __init__(self, col_mgr, cache_col):

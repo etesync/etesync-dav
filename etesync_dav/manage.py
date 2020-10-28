@@ -206,6 +206,23 @@ class Manager:
         if not exists:
             raise RuntimeError("User not found")
 
+        try:
+            with etesync_for_user(username) as (etesync, _):
+                if hasattr(etesync, 'clear_user'):
+                    etesync.clear_user()
+                else:
+                    # Legacy etesync, do manually:
+                    user = etesync.user
+                    for col in user.journals:
+                        for item in col.entries:
+                            item.delete_instance()
+                        col.delete_instance()
+                    user.user_info.delete_instance()
+                    user.delete()
+                    user = None
+        except Exception as e:
+            print("Failed removing user cache", e)
+
         self.htpasswd.delete(username)
         self.creds.delete(username)
         self.htpasswd.save()
