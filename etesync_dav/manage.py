@@ -183,10 +183,14 @@ class Manager:
                     ["etebase.vevent", "My Calendar"],
                     ["etebase.vtodo", "My Tasks"],
                 ]
-                for [col_type, name] in wanted:
-                    meta = {"name": name, "mtime": local_cache.get_millis()}
-                    col = col_mgr.create(col_type, meta, b"")
-                    col_mgr.upload(col)
+                try:
+                    for [col_type, name] in wanted:
+                        meta = {"name": name, "mtime": local_cache.get_millis()}
+                        col = col_mgr.create(col_type, meta, b"")
+                        col_mgr.upload(col)
+                except Exception as e:
+                    print("Failed creating default collections (skipping). Reason:", e)
+                    pass
         except Exception as e:
             # Remove the username on error
             self.htpasswd.delete(username)
