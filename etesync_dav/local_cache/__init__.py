@@ -75,7 +75,7 @@ class Etebase:
         self._set_db(database)
 
     def _init_db_tables(self, database, additional_tables=None):
-        CURRENT_DB_VERSION = 0
+        CURRENT_DB_VERSION = 1
 
         database.create_tables([models.Config, models.User, models.CollectionEntity,
                                 models.ItemEntity, models.HrefMapper], safe=True)

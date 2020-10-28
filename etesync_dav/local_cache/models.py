@@ -13,7 +13,7 @@ class User(db.BaseModel):
 
 
 class CollectionEntity(db.BaseModel):
-    local_user = pw.ForeignKeyField(User, backref='collections')
+    local_user = pw.ForeignKeyField(User, backref='collections', on_delete='CASCADE')
     # The uid of the collection (same as Etebase)
     uid = pw.CharField(null=False, index=True)
     eb_col = pw.BlobField()
@@ -30,7 +30,7 @@ class CollectionEntity(db.BaseModel):
 
 
 class ItemEntity(db.BaseModel):
-    collection = pw.ForeignKeyField(CollectionEntity, backref='items')
+    collection = pw.ForeignKeyField(CollectionEntity, backref='items', on_delete='CASCADE')
     # The uid of the content (vobject uid)
     uid = pw.CharField(null=False, index=True)
     eb_item = pw.BlobField()
