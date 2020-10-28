@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.30.2
+* Simplify locking mechanism and fix cache eviction for changed etebase creds.
+* Delete the user cache when removing user
+* Creating default collections: skip creating them if fails (e.g. for associate accounts)
+* Fix new collection init.
+* etebase cache: add missing on_delete.
+
 ## Version 0.30.1
 * Fixed race condition when there are many connections in parallel.
 
