@@ -172,21 +172,18 @@ class Manager:
 
         print("Initializing account")
         try:
-            existing = {}
             col_mgr = etebase.get_collection_manager()
             fetch_options = Etebase.FetchOptions().limit(1)
             collections = col_mgr.list(local_cache.COL_TYPES, fetch_options)
-            for col in collections.data:
-                collection_type = col.collection_type
-                existing[collection_type] = True
 
-            wanted = [
-                ["etebase.vcard", "My Contacts"],
-                ["etebase.vevent", "My Calendar"],
-                ["etebase.vtodo", "My Tasks"],
-            ]
-            for [col_type, name] in wanted:
-                if col_type not in existing:
+            # This means its a new account, so create default collections
+            if len(list(collections.data)) == 0:
+                wanted = [
+                    ["etebase.vcard", "My Contacts"],
+                    ["etebase.vevent", "My Calendar"],
+                    ["etebase.vtodo", "My Tasks"],
+                ]
+                for [col_type, name] in wanted:
                     meta = {"name": name, "mtime": local_cache.get_millis()}
                     col = col_mgr.create(col_type, meta, b"")
                     col_mgr.upload(col)
