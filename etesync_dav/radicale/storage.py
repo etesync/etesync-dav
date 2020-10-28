@@ -485,15 +485,13 @@ class Storage(BaseStorage):
     """Collection stored in several files per calendar."""
 
     _sync_thread_lock = threading.RLock()
-    # Per-object lock for this storage. Controls the etesync refcount. There can only be one active etesync object
-    # at any given moment, so it's fine to have just one lock.
-    _user_refcount_lock = None
+    # Per-object lock for the "global" user and etesync
+    _etesync_user_lock = None
 
     def __init__(self, configuration):
         self.user = None
         self.etesync = None
-        self._user_refcount_lock = threading.RLock()
-        self._user_refcount = 0
+        self._etesync_user_lock = threading.RLock()
         super().__init__(configuration)
 
     def discover(self, path, depth="0"):
@@ -623,11 +621,9 @@ class Storage(BaseStorage):
         # At most wait for 5 seconds before returning stale data
         etesync.sync_thread.wait_for_sync(5)
 
-        with etesync_for_user(user) as (etesync, _):
-            with self._user_refcount_lock:
-                self._user_refcount += 1
-                self.user = user
-                self.etesync = etesync
+        with self._etesync_user_lock, etesync_for_user(user) as (etesync, _):
+            self.user = user
+            self.etesync = etesync
 
             yield
 
@@ -635,8 +631,5 @@ class Storage(BaseStorage):
             if mode == "w":
                 etesync.sync_thread.force_sync()
 
-            with self._user_refcount_lock:
-                self._user_refcount -= 1
-                if self._user_refcount == 0:
-                    self.etesync = None
-                    self.user = None
+            self.etesync = None
+            self.user = None
