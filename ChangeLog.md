@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.30.3
+* Sync: fix syncing of item deletions.
+* Update etebase dep
+
 ## Version 0.30.2
 * Simplify locking mechanism and fix cache eviction for changed etebase creds.
 * Delete the user cache when removing user
