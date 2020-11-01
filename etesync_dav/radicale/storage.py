@@ -303,7 +303,7 @@ class Collection(BaseCollection):
         ValueError is raised for invalid or old tokens.
         """
         token_prefix = 'http://radicale.org/ns/sync/'
-        token = "{}{}".format(token_prefix, self.etag.strip('"'))
+        token = None  # XXX "{}{}".format(token_prefix, self.etag.strip('"'))
         if old_token is not None and old_token.startswith(token_prefix):
             old_token = old_token[len(token_prefix):]
 
