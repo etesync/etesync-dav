@@ -12,7 +12,7 @@ Outlook doesn't natively support CalDAV and CardDAV and requires an open-source 
   - Outlook folder: From the dropdown, pick or make (with the New button) the Outlook folder where you want the EteSync calendar items to be stored. The default local calendar folder is Outlook/Calendar, but you could create a subfolder like Outlook/Calendar/EteSync Calendar.
   - Tick “Synchronize items immediately after change”.
   - DAV URL: http://localhost:37358/
-  - Username: your account's email addres.
+  - Username: your account's username.
   - Password: paste the password you copied in step 2
   - Email address: same as Username
 7. Click OK at the bottom of the profile form.
@@ -51,7 +51,7 @@ This works for Windows Calendar and People, though apparently Outlook has a diff
 
 1. Open the windows settings app (search for "Settings" in the start menu's search box)
 2. Go to Email & accounts and click add account
-3. Choose iCloud and put in your email and for the password use "NotPassword". Click save.
+3. Choose iCloud and put in your username and for the password use "NotPassword". Click save.
 4. From the account list click on your account and then click modify
 5. Scroll to the bottom and tap on "Advanced mailbox settings"
 6. For SMTP/IMAP put `localhost` as the server. Make sure to also set email fetch frequency to manual, and disable email sync if not already disabled.

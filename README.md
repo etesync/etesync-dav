@@ -40,7 +40,7 @@ You now need to set up your CalDAV/CardDAV client using your username and the pa
 Depending on the client you use, the server path should either be:
 
 * `http://localhost:37358/`
-* `http://localhost:37358/user@example.com/`
+* `http://localhost:37358/YOUR-USERNAME/`
 
 On most clients this should automatically detect your collections (i.e.
 calendars and address books).
@@ -57,7 +57,7 @@ when you click on your username.
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
-4. Use `http://localhost:37358/user@example.com/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
+4. Use `http://localhost:37358/` for both servers, your EteSync username as the username and the DAV password you got in [configuration and running](#configuration-and-running) as the password.
 
 **Note:** if you enabled SSL in etesync-dav, you should follow the [TbSync instructions for self-signed certificates](https://github.com/jobisoft/TbSync/wiki/How-to-use-TbSync-with-self-signed-or-otherwise-untrusted-certificates%3F).
 
@@ -72,7 +72,7 @@ Using TbSync is recommended, because it includes address book support (Lightning
 GNOME Calendar and Contacts do not support adding WebDAV calendars and address books directly, but you can add them in Evolution and they will appear correctly in all the apps.
 
 1. Open Evolution and click File -> New -> Collection account
-2. Put your username (user@example.com) in the user field.
+2. Put your username in the user field.
 3. Click Advanced Options and use `http://localhost:37358/` as the server.
 4. Make sure "Look up for a CalDAV/CardDAV server" is ticked, and untick all the rest.
 5. Click "Look Up" and when prompted, the DAV password you got in [configuration and running](#configuration-and-running).
@@ -178,9 +178,9 @@ Please note that you'll have to run `source venv/bin/activate` every time you'd 
 
 You need to first add an EteSync user using `./etesync-dav manage`, for example:
 
-`./etesync-dav manage add user@example.com`
+`./etesync-dav manage add USERNAME`
 
-*Substitute `user@example.com` with the username or email you use with your
+*Substitute `USERNAME` with the username you use with your
 EteSync account or self-hosted server.*
 
 and then run the server:
