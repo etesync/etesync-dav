@@ -238,6 +238,9 @@ class Collection(BaseCollection):
 
         etesync_item = self.collection.get(uid)
 
+        if etesync_item is None:
+            return None
+
         try:
             item = vobject.readOne(etesync_item.content)
             # XXX Hack: fake transform 4.0 vCards to 3.0 as 4.0 is not yet widely supported

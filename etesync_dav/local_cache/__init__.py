@@ -300,8 +300,13 @@ class Collection:
     def get(self, uid):
         with db.database_proxy:
             item_mgr = self.col_mgr.get_item_manager(self.col)
-            return Item(item_mgr,
-                        self.cache_col.items.where((models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted).get())
+            try:
+                return Item(item_mgr,
+                            self.cache_col.items.where(
+                                (models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted
+                            ).get())
+            except models.ItemEntity.DoesNotExist:
+                return None
 
     def list(self):
         with db.database_proxy:
