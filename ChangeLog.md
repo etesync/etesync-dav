@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.30.4
+* Make it more obvious that users need to copy the DAV password
+* Fix crash when trying to operate on deleted/non-existent items
+
 ## Version 0.30.3
 * Sync: fix syncing of item deletions.
 * Update etebase dep
