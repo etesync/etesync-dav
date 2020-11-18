@@ -21,7 +21,7 @@ pyinstaller \
 mkdir deploy
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
-    mv dist/etesync-dav deploy/linux-etesync-dav
+    mv dist/etesync-dav "deploy/linux-$TRAVIS_CPU_ARCH-etesync-dav"
 fi
 if [ "$TRAVIS_OS_NAME" = "osx" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
