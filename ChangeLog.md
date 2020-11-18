@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.30.5
+* Change how we generate SSL certificates to not allow them to be used as CA
+* Build binaries for aarch64 on Linux
+
 ## Version 0.30.4
 * Make it more obvious that users need to copy the DAV password
 * Fix crash when trying to operate on deleted/non-existent items
