@@ -70,7 +70,7 @@ def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
     san = x509.SubjectAlternativeName(alt_names)
 
     # path_len=0 means this cert can only sign itself, not other certs.
-    basic_contraints = x509.BasicConstraints(ca=True, path_length=0)
+    basic_contraints = x509.BasicConstraints(ca=False, path_length=0)
     now = datetime.utcnow()
     cert = (
         x509.CertificateBuilder()
