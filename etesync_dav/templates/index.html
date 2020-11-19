@@ -30,14 +30,24 @@
 <div>
   <h2>Welcome {{ username }}!</h2>
   <p>
+  Add the DAV account to any application using the following credentials:
+  </p>
+  <ul>
+    <li>
+      <strong>Server:</strong>
+      Your DAV server, e.g:
+      <code>{{ server_url_example }}</code>
+    </li>
+    <li>
+      <strong>Username:</strong> {{ username }}
+    </li>
+    <li>
+      <strong>Password:</strong>
+      <button class="btn btn-sm btn-success" onclick="copyPassword('{{ password }}')">Copy Password</button>
+    </li>
+  </ul>
+  <p>
   To see the available collections please view the <a style="min-width: 400px" href="{{ url_for('user_index', user=username) }}">collection list</a>.
   </p>
-  <div>
-    <strong>Important:</strong>
-    Please copy the app-specific password below to setup your DAV clients with:
-    <div style="margin-top: 1em">
-      <button class="btn btn-lg btn-success" onclick="copyPassword('{{ password }}')">Copy Client Password</button>
-    </div>
-  </div>
 </div>
 {% endblock content %}

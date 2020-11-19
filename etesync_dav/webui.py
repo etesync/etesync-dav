@@ -26,7 +26,7 @@ from wtforms.validators import Optional, DataRequired, url
 
 import etesync as api
 from etesync_dav.manage import Manager
-from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl
+from etesync_dav.mac_helpers import generate_cert, trust_cert, needs_ssl, has_ssl
 from .radicale.etesync_cache import etesync_for_user
 from etesync_dav.local_cache import Etebase
 from etesync_dav.config import LEGACY_ETESYNC_URL, ETESYNC_URL
@@ -101,8 +101,9 @@ def account_list():
     remove_user_form = UsernameForm(request.form)
     username = session['username']
     password = manager.get(username)
+    server_url_example = "{}://localhost:37358/{}/".format("https" if has_ssl() else "http", username)
     return render_template('index.html', username=username, password=password, remove_user_form=remove_user_form,
-                           osx_ssl_warning=needs_ssl())
+                           osx_ssl_warning=needs_ssl(), server_url_example=server_url_example)
 
 
 @app.route('/user/<string:user>')
