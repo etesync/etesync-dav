@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.30.6
+* Fix SSL certificate generation (introduced in the previous release)
+
 ## Version 0.30.5
 * Change how we generate SSL certificates to not allow them to be used as CA
 * Build binaries for aarch64 on Linux
