@@ -124,7 +124,7 @@ This methods are not as easy as the pre-built binaries method above, but are als
 
 Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
 
-    docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USER_EMAIL
+    docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USERNAME
 
 Run etesync-dav in a background docker container with configuration from previous step. This wil (re)start the container on boot and after crashes.
 
