@@ -238,10 +238,13 @@ etesync-dav.exe -D
 `etesync-dav` stores data in the directory specified by the `ETESYNC_DATA_DIR`
 environment variable. This includes a database and the credentials cache.
 
-`ETESYNC_DATA_DIR` defaults to a subdirectory of the appropriate config directory
-for your platform (`~/.local/share/etesync-dav` on Unix/Linux, see
-[appdirs](http://pypi.python.org/pypi/appdirs) module docs for where it
-will be on other platforms).
+`ETESYNC_DATA_DIR` defaults to a subdirectory of the appropriate data directory
+for your platform. For example:
+1. `~/.local/share/etesync-dav` on Linux.
+2. `~/Library/Application Support/etesync-dav` on macOS
+3. `C:\Documents and Settings\<User>\Application Data\Local Settings\etesync\etesync-dav` on Windows (most likely).
+
+See the [appdirs](http://pypi.python.org/pypi/appdirs) module docs for mor examples.
 
 # Credits
 
