@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.30.7
+* Fix macOS (wrongfully) complaining that app isn't responding
+
 ## Version 0.30.6
 * Fix SSL certificate generation (introduced in the previous release)
 
