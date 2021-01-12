@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  build_pyinstaller:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.8'
+
+      - name: Update pip and install deps
+        run: |
+          python -m pip install --upgrade pip pyinstaller wheel
+          python -m pip install -r requirements.txt .
+
+      - name: Build binaries
+        shell: bash
+        run: |
+          cd pyinstaller
+          ./bundle.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./pyinstaller/deploy/*

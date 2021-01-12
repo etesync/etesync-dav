@@ -3,7 +3,7 @@
 set -e
 
 ICON=ic_launcher.icns
-if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+if [ "$RUNNER_OS" = "Windows" ]; then
     ICON=ic_launcher.ico
 fi
 
@@ -18,18 +18,18 @@ pyinstaller \
     ../scripts/etesync-dav
 
 # Travis stuff
-mkdir deploy
-if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+mkdir -p deploy
+if [ "$RUNNER_OS" = "Linux" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
-    mv dist/etesync-dav "deploy/linux-$TRAVIS_CPU_ARCH-etesync-dav"
+    mv dist/etesync-dav "deploy/linux-amd64-etesync-dav"
 fi
-if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+if [ "$RUNNER_OS" = "macOS" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
     cd dist
     zip -r mac-etesync-dav.zip *
     mv mac-etesync-dav.zip ../deploy/
     cd ../
 fi
-if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+if [ "$RUNNER_OS" = "Windows" ]; then
     mv dist/etesync-dav.exe deploy/
 fi
