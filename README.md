@@ -21,6 +21,8 @@ The easiest way to start using etesync-dav is by getting one of the pre-built bi
 
 These binaries are self-contained and can be run as-is, though they do not start automatically on boot. You'd need to either start them manually, or set up [autostart based on your OS](#autostart-on-system-boot).
 
+For Linux users there's a [short installation guide](https://github.com/etesync/etesync-dav/wiki/Installing-EteSync-DAV-on-Linux) in the wiki.
+
 # Configuration and running
 
 1. Run `etesync-dav` and open the management UI in your browser: http://localhost:37358/
@@ -81,12 +83,12 @@ GNOME Calendar and Contacts do not support adding WebDAV calendars and address b
 ### Windows 10 (Outlook, Windows Calendar and Windows People)
 While EteSync-DAV works great on Windows 10, due to bugs in Windows itself, the instructions require a few extra steps for syncing with Outlook, Windows Calendar and Windows people. Other clients, such as Thunderbird, do no require these extra steps.
 
-Please take a look at the [Windows 10 instructions](win10-instructions.md) for more information.
+Please take a look at the [Windows 10 instructions](https://github.com/etesync/etesync-dav/wiki/Windows-10-instructions) for more information.
 
 ### macOS (Contacts.app and Calendar.app)
 While EteSync-DAV works great on macOS, due to bugs in macOS Mojave, the instructions require a few extra steps for syncing with Contacts.app and Calendar.app. Other clients, such as Thunderbird, do no require these extra steps.
 
-Please take a look at the [macOS instructions](macos-instructions.md) for more information.
+Please take a look at the [macOS instructions](https://github.com/etesync/etesync-dav/wiki/MacOS-instructions) for more information.
 
 ### iOS
 
