@@ -10,7 +10,7 @@ certifi==2019.6.16        # via requests
 cffi==1.12.3              # via cryptography, etesync
 chardet==3.0.4            # via requests
 click==7.0                # via flask
-cryptography==3.2         # via etesync
+cryptography==3.3.2         # via etesync
 defusedxml==0.6.0         # via radicale
 etebase==0.31.1           # via etesync-dav (setup.py)
 etesync==0.12.1           # via etesync-dav (setup.py)
