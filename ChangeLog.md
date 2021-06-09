@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.30.8
+* Fix packaging to not include the tests directory
+
 ## Version 0.30.7
 * Fix macOS (wrongfully) complaining that app isn't responding
 
