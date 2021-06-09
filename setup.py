@@ -14,7 +14,7 @@ setup(
     keywords=['etesync', 'encryption', 'sync', 'pim', 'caldav', 'carddav'],
     license='GPL-3.0-only',
     long_description=open('DESCRIPTION.rst').read(),
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     scripts=[
         'scripts/etesync-dav',
     ],
