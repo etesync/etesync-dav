@@ -1,4 +1,29 @@
-include LICENSE
-include README.md
-include DESCRIPTION.rst
+# Include all files matching any of the listed patterns.
+include ChangeLog.md DESCRIPTION.rst LICENSE README.md
+graft .github
+
+# The contents of the directory tree tests will first be added to
+# the sdist. Many OS distributions prefers provide an ability run
+# the tests during the package installation.
+#
+# Note: This will not add tests to the wheel.
+recursive-include tests *.py
+
+# All files in the sdist with a .pyc, .pyo, or .pyd extension will
+# be removed from the sdist.
+global-exclude *.py[cod]
+
+# Exclude stuff for local development
+exclude .dockerignore .flake8 Dockerfile icon.svg setenv
+
+# Do not include configuration examples to the sdist.
+recursive-exclude examples *
+
+# Do not include pyinstaller stuff to the sdist.
+recursive-exclude pyinstaller *
+
+# Include requirements.txt for reproducible tests
+include requirements.txt
+
+# Add templates for the management UI.
 recursive-include etesync_dav/templates *
