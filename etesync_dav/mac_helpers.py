@@ -1,4 +1,4 @@
-# Copyright © 2017 Tom Hacohen
+# Copyright © 2017-2021 Tom Hacohen <tom@stosb.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ def has_ssl():
 def needs_ssl():
     return (ON_MAC or ON_WINDOWS) and \
         not has_ssl()
+
 
 def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
                   key_size: int = KEY_SIZE, key_days: int = KEY_DAYS):
@@ -105,9 +106,19 @@ def macos_trust_cert(cert_path: str = SSL_CERT_FILE):
 
 
 def windows_trust_cert(cert_path: str = SSL_CERT_FILE):
+    """Import given certificate into a certificate store."""
     if not ON_WINDOWS:
         raise Error('this is not Windows.')
-    check_call(['powershell.exe', 'Import-Certificate', '-FilePath', '"{}"'.format(cert_path), '-CertStoreLocation', 'Cert:\CurrentUser\Root'])
+    check_call(
+        [
+            'powershell.exe',
+            'Import-Certificate',
+            '-FilePath',
+            '"{}"'.format(cert_path),
+            '-CertStoreLocation',
+            r'Cert:\CurrentUser\Root',
+        ]
+    )
 
 
 def trust_cert(cert_path: str = SSL_CERT_FILE):
