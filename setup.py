@@ -1,4 +1,16 @@
-# -*- coding: utf-8 -*-
+# Copyright © 2017-2021 Tom Hacohen <tom@stosb.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """Setup module for etesync-dav."""
 
@@ -23,6 +35,13 @@ META_CONTENTS = read_file(META_PATH)
 
 def load_long_description():
     """Load long description from file DESCRIPTION.rst."""
+    def changes():
+        changelog = path.join(PKG_DIR, 'ChangeLog.md')
+        log = r"(## Version \d+.\d+.\d+\r?\n.*?)## Version"
+        result = re.search(log, read_file(changelog), re.S)
+
+        return result.group(1).strip() if result else ''
+
     try:
         title = f"{PKG_NAME}: {find_meta('description')}"
         head = '=' * (len(title.strip(' .')))
@@ -33,11 +52,17 @@ def load_long_description():
             head,
             '',
             read_file(path.join(PKG_DIR, 'DESCRIPTION.rst')),
+            ''
+            'Release Information',
+            '===================\n',
+            changes(),
+            '',
+            f"`Full changelog <{find_meta('url')}/blob/master/ChangeLog.md>`_."
         )
 
         return '\n'.join(contents)
     except (RuntimeError, FileNotFoundError) as read_error:
-        message = 'Long description could not be read from DESCRIPTION.rst'
+        message = 'Long description could not be obtained'
         raise RuntimeError(f'{message}: {read_error}') from read_error
 
 
