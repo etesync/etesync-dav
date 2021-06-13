@@ -26,7 +26,7 @@ orderedmultidict==1.0     # via etesync, furl
 packaging==19.0           # via etesync
 passlib==1.7.2            # via radicale
 peewee==3.9.6             # via etesync
-py==1.8.0                 # via etesync
+py==1.10.0                 # via etesync
 pyasn1==0.4.5             # via etesync
 pycparser==2.19           # via cffi, etesync
 pyparsing==2.4.0          # via etesync, packaging
