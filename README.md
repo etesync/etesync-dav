@@ -13,7 +13,7 @@ This is a CalDAV and CardDAV adapter for [EteSync](https://www.etesync.com)
 This package provides a local CalDAV and CardDAV server that acts as an EteSync compatibility layer (adapter).
 It's meant for letting desktop CalDAV and CardDAV clients such as Thunderbird, Outlook and Apple Contacts connect with EteSync.
 
-If all you want is to access your data from a computer, you are probably better off using [the web app](https://client.etesync.com).
+If all you want is to access your data from a computer, you are probably better off using [the web app](https://pim.etesync.com).
 
 # Installation
 
