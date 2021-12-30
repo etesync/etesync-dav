@@ -14,7 +14,7 @@ recursive-include tests *.py
 global-exclude *.py[cod]
 
 # Exclude stuff for local development
-exclude .dockerignore .flake8 Dockerfile icon.svg setenv
+exclude .dockerignore .flake8 mypy.ini Dockerfile icon.svg setenv
 
 # Do not include configuration examples to the sdist.
 recursive-exclude examples *
