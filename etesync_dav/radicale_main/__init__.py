@@ -53,7 +53,7 @@ def run(passed_args=None):
 
     groups = {}
 
-    _, version_minor, _ = VERSION.split('.')
+    version_major, version_minor, _ = VERSION.split('.')
 
     for section, values in config.DEFAULT_CONFIG_SCHEMA.items():
         if section.startswith("_"):
