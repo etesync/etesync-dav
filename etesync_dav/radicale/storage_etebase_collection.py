@@ -135,23 +135,23 @@ class Collection(BaseCollection):
         attributes = _get_attributes_from_path(path)
         self.etesync = self._storage.etesync
         if len(attributes) == 2:
+            self.is_fake = False
             self.uid = attributes[-1]
             self.collection = self.etesync.get(self.uid)
             col_type = self.collection.col_type
             if col_type == "etebase.vevent":
-                self.tag = "VCALENDAR"
                 self.meta_mappings = MetaMappingCalendar()
+                self.set_meta({'tag': 'VCALENDAR'})
                 self.content_suffix = ".ics"
             elif col_type == "etebase.vtodo":
-                self.tag = "VCALENDAR"
                 self.meta_mappings = MetaMappingTaskList()
+                self.set_meta({'tag': 'VCALENDAR'})
                 self.content_suffix = ".ics"
             elif col_type == "etebase.vcard":
-                self.tag = "VADDRESSBOOK"
                 self.meta_mappings = MetaMappingContacts()
+                self.set_meta({'tag': 'VADDRESSBOOK'})
                 self.content_suffix = ".vcf"
 
-            self.is_fake = False
         else:
             self.is_fake = True
 
@@ -168,6 +168,11 @@ class Collection(BaseCollection):
             return
 
         return '"{}"'.format(self.collection.stoken)
+
+    @property
+    def tag(self) -> str:
+        """The tag of the collection."""
+        return self.get_meta("tag") or ""
 
     def sync(self, old_token=None):
         """Get the current sync token and changed items for synchronization.
@@ -315,9 +320,7 @@ class Collection(BaseCollection):
         if self.is_fake:
             return {}
 
-        if key == "tag":
-            return self.tag
-        elif key is None:
+        if key is None:
             ret = {}
             meta = self.collection.meta
             for key in meta.keys():
@@ -343,12 +346,11 @@ class Collection(BaseCollection):
             props[key] = value
 
         # Pop out tag which we don't want
-        props.pop("tag", None)
+        # props.pop("tag", None)
 
         self.collection.update_meta(props)
-        self.collection.save()
 
     @property
     def last_modified(self):
         """Get the HTTP-datetime of when the collection was modified."""
-        return ''
+        return ' '
