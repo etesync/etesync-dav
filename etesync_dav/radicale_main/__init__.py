@@ -52,6 +52,9 @@ def run(passed_args=None):
                         help="print debug information")
 
     groups = {}
+
+    _, version_minor, _ = VERSION.split('.')
+
     for section, values in config.DEFAULT_CONFIG_SCHEMA.items():
         if section.startswith("_"):
             continue
@@ -62,7 +65,7 @@ def run(passed_args=None):
                 continue
             kwargs = data.copy()
             long_name = "--%s-%s" % (section, option.replace("_", "-"))
-            args = kwargs.pop("aliases", [])
+            args = list(kwargs.pop("aliases", []))
             args.append(long_name)
             kwargs["dest"] = "%s_%s" % (section, option)
             groups[group].append(kwargs["dest"])
@@ -71,17 +74,28 @@ def run(passed_args=None):
                 del kwargs["internal"]
 
             if kwargs["type"] == bool:
-                del kwargs["type"]
-                kwargs["action"] = "store_const"
-                kwargs["const"] = "True"
-                opposite_args = kwargs.pop("opposite", [])
-                opposite_args.append("--no%s" % long_name[1:])
-                group.add_argument(*args, **kwargs)
+                if int(version_minor) >= 1:  # Changed since 3.1.0
+                    del kwargs["type"]
+                    opposite_args = list(kwargs.pop("opposite_aliases", ()))
+                    opposite_args.append("--no%s" % long_name[1:])
+                    group.add_argument(*args, nargs="?", const="True", **kwargs)
+                    # Opposite argument
+                    kwargs["help"] = "do not %s (opposite of %s)" % (
+                        kwargs["help"], long_name)
+                    group.add_argument(*opposite_args, action="store_const",
+                                       const="False", **kwargs)
+                else:
+                    del kwargs["type"]
+                    kwargs["action"] = "store_const"
+                    kwargs["const"] = "True"
+                    opposite_args = list(kwargs.pop("opposite", []))
+                    opposite_args.append("--no%s" % long_name[1:])
+                    group.add_argument(*args, **kwargs)
 
-                kwargs["const"] = "False"
-                kwargs["help"] = "do not %s (opposite of %s)" % (
-                    kwargs["help"], long_name)
-                group.add_argument(*opposite_args, **kwargs)
+                    kwargs["const"] = "False"
+                    kwargs["help"] = "do not %s (opposite of %s)" % (
+                        kwargs["help"], long_name)
+                    group.add_argument(*opposite_args, **kwargs)
             else:
                 del kwargs["type"]
                 group.add_argument(*args, **kwargs)
