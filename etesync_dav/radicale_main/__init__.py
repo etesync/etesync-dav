@@ -74,7 +74,7 @@ def run(passed_args=None):
                 del kwargs["internal"]
 
             if kwargs["type"] == bool:
-                if int(version_minor) >= 1:  # Changed since 3.1.0
+                if int(version_major) >= 3 and int(version_minor) >= 1:  # Changed since 3.1.0
                     del kwargs["type"]
                     opposite_args = list(kwargs.pop("opposite_aliases", ()))
                     opposite_args.append("--no%s" % long_name[1:])
