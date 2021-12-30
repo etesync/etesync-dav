@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.31.1
+* Fix build due to mismatching deps
+
 ## Version 0.31.0
 * Support radicale 3.1.0
 * Improve package structure
