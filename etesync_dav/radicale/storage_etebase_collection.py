@@ -353,4 +353,4 @@ class Collection(BaseCollection):
     @property
     def last_modified(self):
         """Get the HTTP-datetime of when the collection was modified."""
-        return ''
+        return ' '
