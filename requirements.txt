@@ -95,7 +95,7 @@ six==1.12.0
     #   orderedmultidict
     #   packaging
     #   python-dateutil
-urllib3==1.25.11
+urllib3==1.26.5
     # via requests
 vobject==0.9.6.1
     # via
