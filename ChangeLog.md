@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.32.0
+* Upgrade a lot of dependencies and adjust code accordingly
+
 ## Version 0.31.2
 * Fix more things to make radicale 3.1.0 work
 
