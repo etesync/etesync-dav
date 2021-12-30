@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.31.0
+* Support radicale 3.1.0
+* Improve package structure
+
 ## Version 0.30.8
 * Fix packaging to not include the tests directory
 
