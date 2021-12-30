@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.31.2
+* Fix more things to make radicale 3.1.0 work
+
 ## Version 0.31.1
 * Fix build due to mismatching deps
 
