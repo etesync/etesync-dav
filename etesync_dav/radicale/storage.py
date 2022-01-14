@@ -257,23 +257,23 @@ class Collection(BaseCollection):
         attributes = _get_attributes_from_path(path)
         self.etesync = self._storage.etesync
         if len(attributes) == 2:
+            self.is_fake = False
             self.uid = attributes[-1]
             self.journal = self.etesync.get(self.uid)
             self.collection = self.journal.collection
             if isinstance(self.collection, api.Calendar):
-                self.tag = "VCALENDAR"
                 self.meta_mappings = MetaMappingCalendar()
+                self.set_meta({'tag': 'VCALENDAR'})
                 self.content_suffix = ".ics"
             elif isinstance(self.collection, api.TaskList):
-                self.tag = "VCALENDAR"
                 self.meta_mappings = MetaMappingTaskList()
+                self.set_meta({'tag': 'VCALENDAR'})
                 self.content_suffix = ".ics"
             elif isinstance(self.collection, api.AddressBook):
-                self.tag = "VADDRESSBOOK"
                 self.meta_mappings = MetaMappingContacts()
+                self.set_meta({'tag': 'VADDRESSBOOK'})
                 self.content_suffix = ".vcf"
 
-            self.is_fake = False
         else:
             self.is_fake = True
 
@@ -294,6 +294,11 @@ class Collection(BaseCollection):
             pass
 
         return entry.uid if entry is not None else self.journal.uid
+
+    @property
+    def tag(self) -> str:
+        """The tag of the collection."""
+        return self.get_meta("tag") or ""
 
     def sync(self, old_token=None):
         """Get the current sync token and changed items for synchronization.
@@ -443,9 +448,7 @@ class Collection(BaseCollection):
         if self.is_fake:
             return {}
 
-        if key == "tag":
-            return self.tag
-        elif key is None:
+        if key is  None:
             ret = {}
             for key in self.journal.info.keys():
                 ret[key] = self.meta_mappings.map_get(self.journal.info, key)[1]
@@ -469,7 +472,7 @@ class Collection(BaseCollection):
             props[key] = value
 
         # Pop out tag which we don't want
-        props.pop("tag", None)
+        # props.pop("tag", None)
 
         self.journal.update_info({})
         self.journal.update_info(props)
@@ -478,7 +481,7 @@ class Collection(BaseCollection):
     @property
     def last_modified(self):
         """Get the HTTP-datetime of when the collection was modified."""
-        return ''
+        return ' '
 
 
 class Storage(BaseStorage):
