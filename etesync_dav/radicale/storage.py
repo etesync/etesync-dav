@@ -448,7 +448,7 @@ class Collection(BaseCollection):
         if self.is_fake:
             return {}
 
-        if key is  None:
+        if key is None:
             ret = {}
             for key in self.journal.info.keys():
                 ret[key] = self.meta_mappings.map_get(self.journal.info, key)[1]
