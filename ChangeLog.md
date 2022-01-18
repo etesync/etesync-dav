@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.32.1
+* Support radicale 3.1.0 for EteSync 1.0 too
+
 ## Version 0.32.0
 * Upgrade a lot of dependencies and adjust code accordingly
 
