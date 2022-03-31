@@ -55,7 +55,33 @@ when you click on your username.
 
 ### Thunderbird
 
-#### Thunderbird (using TbSync) - recommended
+#### Thunderbird (using native CalDAV and CardDAV support available as of [Thunderbird 91](https://support.mozilla.org/en-US/kb/new-thunderbird-91) ) - preferred
+
+##### To add calendars
+1. Add a calendar by hitting the "+" symbol in the toolbar that is usually on the left of Thunderbird's Calendar view, or right-click for the context menu and select "New Calendar"
+2. Select the "On the Network" radio button
+3. For Username put the name of your local Etesync account
+4. For Location, you will get the information from Etesync. Head to http://localhost:37358/.web/login/ and log in
+5. Then click the link to collection list
+6. Then copy the link for the calendar you're trying to add, and put that in for Location in the Thunderbird dialog
+7. Click "Find Calendars"
+8. You will see a "Password Required" popup. You need to get the password from the Etesync web interface. Go back to http://localhost:37358/.web/ and click the "Copy Password" button. Paste this password in the Thunderbird popup.
+9. Hit Subscribe and you are finished, that calendar is added
+10. Repeat for any additional calendars
+
+##### To add address books
+1. Click the "Address Book" icon in Thunderbird's mail view to open the Address Book
+2. Within the Address Book, click File-->New-->CardDAV Address Book
+3. For Username put the name of your local Etesync account
+4. For Location, you will get the information from Etesync. Head to http://localhost:37358/.web/login/ and log in
+5. Then click the link to collection list
+6. Then copy the link for the address book you're trying to add, and put that in for Location in the Thunderbird dialog
+7. Click "Continue"
+8. You will see a "Password Required" popup. You need to get the password from the Etesync web interface. Go back to http://localhost:37358/.web/ and click the "Copy Password" button. Paste this password in the Thunderbird popup.
+9. Hit Subscribe and you are finished, that address book is added
+10. Repeat for any additional address books
+
+#### Thunderbird (using TbSync) - deprecated
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
@@ -63,7 +89,7 @@ when you click on your username.
 
 **Note:** if you enabled SSL in etesync-dav, you should follow the [TbSync instructions for self-signed certificates](https://github.com/jobisoft/TbSync/wiki/How-to-use-TbSync-with-self-signed-or-otherwise-untrusted-certificates%3F).
 
-#### Thunderbird (no additional add-ons)
+#### Thunderbird (no additional add-ons) - deprecated
 Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general. However, you *can* also do the following:
 
 1. Install a CardDAV add-on such as Cardbook if you want to sync your contacts
