@@ -81,7 +81,7 @@ when you click on your username.
 9. Hit Subscribe and you are finished, that address book is added
 10. Repeat for any additional address books
 
-#### Thunderbird (using TbSync) - deprecated
+#### Thunderbird (using TbSync, for Thurderbird older than version 91)
 1. Install [TbSync](https://addons.thunderbird.net/en-us/thunderbird/addon/tbsync/) and the accompanying [DAV provider](https://addons.thunderbird.net/en-us/thunderbird/addon/dav-4-tbsync/).
 2. Open the TbSync window: Edit -> TbSync
 3. Add new DAV account (choose manual configuration).
@@ -89,8 +89,8 @@ when you click on your username.
 
 **Note:** if you enabled SSL in etesync-dav, you should follow the [TbSync instructions for self-signed certificates](https://github.com/jobisoft/TbSync/wiki/How-to-use-TbSync-with-self-signed-or-otherwise-untrusted-certificates%3F).
 
-#### Thunderbird (no additional add-ons) - deprecated
-Using TbSync is recommended, because it includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general. However, you *can* also do the following:
+#### Thunderbird (no additional add-ons, for Thurderbird older than version 91)
+TbSync includes address book support (Lightning does not), automatically discovers all your calendars/address books/tasks, and just works better in general than this solution for versions of Thunderbird older than 91. However, you *can* also do the following:
 
 1. Install a CardDAV add-on such as Cardbook if you want to sync your contacts
 2. Open http://localhost:37358 in a browser, log in with your username and account password (not encryption password), and click on the link to your DAV colection to see a list of all the calendars, tasks lists, and address books in that collection
