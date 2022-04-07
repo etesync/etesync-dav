@@ -55,7 +55,7 @@ when you click on your username.
 
 ### Thunderbird
 
-#### Thunderbird (using native CalDAV and CardDAV support available as of [Thunderbird 91](https://support.mozilla.org/en-US/kb/new-thunderbird-91) ) - preferred
+#### Thunderbird (using native CalDAV and CardDAV support available as of [Thunderbird 91](https://support.mozilla.org/en-US/kb/new-thunderbird-91)) - preferred
 
 ##### To add calendars
 1. Add a calendar by hitting the "+" symbol in the toolbar that is usually on the left of Thunderbird's Calendar view, or right-click for the context menu and select "New Calendar"
