@@ -270,7 +270,8 @@ environment variable. This includes a database and the credentials cache.
 for your platform. For example:
 1. `~/.local/share/etesync-dav` on Linux.
 2. `~/Library/Application Support/etesync-dav` on macOS
-3. `C:\Documents and Settings\<User>\Application Data\Local Settings\etesync\etesync-dav` on Windows (most likely).
+3. `C:\Documents and Settings\<User>\Application Data\Local Settings\etesync\etesync-dav` on older Windows
+4. `C:\Users\<User>\AppData\Local\etesync\etesync-dav` on Windows 7 and up (Most likely)
 
 See the [appdirs](http://pypi.python.org/pypi/appdirs) module docs for mor examples.
 
