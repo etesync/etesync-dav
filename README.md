@@ -170,6 +170,14 @@ To update to the latest version of the docker image, run:
 
 The package `etesync-dav` is [available on AUR](https://aur.archlinux.org/packages/etesync-dav/).
 
+The package comes with a systemd unit. To see the status of the systemd service, run:
+
+    systemctl --user status etesync-dav
+
+To inspect the logs, run:
+
+    journalctl --user -xeu etesync-dav
+
 ## Windows systems
 
 You can either follow the Docker instructions above (get Docker [here](https://www.docker.com)), or alternatively install Python3 for windows from [here](https://www.python.org/downloads/windows).
