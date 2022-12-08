@@ -10,7 +10,7 @@ appdirs==1.4.4
     #   etesync-dav (setup.py)
 asn1crypto==1.4.0
     # via etesync
-certifi==2021.10.8
+certifi==2022.12.7
     # via requests
 cffi==1.15.0
     # via
