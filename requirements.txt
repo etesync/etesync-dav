@@ -20,7 +20,7 @@ charset-normalizer==2.0.9
     # via requests
 click==8.0.3
     # via flask
-cryptography==36.0.1
+cryptography==39.0.1
     # via etesync
 defusedxml==0.7.1
     # via radicale
