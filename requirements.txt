@@ -28,7 +28,7 @@ etebase==0.31.5
     # via etesync-dav (setup.py)
 etesync==0.12.1
     # via etesync-dav (setup.py)
-flask==2.0.2
+flask==2.3.2
     # via
     #   etesync-dav (setup.py)
     #   flask-wtf
