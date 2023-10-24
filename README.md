@@ -281,8 +281,8 @@ for your platform. For example:
 3. `C:\Documents and Settings\<User>\Application Data\Local Settings\etesync\etesync-dav` on older Windows
 4. `C:\Users\<User>\AppData\Local\etesync\etesync-dav` on Windows 7 and up (Most likely)
 
-See the [appdirs](http://pypi.python.org/pypi/appdirs) module docs for mor examples.
+See the [appdirs](https://pypi.python.org/pypi/appdirs) module docs for mor examples.
 
 # Credits
 
-This depends on the [Radicale server](http://radicale.org) for operation.
+This depends on the [Radicale server](https://radicale.org) for operation.
