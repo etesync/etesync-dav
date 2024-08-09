@@ -12,7 +12,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import pkg_resources
+from contextlib import ExitStack
+import importlib.resources
 
 from radicale import web
 
@@ -22,7 +23,12 @@ from etesync_dav.mac_helpers import has_ssl
 class Web(web.BaseWeb):
     def __init__(self, configuration):
         super().__init__(configuration)
-        self.folder = pkg_resources.resource_filename(__name__, "web")
+        self._file_manager = ExitStack()
+        ref = importlib.resources.files(__name__) / 'web'
+        self.folder = self._file_manager.enter_context(importlib.resources.as_file(ref))
+
+    def __del__ (self):
+        self._file_manager.close()
 
     def _call(self, environ, base_prefix, path, user):
         from etesync_dav.webui import app
