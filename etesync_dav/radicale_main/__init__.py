@@ -107,7 +107,7 @@ def run(passed_args=None):
         args.logging_level = "debug"
     with contextlib.suppress(ValueError):
         log.set_level(config.DEFAULT_CONFIG_SCHEMA["logging"]["level"]["type"](
-            args.logging_level))
+            args.logging_level), True)
 
     # Update Radicale configuration according to arguments
     arguments_config = {}
@@ -133,7 +133,7 @@ def run(passed_args=None):
         sys.exit(1)
 
     # Configure logging
-    log.set_level(configuration.get("logging", "level"))
+    log.set_level(configuration.get("logging", "level"), configuration.get("logging", "backtrace_on_debug"))
 
     # Log configuration after logger is configured
     for source, miss in configuration.sources():
