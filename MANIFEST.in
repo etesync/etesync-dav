@@ -24,6 +24,8 @@ recursive-exclude pyinstaller *
 
 # Include requirements.txt for reproducible tests
 include requirements.txt
+include requirements.in/*.txt
+include requirements-dev.txt
 
 # Add templates for the management UI.
 recursive-include etesync_dav/templates *

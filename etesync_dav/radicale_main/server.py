@@ -66,9 +66,7 @@ def format_address(address):
     return "[%s]:%d" % address[:2]
 
 
-class ParallelHTTPServer(socketserver.ThreadingMixIn,
-                         wsgiref.simple_server.WSGIServer):
-
+class ParallelHTTPServer(socketserver.ThreadingMixIn, wsgiref.simple_server.WSGIServer):
     # We wait for child threads ourself
     block_on_close = False
 
@@ -109,12 +107,10 @@ class ParallelHTTPServer(socketserver.ThreadingMixIn,
         if issubclass(sys.exc_info()[0], socket.timeout):
             logger.info("client timed out", exc_info=True)
         else:
-            logger.error("An exception occurred during request: %s",
-                         sys.exc_info()[1], exc_info=True)
+            logger.error("An exception occurred during request: %s", sys.exc_info()[1], exc_info=True)
 
 
 class ParallelHTTPSServer(ParallelHTTPServer):
-
     def server_bind(self):
         super().server_bind()
         # Wrap the TCP socket in an SSL socket
@@ -122,10 +118,8 @@ class ParallelHTTPSServer(ParallelHTTPServer):
         keyfile = self.configuration.get("server", "key")
         cafile = self.configuration.get("server", "certificate_authority")
         # Test if the files can be read
-        for name, filename in [("certificate", certfile), ("key", keyfile),
-                               ("certificate_authority", cafile)]:
-            type_name = config.DEFAULT_CONFIG_SCHEMA["server"][name][
-                "type"].__name__
+        for name, filename in [("certificate", certfile), ("key", keyfile), ("certificate_authority", cafile)]:
+            type_name = config.DEFAULT_CONFIG_SCHEMA["server"][name]["type"].__name__
             source = self.configuration.get_source("server", name)
             if name == "certificate_authority" and not filename:
                 continue
@@ -134,15 +128,14 @@ class ParallelHTTPSServer(ParallelHTTPServer):
             except OSError as e:
                 raise RuntimeError(
                     "Invalid %s value for option %r in section %r in %s: %r "
-                    "(%s)" % (type_name, name, "server", source, filename,
-                              e)) from e
+                    "(%s)" % (type_name, name, "server", source, filename, e)
+                ) from e
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=certfile, keyfile=keyfile)
         if cafile:
             context.load_verify_locations(cafile=cafile)
             context.verify_mode = ssl.CERT_REQUIRED
-        self.socket = context.wrap_socket(
-            self.socket, server_side=True, do_handshake_on_connect=False)
+        self.socket = context.wrap_socket(self.socket, server_side=True, do_handshake_on_connect=False)
 
     def finish_request_locked(self, request, client_address):
         try:
@@ -162,13 +155,11 @@ class ParallelHTTPSServer(ParallelHTTPServer):
 
 
 class ServerHandler(wsgiref.simple_server.ServerHandler):
-
     # Don't pollute WSGI environ with OS environment
     os_environ = {}
 
     def log_exception(self, exc_info):
-        logger.error("An exception occurred during request: %s",
-                     exc_info[1], exc_info=exc_info)
+        logger.error("An exception occurred during request: %s", exc_info[1], exc_info=exc_info)
 
 
 class RequestHandler(wsgiref.simple_server.WSGIRequestHandler):
@@ -203,9 +194,7 @@ class RequestHandler(wsgiref.simple_server.WSGIRequestHandler):
         if not self.parse_request():
             return
 
-        handler = ServerHandler(
-            self.rfile, self.wfile, self.get_stderr(), self.get_environ()
-        )
+        handler = ServerHandler(self.rfile, self.wfile, self.get_stderr(), self.get_environ())
         handler.request_handler = self
         handler.run(self.server.get_app())
 
@@ -215,8 +204,7 @@ def serve(configuration, shutdown_socket):
     logger.info("Starting Radicale")
     # Copy configuration before modifying
     configuration = configuration.copy()
-    configuration.update({"server": {"_internal_server": "True"}}, "server",
-                         privileged=True)
+    configuration.update({"server": {"_internal_server": "True"}}, "server", privileged=True)
 
     use_ssl = configuration.get("server", "ssl")
     server_class = ParallelHTTPSServer if use_ssl else ParallelHTTPServer
@@ -230,36 +218,39 @@ def serve(configuration, shutdown_socket):
             for i, family in enumerate(possible_families):
                 is_last = i == len(possible_families) - 1
                 try:
-                    server = server_class(configuration, family, address,
-                                          RequestHandler)
+                    server = server_class(configuration, family, address, RequestHandler)
                 except OSError as e:
                     # Ignore unsupported families (only one must work)
-                    if ((bind_ok or not is_last) and (
-                            isinstance(e, socket.gaierror) and (
-                                # Hostname does not exist or doesn't have
-                                # address for address family
-                                # macOS: IPv6 address for INET address family
-                                e.errno == socket.EAI_NONAME or
-                                # Address not for address family
-                                e.errno == COMPAT_EAI_ADDRFAMILY or
-                                e.errno == COMPAT_EAI_NODATA) or
-                            # Workaround for PyPy
-                            str(e) == "address family mismatched" or
-                            # Address family not available (e.g. IPv6 disabled)
-                            # macOS: IPv4 address for INET6 address family with
-                            #        IPV6_V6ONLY set
-                            e.errno == errno.EADDRNOTAVAIL or
-                            # Address family not supported
-                            e.errno == errno.EAFNOSUPPORT)):
+                    if (bind_ok or not is_last) and (
+                        isinstance(e, socket.gaierror)
+                        and (
+                            # Hostname does not exist or doesn't have
+                            # address for address family
+                            # macOS: IPv6 address for INET address family
+                            e.errno == socket.EAI_NONAME
+                            or
+                            # Address not for address family
+                            e.errno == COMPAT_EAI_ADDRFAMILY
+                            or e.errno == COMPAT_EAI_NODATA
+                        )
+                        or
+                        # Workaround for PyPy
+                        str(e) == "address family mismatched"
+                        or
+                        # Address family not available (e.g. IPv6 disabled)
+                        # macOS: IPv4 address for INET6 address family with
+                        #        IPV6_V6ONLY set
+                        e.errno == errno.EADDRNOTAVAIL
+                        or
+                        # Address family not supported
+                        e.errno == errno.EAFNOSUPPORT
+                    ):
                         continue
-                    raise RuntimeError("Failed to start server %r: %s" % (
-                                           format_address(address), e)) from e
+                    raise RuntimeError("Failed to start server %r: %s" % (format_address(address), e)) from e
                 servers[server.socket] = server
                 bind_ok = True
                 server.set_app(application)
-                logger.info("Listening on %r%s",
-                            format_address(server.server_address),
-                            " with SSL" if use_ssl else "")
+                logger.info("Listening on %r%s", format_address(server.server_address), " with SSL" if use_ssl else "")
         assert servers, "no servers started"
 
         # Mainloop

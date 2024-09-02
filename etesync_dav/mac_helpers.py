@@ -18,20 +18,19 @@ from datetime import datetime, timedelta
 from subprocess import check_call
 
 from cryptography import x509
-from cryptography.x509.oid import NameOID
-from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
 
-from etesync_dav.config import SSL_KEY_FILE, SSL_CERT_FILE
+from etesync_dav.config import SSL_CERT_FILE, SSL_KEY_FILE
 
-KEY_CIPHER = 'rsa'
+KEY_CIPHER = "rsa"
 KEY_SIZE = 4096
 KEY_DAYS = 3650  # That's 10 years.
 
-ON_MAC = sys.platform == 'darwin'
-ON_WINDOWS = sys.platform in ['win32', 'cygwin']
+ON_MAC = sys.platform == "darwin"
+ON_WINDOWS = sys.platform in ["win32", "cygwin"]
 
 
 class Error(Exception):
@@ -43,17 +42,17 @@ def has_ssl():
 
 
 def needs_ssl():
-    return (ON_MAC or ON_WINDOWS) and \
-        not has_ssl()
+    return (ON_MAC or ON_WINDOWS) and not has_ssl()
 
 
-def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
-                  key_size: int = KEY_SIZE, key_days: int = KEY_DAYS):
+def generate_cert(
+    cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE, key_size: int = KEY_SIZE, key_days: int = KEY_DAYS
+):
     if os.path.exists(key_path):
-        print('Skipping key generation as already exists.')
+        print("Skipping key generation as already exists.")
         return
 
-    hostname = 'localhost'
+    hostname = "localhost"
 
     key = rsa.generate_private_key(
         public_exponent=65537,
@@ -61,9 +60,7 @@ def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
         backend=default_backend(),
     )
 
-    name = x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, hostname)
-    ])
+    name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, hostname)])
 
     # best practice seem to be to include the hostname in the SAN, which *SHOULD* mean COMMON_NAME is ignored.
     alt_names = [x509.DNSName(hostname)]
@@ -92,31 +89,31 @@ def generate_cert(cert_path: str = SSL_CERT_FILE, key_path: str = SSL_KEY_FILE,
         encryption_algorithm=serialization.NoEncryption(),
     )
 
-    with open(key_path, 'wb') as f:
+    with open(key_path, "wb") as f:
         f.write(key_pem)
-    with open(cert_path, 'wb') as f:
+    with open(cert_path, "wb") as f:
         f.write(cert_pem)
 
 
 def macos_trust_cert(cert_path: str = SSL_CERT_FILE):
     if not ON_MAC:
-        raise Error('this is not macOS.')
-    check_call(['security', 'import', cert_path])
-    check_call(['security', 'add-trusted-cert', '-p', 'ssl', cert_path])
+        raise Error("this is not macOS.")
+    check_call(["security", "import", cert_path])
+    check_call(["security", "add-trusted-cert", "-p", "ssl", cert_path])
 
 
 def windows_trust_cert(cert_path: str = SSL_CERT_FILE):
     """Import given certificate into a certificate store."""
     if not ON_WINDOWS:
-        raise Error('this is not Windows.')
+        raise Error("this is not Windows.")
     check_call(
         [
-            'powershell.exe',
-            'Import-Certificate',
-            '-FilePath',
+            "powershell.exe",
+            "Import-Certificate",
+            "-FilePath",
             '"{}"'.format(cert_path),
-            '-CertStoreLocation',
-            r'Cert:\CurrentUser\Root',
+            "-CertStoreLocation",
+            r"Cert:\CurrentUser\Root",
         ]
     )
 
@@ -127,4 +124,4 @@ def trust_cert(cert_path: str = SSL_CERT_FILE):
     elif ON_MAC:
         macos_trust_cert(cert_path)
     else:
-        raise Error('Only supported on windows/macOS')
+        raise Error("Only supported on windows/macOS")

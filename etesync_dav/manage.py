@@ -12,18 +12,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import hashlib
 import os
 import random
 import string
 import time
-import hashlib
 
-import etesync as api
 import etebase as Etebase
+import etesync as api
+
+from etesync_dav.config import CREDS_FILE, DATA_DIR, ETESYNC_URL, HTPASSWD_FILE, LEGACY_CONFIG_DIR, LEGACY_ETESYNC_URL
+
+from . import local_cache
 from .radicale.creds import Credentials
 from .radicale.etesync_cache import etesync_for_user
-from . import local_cache
-from etesync_dav.config import CREDS_FILE, HTPASSWD_FILE, LEGACY_ETESYNC_URL, ETESYNC_URL, DATA_DIR, LEGACY_CONFIG_DIR
 
 
 class Htpasswd:
@@ -34,7 +36,7 @@ class Htpasswd:
     def load(self):
         if os.path.exists(self.filename):
             with open(self.filename, "r") as f:
-                self.content = dict(map(lambda x: x.strip(), line.split(':', 1)) for line in f)
+                self.content = dict(map(lambda x: x.strip(), line.split(":", 1)) for line in f)
         else:
             self.content = {}
 
@@ -58,13 +60,12 @@ class Htpasswd:
 
 
 class Manager:
-    def __init__(self,
-                 config_dir=DATA_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE):
-
+    def __init__(self, config_dir=DATA_DIR, htpasswd_file=HTPASSWD_FILE, creds_file=CREDS_FILE):
         if not os.path.exists(config_dir):
             # If the old dir still exists and the new one doesn't, mv the location
             if os.path.exists(LEGACY_CONFIG_DIR):
                 import shutil
+
                 shutil.move(LEGACY_CONFIG_DIR, DATA_DIR)
             else:
                 os.makedirs(config_dir, mode=0o700)
@@ -77,13 +78,14 @@ class Manager:
             self.htpasswd.save()
 
     def _generate_pasword(self):
-        return ''.join(
-                [random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16)])
+        return "".join(
+            [random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(16)]
+        )
 
     def validate_username(self, username):
         if username is None:
             raise RuntimeError("Username is required")
-        if ':' in username:
+        if ":" in username:
             raise RuntimeError("Username can't include a colon.")
         return self.htpasswd.get(username) is not None
 
@@ -112,7 +114,7 @@ class Manager:
         auth_token = api.Authenticator(remote_url).get_auth_token(username, login_password)
 
         print("Deriving password")
-        etesync = api.EteSync(username, auth_token, remote=remote_url, db_path=':memory:')
+        etesync = api.EteSync(username, auth_token, remote=remote_url, db_path=":memory:")
         cipher_key = etesync.derive_key(encryption_password)
 
         print("Saving config")
@@ -208,7 +210,7 @@ class Manager:
 
         try:
             with etesync_for_user(username) as (etesync, _):
-                if hasattr(etesync, 'clear_user'):
+                if hasattr(etesync, "clear_user"):
                     etesync.clear_user()
                 else:
                     # Legacy etesync, do manually:

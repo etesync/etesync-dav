@@ -12,11 +12,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import etesync as api
 from radicale import pathutils, rights
 
 from .etesync_cache import etesync_for_user
-
-import etesync as api
 
 
 class Rights(rights.BaseRights):
@@ -28,7 +27,7 @@ class Rights(rights.BaseRights):
         if not sane_path:
             return "R"
 
-        attributes = sane_path.split('/')
+        attributes = sane_path.split("/")
         if user != attributes[0]:
             return ""
 
@@ -42,8 +41,8 @@ class Rights(rights.BaseRights):
                 try:
                     journal = etesync.get(journal_uid)
                 except api.exceptions.DoesNotExist:
-                    return ''
+                    return ""
 
-            return 'rw' if not journal.read_only else 'r'
+            return "rw" if not journal.read_only else "r"
 
         return ""

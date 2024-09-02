@@ -12,17 +12,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from .creds import Credentials
-import threading
 import os
+import threading
 from contextlib import contextmanager
 
 import etesync as api
+
 from etesync_dav import config
 
-from .href_mapper import HrefMapper
-
 from ..local_cache import Etebase
+from .creds import Credentials
+from .href_mapper import HrefMapper
 
 
 class EteSync(api.EteSync):
@@ -47,8 +47,9 @@ class EteSyncCache:
                 etesync = self._etesync_cache[user]
                 if isinstance(etesync, Etebase) and (etesync.stored_session == self.creds.get_etebase(user)):
                     return etesync, False
-                elif isinstance(etesync, EteSync) and \
-                        ((etesync.auth_token, etesync.cipher_key) == self.creds.get(user)):
+                elif isinstance(etesync, EteSync) and (
+                    (etesync.auth_token, etesync.cipher_key) == self.creds.get(user)
+                ):
                     return etesync, False
                 else:
                     del self._etesync_cache[user]
@@ -62,7 +63,7 @@ class EteSyncCache:
         else:
             auth_token, cipher_key = self.creds.get(user)
 
-            db_name_unique = 'generic'
+            db_name_unique = "generic"
 
             db_path = self.db_path.format(db_name_unique)
 

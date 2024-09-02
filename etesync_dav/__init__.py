@@ -32,10 +32,10 @@ for details on the use of this package.
 
 """
 
-__copyright__ = 'Copyright (C) 2017-2021 Tom Hacohen'
-__version__ = '0.32.1'
-__license__ = 'GPL-3.0-only'
-__author__ = 'Tom Hacohen'
-__author_email__ = 'tom@stosb.com'
-__url__ = 'https://github.com/etesync/etesync-dav'
-__description__ = 'A CalDAV and CardDAV frontend for EteSync'
+__copyright__ = "Copyright (C) 2017-2021 Tom Hacohen"
+__version__ = "0.32.1"
+__license__ = "GPL-3.0-only"
+__author__ = "Tom Hacohen"
+__author_email__ = "tom@stosb.com"
+__url__ = "https://github.com/etesync/etesync-dav"
+__description__ = "A CalDAV and CardDAV frontend for EteSync"

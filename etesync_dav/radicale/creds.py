@@ -23,7 +23,7 @@ class Credentials:
     def __init__(self, filename):
         self.filename = filename
         self.last_mtime = 0
-        self.content = {'users': {}}
+        self.content = {"users": {}}
         self.load()
 
     def load(self):
@@ -39,46 +39,39 @@ class Credentials:
             json.dump(self.content, f)
 
     def get_server_url(self, username):
-        users = self.content['users']
+        users = self.content["users"]
         if username not in users:
             return None
 
         user = users[username]
-        return user.get('serverUrl', LEGACY_ETESYNC_URL)
+        return user.get("serverUrl", LEGACY_ETESYNC_URL)
 
     def get(self, username):
-        users = self.content['users']
+        users = self.content["users"]
         if username not in users:
             return None, None
 
         user = users[username]
-        return user['authToken'], base64.b64decode(user['cipherKey'])
+        return user["authToken"], base64.b64decode(user["cipherKey"])
 
     def set(self, username, auth_token, cipher_key, server_url):
-        users = self.content['users']
-        user = {
-                'authToken': auth_token,
-                'cipherKey': base64.b64encode(cipher_key).decode(),
-                'serverUrl': server_url
-            }
+        users = self.content["users"]
+        user = {"authToken": auth_token, "cipherKey": base64.b64encode(cipher_key).decode(), "serverUrl": server_url}
         users[username] = user
 
     def get_etebase(self, username):
-        users = self.content['users']
+        users = self.content["users"]
         if username not in users:
             return None
 
         user = users[username]
-        return user.get('storedSession', None)
+        return user.get("storedSession", None)
 
     def set_etebase(self, username, stored_session, server_url):
-        users = self.content['users']
-        user = {
-                'storedSession': stored_session,
-                'serverUrl': server_url
-            }
+        users = self.content["users"]
+        user = {"storedSession": stored_session, "serverUrl": server_url}
         users[username] = user
 
     def delete(self, username):
-        users = self.content['users']
+        users = self.content["users"]
         users.pop(username, None)
