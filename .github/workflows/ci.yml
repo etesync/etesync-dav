@@ -30,12 +30,11 @@ jobs:
       matrix:
         python:
           # Versions 3.0 - 3.5 are not provided by actions/python-versions
-          - '3.6'
-          - '3.7'
-          - '3.8'
           - '3.9'
           - '3.10'
-        os: [ubuntu-18.04, windows-latest, macos-latest]
+          - '3.11'
+          - '3.12'
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -44,7 +43,7 @@ jobs:
           fetch-depth: 5
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
 

@@ -11,17 +11,17 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     name: Code linting
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.21
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.7'
+          python-version: '3.12'
 
       - name: Update pip and install deps
         run: |
