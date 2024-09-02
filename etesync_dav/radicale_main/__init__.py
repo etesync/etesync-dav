@@ -30,10 +30,10 @@ import signal
 import socket
 import sys
 
-from . import server
-
 from radicale import VERSION, config, log, storage
 from radicale.log import logger
+
+from . import server
 
 
 def run(passed_args=None):
@@ -44,16 +44,13 @@ def run(passed_args=None):
     parser = argparse.ArgumentParser(usage="radicale [OPTIONS]")
 
     parser.add_argument("--version", action="version", version=VERSION)
-    parser.add_argument("--verify-storage", action="store_true",
-                        help="check the storage for errors and exit")
-    parser.add_argument(
-        "-C", "--config", help="use specific configuration files", nargs="*")
-    parser.add_argument("-D", "--debug", action="store_true",
-                        help="print debug information")
+    parser.add_argument("--verify-storage", action="store_true", help="check the storage for errors and exit")
+    parser.add_argument("-C", "--config", help="use specific configuration files", nargs="*")
+    parser.add_argument("-D", "--debug", action="store_true", help="print debug information")
 
     groups = {}
 
-    version_major, version_minor, _ = VERSION.split('.')
+    version_major, version_minor, _ = VERSION.split(".")
 
     for section, values in config.DEFAULT_CONFIG_SCHEMA.items():
         if section.startswith("_"):
@@ -80,10 +77,8 @@ def run(passed_args=None):
                     opposite_args.append("--no%s" % long_name[1:])
                     group.add_argument(*args, nargs="?", const="True", **kwargs)
                     # Opposite argument
-                    kwargs["help"] = "do not %s (opposite of %s)" % (
-                        kwargs["help"], long_name)
-                    group.add_argument(*opposite_args, action="store_const",
-                                       const="False", **kwargs)
+                    kwargs["help"] = "do not %s (opposite of %s)" % (kwargs["help"], long_name)
+                    group.add_argument(*opposite_args, action="store_const", const="False", **kwargs)
                 else:
                     del kwargs["type"]
                     kwargs["action"] = "store_const"
@@ -93,8 +88,7 @@ def run(passed_args=None):
                     group.add_argument(*args, **kwargs)
 
                     kwargs["const"] = "False"
-                    kwargs["help"] = "do not %s (opposite of %s)" % (
-                        kwargs["help"], long_name)
+                    kwargs["help"] = "do not %s (opposite of %s)" % (kwargs["help"], long_name)
                     group.add_argument(*opposite_args, **kwargs)
             else:
                 del kwargs["type"]
@@ -106,8 +100,7 @@ def run(passed_args=None):
     if args.debug:
         args.logging_level = "debug"
     with contextlib.suppress(ValueError):
-        log.set_level(config.DEFAULT_CONFIG_SCHEMA["logging"]["level"]["type"](
-            args.logging_level), True)
+        log.set_level(config.DEFAULT_CONFIG_SCHEMA["logging"]["level"]["type"](args.logging_level), True)
 
     # Update Radicale configuration according to arguments
     arguments_config = {}
@@ -117,15 +110,18 @@ def run(passed_args=None):
         for action in actions:
             value = getattr(args, action)
             if value is not None:
-                section_config[action.split('_', 1)[1]] = value
+                section_config[action.split("_", 1)[1]] = value
         if section_config:
             arguments_config[section] = section_config
 
     try:
-        configuration = config.load(config.parse_compound_paths(
-            config.DEFAULT_CONFIG_PATH,
-            os.environ.get("RADICALE_CONFIG"),
-            os.pathsep.join(args.config) if args.config else None))
+        configuration = config.load(
+            config.parse_compound_paths(
+                config.DEFAULT_CONFIG_PATH,
+                os.environ.get("RADICALE_CONFIG"),
+                os.pathsep.join(args.config) if args.config else None,
+            )
+        )
         if arguments_config:
             configuration.update(arguments_config, "arguments")
     except Exception as e:
@@ -148,8 +144,7 @@ def run(passed_args=None):
                     logger.fatal("Storage verifcation failed")
                     sys.exit(1)
         except Exception as e:
-            logger.fatal("An exception occurred during storage verification: "
-                         "%s", e, exc_info=True)
+            logger.fatal("An exception occurred during storage verification: " "%s", e, exc_info=True)
             sys.exit(1)
         return
 
@@ -159,14 +154,14 @@ def run(passed_args=None):
     # SIGTERM and SIGINT (aka KeyboardInterrupt) shutdown the server
     def shutdown(signal_number, stack_frame):
         shutdown_socket.close()
+
     signal.signal(signal.SIGTERM, shutdown)
     signal.signal(signal.SIGINT, shutdown)
 
     try:
         server.serve(configuration, shutdown_socket_out)
     except Exception as e:
-        logger.fatal("An exception occurred during server startup: %s", e,
-                     exc_info=True)
+        logger.fatal("An exception occurred during server startup: %s", e, exc_info=True)
         sys.exit(1)
 
 

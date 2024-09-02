@@ -1,11 +1,12 @@
 import re
 
+import vobject
 from radicale import pathutils
 from radicale.item import Item
 from radicale.storage import (
-        BaseCollection, ComponentNotFoundError,
-    )
-import vobject
+    BaseCollection,
+    ComponentNotFoundError,
+)
 
 from ..local_cache.models import HrefMapper
 
@@ -13,8 +14,8 @@ from ..local_cache.models import HrefMapper
 class MetaMapping:
     # Mappings between etesync meta and radicale
     _mappings = {
-            "D:displayname": ("name", None, None),
-        }
+        "D:displayname": ("name", None, None),
+    }
 
     @classmethod
     def _reverse_mapping(cls, mappings):
@@ -29,8 +30,8 @@ class MetaMapping:
         if get_transform is not None:
             value = get_transform(value)
 
-        if key == 'C:supported-calendar-component-set':
-            return key, getattr(self, 'supported_calendar_component', 'none')
+        if key == "C:supported-calendar-component-set":
+            return key, getattr(self, "supported_calendar_component", "none")
 
         return key, value
 
@@ -43,31 +44,35 @@ class MetaMapping:
 
 
 class MetaMappingCalendar(MetaMapping):
-    supported_calendar_component = 'VEVENT'
+    supported_calendar_component = "VEVENT"
     _mappings = MetaMapping._mappings.copy()
-    _mappings.update({
+    _mappings.update(
+        {
             "C:calendar-description": ("description", None, None),
             "ICAL:calendar-color": ("color", None, None),
-        })
+        }
+    )
     MetaMapping._reverse_mapping(_mappings)
 
 
 class MetaMappingTaskList(MetaMappingCalendar):
-    supported_calendar_component = 'VTODO'
+    supported_calendar_component = "VTODO"
 
 
 class MetaMappingContacts(MetaMapping):
     _mappings = MetaMapping._mappings.copy()
-    _mappings.update({
+    _mappings.update(
+        {
             "CR:addressbook-description": ("description", None, None),
-        })
+        }
+    )
     MetaMapping._reverse_mapping(_mappings)
 
 
 def _trim_suffix(path, suffixes):
     for suffix in suffixes:
         if path.endswith(suffix):
-            path = path[:-len(suffix)]
+            path = path[: -len(suffix)]
             break
 
     return path
@@ -82,8 +87,8 @@ def _get_attributes_from_path(path):
     return attributes
 
 
-VCARD_4_TO_3_PHOTO_URI_REGEX = re.compile(r'^(PHOTO|LOGO):http', re.MULTILINE)
-VCARD_4_TO_3_PHOTO_INLINE_REGEX = re.compile(r'^(PHOTO|LOGO):data:image/([^;]*);base64,', re.MULTILINE)
+VCARD_4_TO_3_PHOTO_URI_REGEX = re.compile(r"^(PHOTO|LOGO):http", re.MULTILINE)
+VCARD_4_TO_3_PHOTO_INLINE_REGEX = re.compile(r"^(PHOTO|LOGO):data:image/([^;]*);base64,", re.MULTILINE)
 
 
 class EteSyncItem(Item):
@@ -117,7 +122,7 @@ class EteSyncItem(Item):
         See ``find_tag_and_time_range``.
 
         """
-        self.etesync_item = kwargs.pop('etesync_item')
+        self.etesync_item = kwargs.pop("etesync_item")
         super().__init__(*args, **kwargs)
 
     @property
@@ -141,15 +146,15 @@ class Collection(BaseCollection):
             col_type = self.collection.col_type
             if col_type == "etebase.vevent":
                 self.meta_mappings = MetaMappingCalendar()
-                self.set_meta({'tag': 'VCALENDAR'})
+                self.set_meta({"tag": "VCALENDAR"})
                 self.content_suffix = ".ics"
             elif col_type == "etebase.vtodo":
                 self.meta_mappings = MetaMappingTaskList()
-                self.set_meta({'tag': 'VCALENDAR'})
+                self.set_meta({"tag": "VCALENDAR"})
                 self.content_suffix = ".ics"
             elif col_type == "etebase.vcard":
                 self.meta_mappings = MetaMappingContacts()
-                self.set_meta({'tag': 'VADDRESSBOOK'})
+                self.set_meta({"tag": "VADDRESSBOOK"})
                 self.content_suffix = ".vcf"
 
         else:
@@ -181,10 +186,10 @@ class Collection(BaseCollection):
         delta update. If sync token is missing, all items are returned.
         ValueError is raised for invalid or old tokens.
         """
-        token_prefix = 'http://radicale.org/ns/sync/'
+        token_prefix = "http://radicale.org/ns/sync/"
         token = None  # XXX "{}{}".format(token_prefix, self.etag.strip('"'))
         if old_token is not None and old_token.startswith(token_prefix):
-            old_token = old_token[len(token_prefix):]
+            old_token = old_token[len(token_prefix) :]
 
         # FIXME: actually implement filtering by token
         return token, self._list()
@@ -249,29 +254,29 @@ class Collection(BaseCollection):
         try:
             item = vobject.readOne(etesync_item.content)
             # XXX Hack: fake transform 4.0 vCards to 3.0 as 4.0 is not yet widely supported
-            if item.name == 'VCARD' and item.contents['version'][0].value == '4.0':
+            if item.name == "VCARD" and item.contents["version"][0].value == "4.0":
                 # Don't do anything for groups as transforming them won't help anyway.
-                if hasattr(item, 'kind') and item.kind.value.lower() == 'group':
+                if hasattr(item, "kind") and item.kind.value.lower() == "group":
                     pass
                 else:
                     # XXX must be first because we are editing the content and reparsing
-                    if 'photo' in item.contents:
+                    if "photo" in item.contents:
                         content = etesync_item.content
-                        content = VCARD_4_TO_3_PHOTO_URI_REGEX.sub(r'\1;VALUE=uri:', content)
-                        content = VCARD_4_TO_3_PHOTO_INLINE_REGEX.sub(r'\1;ENCODING=b;TYPE=\2:', content)
+                        content = VCARD_4_TO_3_PHOTO_URI_REGEX.sub(r"\1;VALUE=uri:", content)
+                        content = VCARD_4_TO_3_PHOTO_INLINE_REGEX.sub(r"\1;ENCODING=b;TYPE=\2:", content)
                         item = vobject.readOne(content)
                         if content == etesync_item.content:
                             # Delete the PHOTO if we haven't managed to convert it
-                            del item.contents['photo']
+                            del item.contents["photo"]
 
-                    item.contents['version'][0].value = '3.0'
+                    item.contents["version"][0].value = "3.0"
         except Exception as e:
-            raise RuntimeError("Failed to parse item %r in %r" %
-                               (href, self.path)) from e
-        last_modified = ''
+            raise RuntimeError("Failed to parse item %r in %r" % (href, self.path)) from e
+        last_modified = ""
 
-        return EteSyncItem(collection=self, vobject_item=item, href=href, last_modified=last_modified,
-                           etesync_item=etesync_item)
+        return EteSyncItem(
+            collection=self, vobject_item=item, href=href, last_modified=last_modified, etesync_item=etesync_item
+        )
 
     def upload(self, href, vobject_item):
         """Upload a new or replace an existing item."""
@@ -353,4 +358,4 @@ class Collection(BaseCollection):
     @property
     def last_modified(self):
         """Get the HTTP-datetime of when the collection was modified."""
-        return ' '
+        return " "

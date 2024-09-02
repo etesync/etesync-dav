@@ -13,7 +13,7 @@ class User(db.BaseModel):
 
 
 class CollectionEntity(db.BaseModel):
-    local_user = pw.ForeignKeyField(User, backref='collections', on_delete='CASCADE')
+    local_user = pw.ForeignKeyField(User, backref="collections", on_delete="CASCADE")
     # The uid of the collection (same as Etebase)
     uid = pw.CharField(null=False, index=True)
     eb_col = pw.BlobField()
@@ -24,13 +24,11 @@ class CollectionEntity(db.BaseModel):
     local_stoken = pw.CharField(null=True, default=None)
 
     class Meta:
-        indexes = (
-            (('local_user', 'uid'), True),
-        )
+        indexes = ((("local_user", "uid"), True),)
 
 
 class ItemEntity(db.BaseModel):
-    collection = pw.ForeignKeyField(CollectionEntity, backref='items', on_delete='CASCADE')
+    collection = pw.ForeignKeyField(CollectionEntity, backref="items", on_delete="CASCADE")
     # The uid of the content (vobject uid)
     uid = pw.CharField(null=False, index=True)
     eb_item = pw.BlobField()
@@ -39,11 +37,9 @@ class ItemEntity(db.BaseModel):
     deleted = pw.BooleanField(null=False, default=False)
 
     class Meta:
-        indexes = (
-            (('collection', 'uid'), True),
-        )
+        indexes = ((("collection", "uid"), True),)
 
 
 class HrefMapper(db.BaseModel):
-    content = pw.ForeignKeyField(ItemEntity, primary_key=True, backref='href', on_delete='CASCADE')
+    content = pw.ForeignKeyField(ItemEntity, primary_key=True, backref="href", on_delete="CASCADE")
     href = pw.CharField(null=False, index=True)

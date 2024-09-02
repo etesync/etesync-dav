@@ -49,6 +49,7 @@ jobs:
 
       - name: Minimal setuptools load-test
         run: |
+          python -m pip install setuptools
           python setup.py --fullname
           python setup.py --description
           python setup.py --long-description

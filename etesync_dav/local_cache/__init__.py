@@ -1,12 +1,11 @@
 import os
 
 import msgpack
+from etebase import Account, Client, CollectionAccessLevel, FetchOptions
 
-from etebase import Account, Client, FetchOptions, CollectionAccessLevel
 from etesync_dav import config
 
 from . import db, models
-
 
 COL_TYPES = ["etebase.vcard", "etebase.vevent", "etebase.vtodo"]
 
@@ -30,11 +29,12 @@ def msgpack_decode(content):
 def batch(iterable, n=1):
     length = len(iterable)
     for ndx in range(0, length, n):
-        yield iterable[ndx:min(ndx + n, length)]
+        yield iterable[ndx : min(ndx + n, length)]
 
 
 def get_millis():
     import time
+
     return int(round(time.time() * 1000))
 
 
@@ -65,26 +65,30 @@ class Etebase:
         from playhouse.sqlite_ext import SqliteExtDatabase
 
         directory = os.path.dirname(db_path)
-        if directory != '' and not os.path.exists(directory):
+        if directory != "" and not os.path.exists(directory):
             os.makedirs(directory)
 
-        database = SqliteExtDatabase(db_path, pragmas={
-            'journal_mode': 'wal',
-            'foreign_keys': 1,
-            })
+        database = SqliteExtDatabase(
+            db_path,
+            pragmas={
+                "journal_mode": "wal",
+                "foreign_keys": 1,
+            },
+        )
 
         self._set_db(database)
 
     def _init_db_tables(self, database, additional_tables=None):
         CURRENT_DB_VERSION = 1
 
-        database.create_tables([models.Config, models.User, models.CollectionEntity,
-                                models.ItemEntity, models.HrefMapper], safe=True)
+        database.create_tables(
+            [models.Config, models.User, models.CollectionEntity, models.ItemEntity, models.HrefMapper], safe=True
+        )
         if additional_tables:
             database.create_tables(additional_tables, safe=True)
 
         default_db_version = CURRENT_DB_VERSION
-        config, created = models.Config.get_or_create(defaults={'db_version': default_db_version})
+        config, created = models.Config.get_or_create(defaults={"db_version": default_db_version})
 
     def sync(self):
         self.sync_collection_list()
@@ -235,8 +239,12 @@ class Etebase:
         with db.database_proxy:
             col_mgr = self.etebase.get_collection_manager()
             try:
-                return Collection(col_mgr, self.user.collections.where(
-                    (models.CollectionEntity.uid == uid) & ~models.CollectionEntity.deleted).get())
+                return Collection(
+                    col_mgr,
+                    self.user.collections.where(
+                        (models.CollectionEntity.uid == uid) & ~models.CollectionEntity.deleted
+                    ).get(),
+                )
             except models.CollectionEntity.DoesNotExist as e:
                 raise DoesNotExist(e)
 
@@ -301,10 +309,10 @@ class Collection:
         with db.database_proxy:
             item_mgr = self.col_mgr.get_item_manager(self.col)
             try:
-                return Item(item_mgr,
-                            self.cache_col.items.where(
-                                (models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted
-                            ).get())
+                return Item(
+                    item_mgr,
+                    self.cache_col.items.where((models.ItemEntity.uid == uid) & ~models.ItemEntity.deleted).get(),
+                )
             except models.ItemEntity.DoesNotExist:
                 return None
 
@@ -323,7 +331,7 @@ class Item:
 
     @property
     def uid(self):
-        return self.meta['name']
+        return self.meta["name"]
 
     # FIXME: cache
     @property

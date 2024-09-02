@@ -12,11 +12,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import peewee as pw
-
 import etesync as api
+import peewee as pw
 
 
 class HrefMapper(api.db.BaseModel):
-    content = pw.ForeignKeyField(api.pim.Content, primary_key=True, backref='href', on_delete='CASCADE')
+    content = pw.ForeignKeyField(api.pim.Content, primary_key=True, backref="href", on_delete="CASCADE")
     href = pw.CharField(null=False, index=True)
