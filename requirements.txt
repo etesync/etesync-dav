@@ -103,7 +103,7 @@ vobject==0.9.6.1
     # via
     #   etesync
     #   radicale
-werkzeug==2.2.3
+werkzeug==3.0.3
     # via flask
 wtforms==3.0.1
     # via flask-wtf
