@@ -36,7 +36,7 @@ flask-wtf==0.15.1
     # via etesync-dav (setup.py)
 furl==2.1.3
     # via etesync
-idna==3.3
+idna==3.7
     # via
     #   etesync
     #   requests
