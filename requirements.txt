@@ -97,7 +97,7 @@ six==1.16.0
     #   furl
     #   orderedmultidict
     #   python-dateutil
-urllib3==1.26.7
+urllib3==1.26.19
     # via requests
 vobject==0.9.6.1
     # via
