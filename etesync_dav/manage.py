@@ -89,6 +89,12 @@ class Manager:
             raise RuntimeError("Username can't include a colon.")
         return self.htpasswd.get(username) is not None
 
+    def check_login(self, username, password) -> None:
+        server_url = self.creds.get_server_url(username)
+        client = Etebase.Client("etesync-dav", server_url)
+        etebase = Etebase.Account.login(client, username, password)
+        etebase.logout()
+
     def refresh_token(self, username, login_password):
         server_url = self.creds.get_server_url(username)
         stored_session = self.creds.get_etebase(username)

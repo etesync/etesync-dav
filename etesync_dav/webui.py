@@ -155,7 +155,7 @@ def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
         try:
-            manager.refresh_token(form.username.data, form.login_password.data)
+            manager.check_login(form.username.data, form.login_password.data)
             login_user(form.username.data)
             return redirect(url_for("account_list"))
         except Exception as e:
