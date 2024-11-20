@@ -18,7 +18,7 @@ cffi==1.15.0
     #   etesync
 charset-normalizer==2.0.9
     # via requests
-click==8.0.3
+click==8.1.7
     # via flask
 cryptography==42.0.4
     # via etesync
@@ -40,13 +40,13 @@ idna==3.7
     # via
     #   etesync
     #   requests
-itsdangerous==2.0.1
+itsdangerous==2.2.0
     # via
     #   flask
     #   flask-wtf
 jinja2==3.1.4
     # via flask
-markupsafe==2.0.1
+markupsafe==2.1.1
     # via
     #   jinja2
     #   wtforms
@@ -103,7 +103,7 @@ vobject==0.9.6.1
     # via
     #   etesync
     #   radicale
-werkzeug==3.0.3
+werkzeug==3.0.6
     # via flask
 wtforms==3.0.1
     # via flask-wtf
