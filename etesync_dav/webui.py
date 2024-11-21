@@ -60,7 +60,7 @@ else:
     app = Flask(__name__)
 
 app.route = prefix_route(app.route, "/.web")
-app.config['TRUSTED_HOSTS'] = LISTEN_ADDRESS
+app.config["TRUSTED_HOSTS"] = LISTEN_ADDRESS
 
 app.secret_key = os.urandom(32)
 CSRFProtect(app)

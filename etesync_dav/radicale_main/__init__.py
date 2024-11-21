@@ -35,6 +35,7 @@ from radicale.log import logger
 
 from . import server
 
+
 def run(passed_args=None):
     """Run Radicale as a standalone server."""
     log.setup()
