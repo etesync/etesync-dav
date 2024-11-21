@@ -24,7 +24,7 @@ from flask_wtf.csrf import CSRFProtect
 from wtforms import PasswordField, StringField, URLField
 from wtforms.validators import DataRequired, Optional, url
 
-from etesync_dav.config import ETESYNC_URL, LEGACY_ETESYNC_URL
+from etesync_dav.config import ETESYNC_URL, LEGACY_ETESYNC_URL, LISTEN_ADDRESS
 from etesync_dav.local_cache import Etebase
 from etesync_dav.mac_helpers import generate_cert, has_ssl, needs_ssl, trust_cert
 from etesync_dav.manage import Manager
@@ -36,7 +36,6 @@ manager = Manager()
 
 PORT = 37359
 BASE_URL = os.environ.get("ETESYNC_DAV_URL", "/")
-ETESYNC_LISTEN_ADDRESS = os.environ.get("ETESYNC_LISTEN_ADDRESS", "127.0.0.1")
 
 
 def prefix_route(route_function, prefix="", mask="{0}{1}"):
@@ -287,4 +286,4 @@ class AddUserLegacyForm(LoginForm):
 
 
 def run(debug=False):
-    app.run(debug=debug, host=ETESYNC_LISTEN_ADDRESS, port=PORT)
+    app.run(debug=debug, host=LISTEN_ADDRESS, port=PORT)
