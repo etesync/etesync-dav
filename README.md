@@ -35,6 +35,11 @@ For advanced usage and CLI instructions please refer to [the advanced usage sect
 
 Don't forget to set up EteSync to automatically start on startup. Instructions for this are unfortunately OS dependent and out of scope for this README.
 
+## Common environment variables
+
+* `ETESYNC_LISTEN_ADDRESS`: a hostname or IP address to listen on. Requests to a different host/ip will be block for the admin UI. Uses as the default value for the next setting.
+* `ETESYNC_SERVER_HOSTS`: defaults to `{ETESYNC_LISTEN_ADDRESS}:37358`. Otherwise, a list of IP masks, hostnames, and ports for the server to listen on. E.g. `0.0.0.0:37358,[::]:37358` for listening on all ipv4 and ipv6 addresses and port 37358, or `localhost:37358` to only allow requests from localhost.
+
 # Setting up clients
 
 You now need to set up your CalDAV/CardDAV client using your username and the password you got in the previous step.
