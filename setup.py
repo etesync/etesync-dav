@@ -106,9 +106,9 @@ INSTALL_REQUIRES = [
     "etesync>=0.12.1",
     "etebase>=0.30.0",
     "msgpack>=1.0.0",
-    "Radicale>=3.0.3,<3.2.0",
-    "Flask>=1.1.1",
-    "Flask-WTF>=0.14.2,<1.0.0",
+    "Radicale>=3.0.3,<3.4.0",
+    "Flask>=2.3.0",
+    "Flask-WTF>=1.2.0,<2.0.0",
     "requests[socks]>=2.21",
     'pyobjc-framework-Cocoa>=7.0.0 ; sys_platform=="darwin"',
 ]
