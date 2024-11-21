@@ -1,8 +1,10 @@
 # Changelog
 
+## Version 0.33.1
+* Fix build CI for building standalone apps.
+
 ## Version 0.33.0
-* SECURITY: fix login bypass issue (reported by Vít Šesták 'v6ak')
-  * This allowed attackers to bypass admin authentication in the web UI (requires the web UI to be enabled - on by default) by putting any password.
+* SECURITY: fix login bypass issue (reported by Vít Šesták 'v6ak'). This allowed attackers to bypass admin authentication in the web UI (requires the web UI to be enabled - on by default) by putting any password.
 * SECURITY: added DNS rebinding protection for the web UI (reported by Vít Šesták 'v6ak')
 * Support radicale 3.2.0 and 3.3.0
 * Upgrade a lot of dependencies and adjust code accordingly
