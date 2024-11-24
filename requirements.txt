@@ -57,7 +57,7 @@ msgpack==1.0.3
     # via
     #   etebase
     #   etesync-dav (setup.py)
-orderedmultidict==1.0.0
+orderedmultidict==1.0.1
     # via
     #   etesync
     #   furl
