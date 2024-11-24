@@ -1,7 +1,7 @@
 # Changelog
 
 ## Version 0.33.2
-* Downgrade orderedmultidict - should fix standalone builds.
+* Fix build for building standalone apps.
 
 ## Version 0.33.1
 * Fix build CI for building standalone apps.
