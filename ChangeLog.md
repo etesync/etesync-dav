@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.33.3
+* Use macOS 13 for building binaries, as macOS 10.15 seems to no longer be a valid Github target.
+
 ## Version 0.33.2
 * Fix build for building standalone apps.
 
