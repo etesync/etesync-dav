@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.33.4
+* Downgrade Radicale version requirements to 3.2.0 (there are issues with 3.3.0).
+
 ## Version 0.33.3
 * Use macOS 13 for building binaries, as macOS 10.15 seems to no longer be a valid Github target.
 
