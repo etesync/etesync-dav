@@ -16,6 +16,7 @@
 
 import codecs
 import re
+import platform
 from os import path
 
 from setuptools import find_packages, setup
@@ -111,6 +112,7 @@ INSTALL_REQUIRES = [
     "Flask-WTF>=1.2.0,<2.0.0",
     "requests[socks]>=2.21",
     'pyobjc-framework-Cocoa>=7.0.0 ; sys_platform=="darwin"',
+    'pyscrypt>=1.2.6 ; sys_platform=="darwin"'
 ]
 
 KEYWORDS = ["etesync", "encryption", "sync", "pim", "caldav", "carddav"]
