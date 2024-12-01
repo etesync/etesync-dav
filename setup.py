@@ -16,7 +16,6 @@
 
 import codecs
 import re
-import platform
 from os import path
 
 from setuptools import find_packages, setup
