@@ -4,6 +4,9 @@ on:
   create:
     tags:
       - v*
+  push:
+    branches:
+      - *
 
 jobs:
   build_pyinstaller:
@@ -11,7 +14,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        #        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
