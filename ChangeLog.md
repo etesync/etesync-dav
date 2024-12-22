@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.33.5
+* Fix build for building standalone apps with newer versions of radicale.
+
 ## Version 0.33.4
 * Downgrade Radicale version requirements to 3.2.0 (there are issues with 3.3.0).
 
