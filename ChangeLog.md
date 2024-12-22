@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.33.6
+* Fix build on macOS
+
 ## Version 0.33.5
 * Fix build for building standalone apps with newer versions of radicale.
 
