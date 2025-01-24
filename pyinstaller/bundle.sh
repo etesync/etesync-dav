@@ -22,7 +22,15 @@ pyinstaller \
 mkdir -p deploy
 if [ "$RUNNER_OS" = "Linux" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
-    mv dist/etesync-dav "deploy/linux-amd64-etesync-dav"
+    if [ "$ARCH" = "x86_64" ]; then
+        mv dist/etesync-dav "deploy/linux-amd64-etesync-dav"
+    elif [ "$ARCH" = "aarch64" ]; then
+        mv dist/etesync-dav "deploy/linux-arm64-etesync-dav"
+    else
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+    fi
+
 fi
 if [ "$RUNNER_OS" = "macOS" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
