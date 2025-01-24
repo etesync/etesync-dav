@@ -20,6 +20,7 @@ pyinstaller \
 
 # Travis stuff
 mkdir -p deploy
+ARCH=$(uname -m)
 if [ "$RUNNER_OS" = "Linux" ]; then
     ./dist/etesync-dav --version  # Sanity test on Linux and mac, can't do on windows
     if [ "$ARCH" = "x86_64" ]; then
