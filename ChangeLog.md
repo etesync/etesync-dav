@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.34.0
+* Enable ARM builds for Linux
+
 ## Version 0.33.6
 * Fix build on macOS
 
