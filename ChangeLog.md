@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.35.0
+* Fix Radicale 3.3.0 compatibility
+
 ## Version 0.34.0
 * Enable ARM builds for Linux
 
