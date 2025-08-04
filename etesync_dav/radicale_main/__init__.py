@@ -150,7 +150,7 @@ def run(passed_args=None):
                     logger.fatal("Storage verifcation failed")
                     sys.exit(1)
         except Exception as e:
-            logger.fatal("An exception occurred during storage verification: " "%s", e, exc_info=True)
+            logger.fatal("An exception occurred during storage verification: %s", e, exc_info=True)
             sys.exit(1)
         return
 

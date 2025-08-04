@@ -501,7 +501,7 @@ class Storage(BaseStorage):
         self._etesync_user_lock = threading.RLock()
         super().__init__(configuration)
 
-    def discover(self, path, depth="0", child_context_manager = None, user_groups = set([])):
+    def discover(self, path, depth="0", child_context_manager=None, user_groups=set([])):
         """Discover a list of collections under the given ``path``.
 
         If ``depth`` is "0", only the actual object under ``path`` is
