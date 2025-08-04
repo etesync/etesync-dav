@@ -33,7 +33,7 @@ for details on the use of this package.
 """
 
 __copyright__ = "Copyright (C) 2017-2024 Tom Hacohen"
-__version__ = "0.35.0"
+__version__ = "0.35.1"
 __license__ = "GPL-3.0-only"
 __author__ = "Tom Hacohen"
 __author_email__ = "tom@stosb.com"

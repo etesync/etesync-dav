@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 0.35.1
+* Bump to rebuild binaries.
+
 ## Version 0.35.0
 * Fix Radicale 3.3.0 compatibility
 
