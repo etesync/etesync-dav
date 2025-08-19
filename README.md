@@ -194,7 +194,7 @@ Install virtual env (for **Python 3**) from your package manager, for example:
 - Arch Linux: pacman -S python-virtualenv
 - Debian/Ubuntu: apt-get install python3-virtualenv
 
-The bellow commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
+The below commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
 
 Set up the virtual env:
 
