@@ -131,7 +131,7 @@ Or better yet, just use the [EteSync iOS client](https://github.com/etesync/ios)
 
 ## Autostart on system boot
 
-It's probably easiet to just follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) for setting up autostart. Alternatively, you can try following the instructions below.
+It's probably easier to just follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) for setting up autostart. Alternatively, you can try following the instructions below.
 
 ### Linux (systemd)
 
