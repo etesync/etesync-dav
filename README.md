@@ -213,7 +213,7 @@ Please note that you'll have to run `source venv/bin/activate` every time you'd 
 
 ## CLI
 
-1. Open a terminal and navigate to the binary's loctaion by typing `cd /path/to/file` (most likely `cd ~/Downloads`).
+1. Open a terminal and navigate to the binary's location by typing `cd /path/to/file` (most likely `cd ~/Downloads`).
 2. Rename the binary to `etesync-dav` for ease of use, by e.g: `mv linux-etesync-dav etesync-dav`
 3. Make it executable: `chmod +x etesync-dav`
 
