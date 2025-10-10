@@ -151,11 +151,11 @@ Follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-progr
 
 # Alternative Installation Methods
 
-This methods are not as easy as the pre-built binaries method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section below.
+This methods are not as easy as the pre-built binaries method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section.
 
 ## Docker
 
-Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
+Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section for more information.
 
     docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USERNAME
 
@@ -163,7 +163,7 @@ Run etesync-dav in a background docker container with configuration from previou
 
     docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
     
-After this, refer to the [Setting up clients](#setting-up-clients) section below and start using it!
+After this, refer to the [Setting up clients](#setting-up-clients) section and start using it!
 
 ### Updating
 
