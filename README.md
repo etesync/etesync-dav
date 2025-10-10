@@ -159,7 +159,7 @@ Run one time initial setup to persist the required configuration into a docker v
 
     docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USERNAME
 
-Run etesync-dav in a background docker container with configuration from previous step. This wil (re)start the container on boot and after crashes.
+Run etesync-dav in a background docker container with configuration from previous step. This will (re)start the container on boot and after crashes.
 
     docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
     
