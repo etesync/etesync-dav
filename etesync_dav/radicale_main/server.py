@@ -261,7 +261,7 @@ def serve(configuration, shutdown_socket):
         max_connections = configuration.get("server", "max_connections")
         logger.info("Radicale server ready")
         while True:
-            rlist = xlist = []
+            rlist, xlist = [], []
             # Wait for finished clients
             for server in servers.values():
                 rlist.extend(server.client_sockets)
