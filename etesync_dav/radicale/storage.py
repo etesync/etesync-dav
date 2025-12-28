@@ -605,7 +605,7 @@ class Storage(BaseStorage):
         raise NotImplementedError
 
     @contextmanager
-    def acquire_lock(self, mode, user=None):
+    def acquire_lock(self, mode, user=None, *args, **kwargs):
         """Set a context manager to lock the whole storage.
 
         ``mode`` must either be "r" for shared access or "w" for exclusive
