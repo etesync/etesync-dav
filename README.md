@@ -131,7 +131,7 @@ Or better yet, just use the [EteSync iOS client](https://github.com/etesync/ios)
 
 ## Autostart on system boot
 
-It's probably easiet to just follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) for setting up autostart. Alternatively, you can try following the instructions below.
+It's probably easier to just follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-program-run-at-startup-on-any-computer/) for setting up autostart. Alternatively, you can try following the instructions below.
 
 ### Linux (systemd)
 
@@ -151,19 +151,19 @@ Follow [these instructions](https://www.howtogeek.com/228467/how-to-make-a-progr
 
 # Alternative Installation Methods
 
-This methods are not as easy as the pre-built binaries method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section below.
+This methods are not as easy as the pre-built binaries method above, but are also simple. Please follow the instructions below, following which follow the instructions in the [Configuration and running](#configuration-and-running) section.
 
 ## Docker
 
-Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section below for more information.
+Run one time initial setup to persist the required configuration into a docker volume. Check out the configuration section for more information.
 
     docker run -it --rm -v etesync-dav:/data etesync/etesync-dav manage add USERNAME
 
-Run etesync-dav in a background docker container with configuration from previous step. This wil (re)start the container on boot and after crashes.
+Run etesync-dav in a background docker container with configuration from previous step. This will (re)start the container on boot and after crashes.
 
     docker run --name etesync-dav -d -v etesync-dav:/data -p 37358:37358 --restart=always etesync/etesync-dav
     
-After this, refer to the [Setting up clients](#setting-up-clients) section below and start using it!
+After this, refer to the [Setting up clients](#setting-up-clients) section and start using it!
 
 ### Updating
 
@@ -194,7 +194,7 @@ Install virtual env (for **Python 3**) from your package manager, for example:
 - Arch Linux: pacman -S python-virtualenv
 - Debian/Ubuntu: apt-get install python3-virtualenv
 
-The bellow commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
+The below commands will install etesync to a directory called `venv` in the local path. To install to a different location, just choose a different path in the commands below.
 
 Set up the virtual env:
 
@@ -213,7 +213,7 @@ Please note that you'll have to run `source venv/bin/activate` every time you'd 
 
 ## CLI
 
-1. Open a terminal and navigate to the binary's loctaion by typing `cd /path/to/file` (most likely `cd ~/Downloads`).
+1. Open a terminal and navigate to the binary's location by typing `cd /path/to/file` (most likely `cd ~/Downloads`).
 2. Rename the binary to `etesync-dav` for ease of use, by e.g: `mv linux-etesync-dav etesync-dav`
 3. Make it executable: `chmod +x etesync-dav`
 
