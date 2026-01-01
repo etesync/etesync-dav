@@ -53,13 +53,13 @@ elif os.name == "nt":
 
 
 class MyApplication(Application):
-    def do_POST(self, environ, base_prefix, path, user):
+    def do_POST(self, environ, base_prefix, path, user, remote_host="", user_agent=""):
         """Manage POST request."""
         # Dispatch .web URL to web module
         if path == "/.web" or path.startswith("/.web/"):
             return self._web.post(environ, base_prefix, path, user)
 
-        return super().do_POST(environ, base_prefix, path, user)
+        return super().do_POST(environ, base_prefix, path, user, remote_host, user_agent)
 
 
 def format_address(address):
