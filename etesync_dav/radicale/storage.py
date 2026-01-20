@@ -421,7 +421,7 @@ class Collection(BaseCollection):
             href_mapper = HrefMapper(content=etesync_item._cache_obj, href=href)
             href_mapper.save(force_insert=True)
 
-        return self._get(href)
+        return (self._get(href), item)
 
     def delete(self, href=None):
         """Delete an item.
