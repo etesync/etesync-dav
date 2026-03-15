@@ -1,6 +1,8 @@
 import re
 
 import vobject
+import radicale
+from packaging.version import Version
 from radicale import pathutils
 from radicale.item import Item
 from radicale.storage import (
@@ -294,7 +296,10 @@ class Collection(BaseCollection):
             href_mapper = HrefMapper(content=etesync_item.cache_item, href=href)
             href_mapper.save(force_insert=True)
 
-        return self._get(href)
+        uploaded = self._get(href)
+        if Version(radicale.VERSION) >= Version("3.5.5"):
+            return (uploaded, item)
+        return uploaded
 
     def delete(self, href=None):
         """Delete an item.

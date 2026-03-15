@@ -22,6 +22,8 @@ from contextlib import contextmanager
 
 import etesync as api
 import vobject
+import radicale
+from packaging.version import Version
 from radicale import pathutils
 from radicale.item import Item, get_etag
 from radicale.storage import (
@@ -421,7 +423,10 @@ class Collection(BaseCollection):
             href_mapper = HrefMapper(content=etesync_item._cache_obj, href=href)
             href_mapper.save(force_insert=True)
 
-        return self._get(href)
+        uploaded = self._get(href)
+        if Version(radicale.VERSION) >= Version("3.5.5"):
+            return (uploaded, item)
+        return uploaded
 
     def delete(self, href=None):
         """Delete an item.

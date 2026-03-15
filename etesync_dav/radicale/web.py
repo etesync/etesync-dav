@@ -12,6 +12,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import radicale
+from packaging.version import Version
 from radicale import web
 
 from etesync_dav.mac_helpers import has_ssl
@@ -31,10 +33,12 @@ class Web(web.BaseWeb):
             environ["wsgi.url_scheme"] = "https"
         body = list(app(environ, start_response))[0]
         ret_response.append(body)
+        if Version(radicale.VERSION) >= Version("3.5.10"):
+            ret_response.append(None)  # xml_request field
         return tuple(ret_response)
 
-    def get(self, environ, base_prefix, path, user):
+    def get(self, environ, base_prefix, path, user, *args, **kwargs):
         return self._call(environ, base_prefix, path, user)
 
-    def post(self, environ, base_prefix, path, user):
+    def post(self, environ, base_prefix, path, user, *args, **kwargs):
         return self._call(environ, base_prefix, path, user)
