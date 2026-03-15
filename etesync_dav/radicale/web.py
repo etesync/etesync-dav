@@ -37,8 +37,8 @@ class Web(web.BaseWeb):
             ret_response.append(None)  # xml_request field
         return tuple(ret_response)
 
-    def get(self, environ, base_prefix, path, user):
+    def get(self, environ, base_prefix, path, user, *args, **kwargs):
         return self._call(environ, base_prefix, path, user)
 
-    def post(self, environ, base_prefix, path, user):
+    def post(self, environ, base_prefix, path, user, *args, **kwargs):
         return self._call(environ, base_prefix, path, user)
