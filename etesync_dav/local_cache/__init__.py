@@ -62,7 +62,7 @@ class Etebase:
             self.user, created = models.User.get_or_create(username=self.username)
 
     def _init_db(self, db_path):
-        from playhouse.sqlite_ext import SqliteExtDatabase
+        from peewee import SqliteDatabase as SqliteExtDatabase
 
         directory = os.path.dirname(db_path)
         if directory != "" and not os.path.exists(directory):
