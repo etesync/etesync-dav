@@ -22,6 +22,7 @@ from contextlib import contextmanager
 
 import etesync as api
 import vobject
+from etebase import etebase_python
 from radicale import pathutils
 from radicale.item import Item, get_etag
 from radicale.storage import (
@@ -31,7 +32,7 @@ from radicale.storage import (
 )
 
 from ..local_cache import COL_TYPES, Etebase
-from .etesync_cache import etesync_for_user
+from .etesync_cache import etesync_for_user, refresh_etebase_token
 from .href_mapper import HrefMapper
 from .storage_etebase_collection import Collection as EtebaseCollection
 
@@ -74,14 +75,22 @@ class SyncThread(threading.Thread):
             raise e
         return ret
 
+    def sync_once(self):
+        with etesync_for_user(self.user) as (etesync, _):
+            self.last_sync = time.time()
+            self._done_syncing.clear()
+
+            try:
+                etesync.sync()
+            except etebase_python.Error as e:
+                if str(e) != "Invalid token." or not refresh_etebase_token(self.user):
+                    raise
+                etesync.sync()
+
     def run(self):
         while True:
             try:
-                with etesync_for_user(self.user) as (etesync, _):
-                    self.last_sync = time.time()
-                    self._done_syncing.clear()
-
-                    etesync.sync()
+                self.sync_once()
             except Exception as e:
                 # Print errors but keep on syncing in the background
                 logger.exception(e)
