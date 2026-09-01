@@ -77,6 +77,19 @@ class EteSyncCache:
 
         return etesync, True
 
+    def refresh_etebase_token(self, user):
+        etesync, _ = self.etesync_for_user(user)
+        if not isinstance(etesync, Etebase):
+            return False
+
+        etesync.etebase.fetch_token()
+        stored_session = etesync.etebase.save(None)
+        remote_url = self.creds.get_server_url(user)
+        self.creds.set_etebase(user, stored_session, remote_url)
+        self.creds.save()
+        etesync.stored_session = stored_session
+        return True
+
 
 _etesync_cache = EteSyncCache(
     creds_path=config.CREDS_FILE,
@@ -93,3 +106,8 @@ def etesync_for_user(user):
         ret = _etesync_cache.etesync_for_user(user)
 
     yield ret
+
+
+def refresh_etebase_token(user):
+    with _get_etesync_lock:
+        return _etesync_cache.refresh_etebase_token(user)
