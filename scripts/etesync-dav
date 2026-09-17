@@ -1,15 +1,23 @@
 #!/usr/bin/env python
 
+import logging
 import os
 import sys
-import logging
 
 import radicale
-from etesync_dav import radicale_main
 
-from etesync_dav.manage import Manager
-from etesync_dav.config import DATA_DIR, SERVER_HOSTS, HTPASSWD_FILE, SSL_KEY_FILE, SSL_CERT_FILE
+from etesync_dav import radicale_main
+from etesync_dav.config import (
+    DATA_DIR,
+    HTPASSWD_FILE,
+    LOG_FILE,
+    SERVER_HOSTS,
+    SSL_CERT_FILE,
+    SSL_KEY_FILE,
+    local_server_url,
+)
 from etesync_dav.mac_helpers import has_ssl
+from etesync_dav.manage import Manager
 
 logger = logging.getLogger('etesync-dav')
 
@@ -96,9 +104,15 @@ if len(sys.argv) > 1 and sys.argv[1] == '--version':
     print("Radicale version: ", radicale.VERSION)
     sys.exit(0)
 
-logfilename = os.getenv('ETESYNC_LOGFILE', None)
+first_run = not os.path.exists(DATA_DIR)
+if first_run:
+    Manager()
+
+logfilename = os.getenv('ETESYNC_LOGFILE')
+if logfilename is None and sys.platform == 'darwin':
+    logfilename = LOG_FILE
 if logfilename:
-    logfile = open(logfilename, 'a', encoding='utf-8')
+    logfile = open(logfilename, 'a', encoding='utf-8', buffering=1)
     sys.stdout = logfile
     sys.stderr = logfile
 
@@ -133,33 +147,27 @@ if has_ssl():
         '--server-certificate', SSL_CERT_FILE,
     ]
 
+scheme = 'https' if has_ssl() else 'http'
+admin_interface = local_server_url(scheme)
+
 # If first run:
-if not os.path.exists(DATA_DIR):
-    # Init data if no data dir
-    Manager()
+if first_run:
     # Attempt to run the default web browser
     import webbrowser
-    scheme = 'https' if has_ssl() else 'http'
-    url = 'localhost:37358'  # Not good to have it hardcoded, but will work for most people
-    admin_interface = '{}://{}'.format(scheme, url)
     try:
         webbrowser.open(admin_interface)
     except Exception as e:
         logger.exception(e)
 
 if sys.platform == 'darwin':
-    from threading import Thread
-    def machack():
-        try:
-            from PyObjCTools import AppHelper
-            AppHelper.runConsoleEventLoop()
-        except ImportError:
-            pass
+    from etesync_dav.mac_menu import run_menu_bar
 
-    thread = Thread(target=machack)
-    thread.setDaemon(True)
-    thread.start()
-
-radicale_main.run(radicale_args + sys.argv[1:])
+    run_menu_bar(
+        admin_interface,
+        lambda shutdown_socket: radicale_main.run(radicale_args + sys.argv[1:], shutdown_socket),
+        log_file=logfilename,
+    )
+else:
+    radicale_main.run(radicale_args + sys.argv[1:])
 
 sys.exit(0)

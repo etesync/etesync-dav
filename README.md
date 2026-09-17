@@ -189,6 +189,15 @@ You can either follow the Docker instructions above (get Docker [here](https://w
 
 ## Python virtual environment (Linux, BSD and Mac)
 
+The server writes an append-only log to `~/Library/Application Support/etesync-dav/etesync-dav.log`
+on macOS. Set `ETESYNC_LOGFILE` to use a different location.
+
+The macOS app runs without a Dock icon and provides a menu-bar entry for opening the
+management UI, starting on login, hiding the menu-bar entry, and quitting.
+It stays hidden when launched at login and is shown when launched from Finder; opening an
+already-running app from Finder also restores a hidden entry. The menu-bar entry is hidden
+at login only when **Settings → Hide from Menu Bar** is enabled.
+
 Install virtual env (for **Python 3**) from your package manager, for example:
 
 - Arch Linux: pacman -S python-virtualenv

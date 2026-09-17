@@ -29,6 +29,7 @@ import os
 import signal
 import socket
 import sys
+import threading
 
 from radicale import VERSION, config, log, storage
 from radicale.log import logger
@@ -36,7 +37,7 @@ from radicale.log import logger
 from . import server
 
 
-def run(passed_args=None):
+def run(passed_args=None, shutdown_socket=None):
     """Run Radicale as a standalone server."""
     log.setup()
 
@@ -154,21 +155,31 @@ def run(passed_args=None):
             sys.exit(1)
         return
 
-    # Create a socket pair to notify the server of program shutdown
-    shutdown_socket, shutdown_socket_out = socket.socketpair()
+    shutdown_socket_in = None
+    if shutdown_socket is None:
+        # Create a socket pair to notify the server of program shutdown.
+        shutdown_socket_in, shutdown_socket = socket.socketpair()
 
-    # SIGTERM and SIGINT (aka KeyboardInterrupt) shutdown the server
-    def shutdown(signal_number, stack_frame):
-        shutdown_socket.close()
+        # SIGTERM and SIGINT (aka KeyboardInterrupt) shutdown the server.
+        def shutdown(signal_number, stack_frame):
+            with contextlib.suppress(OSError):
+                shutdown_socket_in.close()
 
-    signal.signal(signal.SIGTERM, shutdown)
-    signal.signal(signal.SIGINT, shutdown)
+        if threading.current_thread() is threading.main_thread():
+            signal.signal(signal.SIGTERM, shutdown)
+            signal.signal(signal.SIGINT, shutdown)
 
     try:
-        server.serve(configuration, shutdown_socket_out)
+        server.serve(configuration, shutdown_socket)
     except Exception as e:
         logger.fatal("An exception occurred during server startup: %s", e, exc_info=True)
         sys.exit(1)
+    finally:
+        if shutdown_socket_in is not None:
+            with contextlib.suppress(OSError):
+                shutdown_socket_in.close()
+            with contextlib.suppress(OSError):
+                shutdown_socket.close()
 
 
 if __name__ == "__main__":

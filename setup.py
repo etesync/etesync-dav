@@ -104,13 +104,14 @@ def get_version_string():
 INSTALL_REQUIRES = [
     "appdirs>=1.4.3",
     "etesync>=0.12.1",
-    "etebase>=0.30.0",
+    "etebase @ git+https://github.com/etesync/etebase-py.git",
     "msgpack>=1.0.0",
     "Radicale>=3.0.3,<3.3.0",
     "Flask>=2.3.0",
     "Flask-WTF>=1.2.0,<2.0.0",
     "requests[socks]>=2.21",
     'pyobjc-framework-Cocoa>=7.0.0 ; sys_platform=="darwin"',
+    'pyobjc-framework-ServiceManagement>=7.0.0 ; sys_platform=="darwin"',
     'pyscrypt>=1.2.6 ; sys_platform=="darwin"',
 ]
 

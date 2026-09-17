@@ -13,6 +13,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+from urllib.parse import urlsplit
 
 from appdirs import user_config_dir, user_data_dir
 
@@ -35,3 +36,28 @@ CREDS_FILE = os.path.join(DATA_DIR, "etesync_creds")
 
 SSL_KEY_FILE = os.path.join(DATA_DIR, "etesync.key")
 SSL_CERT_FILE = os.path.join(DATA_DIR, "etesync.crt")
+LOG_FILE = os.path.join(DATA_DIR, "etesync-dav.log")
+
+
+def local_server_url(scheme):
+    """Return a browser-friendly URL for the first configured listener."""
+    listener = SERVER_HOSTS.split(",", 1)[0].strip()
+    try:
+        parsed = urlsplit("//{}".format(listener))
+        host = parsed.hostname
+        port = parsed.port
+    except ValueError:
+        host = None
+        port = None
+
+    if not host:
+        host = LISTEN_ADDRESS
+    if not port:
+        port = LISTEN_PORT
+
+    if host in {"0.0.0.0", "::", "[::]"}:
+        host = "localhost"
+    elif ":" in host:
+        host = "[{}]".format(host)
+
+    return "{}://{}:{}".format(scheme, host, port)
