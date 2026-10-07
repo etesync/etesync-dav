@@ -1,4 +1,5 @@
 import re
+from email.utils import formatdate
 
 import vobject
 from radicale import pathutils
@@ -272,7 +273,12 @@ class Collection(BaseCollection):
                     item.contents["version"][0].value = "3.0"
         except Exception as e:
             raise RuntimeError("Failed to parse item %r in %r" % (href, self.path)) from e
-        last_modified = ""
+        # radicale 3.8 asserts a non-empty Last-Modified in GET
+        try:
+            mtime = etesync_item.meta.get("mtime")
+        except Exception:
+            mtime = None
+        last_modified = formatdate(mtime / 1000 if mtime else None, usegmt=True)
 
         return EteSyncItem(
             collection=self, vobject_item=item, href=href, last_modified=last_modified, etesync_item=etesync_item
@@ -329,7 +335,11 @@ class Collection(BaseCollection):
             ret = {}
             meta = self.collection.meta
             for key in meta.keys():
-                ret[key] = self.meta_mappings.map_get(meta, key)[1]
+                # radicale 3.8 expects "NS:tag" property names here
+                dav_key = self.meta_mappings._mapping_get(key)[0]
+                if ":" not in dav_key:
+                    continue
+                ret[dav_key] = self.meta_mappings.map_get(meta, dav_key)[1]
             return ret
         else:
             meta = self.collection.meta
