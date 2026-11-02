@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.36.0
+* Fix compatibility with Radicale >= 3.5.1 and >= 3.5.9
+* Fix high CPU usage in the select() event loop
+* Upgrade etebase to 0.32.0 (fixes crashes with newer Python versions)
+* Bump cffi to 2.1.1
+
 ## Version 0.35.1
 * Bump to rebuild binaries.
 
