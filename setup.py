@@ -104,7 +104,7 @@ def get_version_string():
 INSTALL_REQUIRES = [
     "appdirs>=1.4.3",
     "etesync>=0.12.1",
-    "etebase>=0.30.0",
+    "etebase>=0.32.0",
     "msgpack>=1.0.0",
     "Radicale>=3.0.3,<3.3.0",
     "Flask>=2.3.0",

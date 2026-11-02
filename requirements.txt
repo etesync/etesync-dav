@@ -26,7 +26,7 @@ cryptography==42.0.4
     # via etesync
 defusedxml==0.7.1
     # via radicale
-etebase==0.31.5
+etebase==0.32.0
     # via etesync-dav (setup.py)
 etesync==0.12.1
     # via etesync-dav (setup.py)
